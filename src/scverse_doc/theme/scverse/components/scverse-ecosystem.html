@@ -1,0 +1,34 @@
+{#- The "scverse packages" dropdown.
+
+    Generated from the registry, so adding a package to scverse/ecosystem-packages makes it reachable from every
+    scverse docs site without any package touching its own conf.py.
+-#}
+{%- if theme_show_ecosystem_dropdown | tobool and scverse_ecosystem -%}
+<div class="dropdown scverse-ecosystem-dropdown">
+  <button
+    class="btn dropdown-toggle nav-link"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    aria-label="{{ _('scverse packages') }}"
+  >
+    {{ _("scverse packages") }}
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    {%- for group, label in [("core", _("Core")), ("ecosystem", _("Ecosystem"))] %}
+    {%- if scverse_ecosystem[group] %}
+    <li><h6 class="dropdown-header">{{ label }}</h6></li>
+    {%- for pkg in scverse_ecosystem[group] %}
+    <li>
+      <a
+        class="dropdown-item{% if pkg.current %} active{% endif %}"
+        href="{{ pkg.docs }}"
+        {% if pkg.current %}aria-current="page"{% endif %}
+      >{{ pkg.name }}</a>
+    </li>
+    {%- endfor %}
+    {%- endif %}
+    {%- endfor %}
+  </ul>
+</div>
+{%- endif -%}

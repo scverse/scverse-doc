@@ -16,20 +16,26 @@ authors = [
 ]
 requires-python = ">=3.12"
 classifiers = [
+  "Framework :: Sphinx :: Theme",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-  "anndata>=0.13",
-  # for debug logging (referenced from the issue template)
-  "session-info2",
+  "myst-nb>=1.1",
+  "pydata-sphinx-theme>=0.16",
+  "sphinx>=8.1",
+  "sphinx-copybutton",
+  "sphinx-design",
+  "sphinxext-opengraph",
 ]
 # https://docs.pypi.org/project_metadata/#project-urls
 urls.Documentation = "https://scverse-doc.readthedocs.io/"
 urls.Homepage = "https://github.com/scverse/scverse-doc"
 urls.Source = "https://github.com/scverse/scverse-doc"
+# Makes `html_theme = "scverse"` resolve after installation.
+entry-points."sphinx.html_themes".scverse = "scverse_doc"
 
 [dependency-groups]
 dev = [
@@ -39,23 +45,17 @@ dev = [
 ]
 test = [
   "coverage>=7.10",
+  "defusedxml",     # for sphinx.testing’s HTML assertions
   "pytest",
   "pytest-cov",     # For VS Code’s coverage functionality
+  "pyyaml",         # for the registry generator
 ]
 doc = [
   "ipykernel",
   "ipython",
-  "myst-nb>=1.1",
-  "pandas",
   "scverse-misc[sphinx]>=0.1.2",
-  "sphinx>=8.1",
   "sphinx-autodoc-typehints",
-  "sphinx-book-theme>=1",
-  "sphinx-copybutton",
-  "sphinx-design",
   "sphinxcontrib-bibtex>=1",
-  "sphinxcontrib-katex",
-  "sphinxext-opengraph",
 ]
 
 [tool.hatch]
@@ -115,6 +115,10 @@ lint.per-file-ignores."*/__init__.py" = [ "F401" ]
 lint.per-file-ignores."docs/*" = [ "I" ]
 lint.per-file-ignores."tests/*" = [ "D" ]
 lint.pydocstyle.convention = "numpy"
+
+[tool.mypy]
+# Fixture conf.py files all share the module name "conf".
+exclude = [ "tests/roots/" ]
 
 [tool.pytest]
 addopts = [

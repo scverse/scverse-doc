@@ -1,39 +1,31 @@
 # API
 
-## Preprocessing
+## Configuration
 
 ```{eval-rst}
-.. module:: scverse_doc.pp
 .. currentmodule:: scverse_doc
 
 .. autosummary::
     :toctree: generated
 
-    pp.basic_preproc
-    pp.elaborate_example
+    config.apply_defaults
 ```
 
-## Tools
+## Registry
 
 ```{eval-rst}
-.. module:: scverse_doc.tl
 .. currentmodule:: scverse_doc
 
 .. autosummary::
     :toctree: generated
 
-    tl.basic_tool
+    registry.packages
+    registry.core_packages
+    registry.get
+    registry.intersphinx
 ```
 
-## Plotting
-
 ```{eval-rst}
-.. module:: scverse_doc.pl
-.. currentmodule:: scverse_doc
-
-.. autosummary::
-    :toctree: generated
-
-    pl.basic_plot
-    pl.BasicClass
+.. autoclass:: scverse_doc.registry.Package
+    :members:
 ```

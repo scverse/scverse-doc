@@ -6,7 +6,18 @@
 [badge-tests]: https://img.shields.io/github/actions/workflow/status/scverse/scverse-doc/test.yaml?branch=main
 [badge-docs]: https://app.readthedocs.org/projects/scverse-doc/badge/
 
-Scverse documentation theme and utilities.
+The shared Sphinx theme and documentation configuration for scverse packages.
+
+Install it, and a package's `conf.py` becomes:
+
+```python
+extensions = ["scverse_doc"]
+html_theme = "scverse"
+
+html_theme_options = {"repo": "scverse/pertpy"}
+```
+
+That gets you the scverse brand and dark mode, the shared navbar, footer, and announcement banner, a "scverse packages" dropdown generated from the package registry, cross-links to every core package, and the standard extension stack.
 
 ## Getting started
 

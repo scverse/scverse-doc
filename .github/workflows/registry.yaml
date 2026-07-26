@@ -1,0 +1,60 @@
+name: Registry
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - src/scverse_doc/registry.json
+      - src/scverse_doc/theme/scverse/static/_tokens.css
+      - scripts/**
+
+permissions:
+  contents: read
+
+jobs:
+  regenerate:
+    name: Generated files match upstream
+    runs-on: ubuntu-latest
+    steps:
+      - &checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: scverse/ecosystem-packages
+          path: .upstream/ecosystem-packages
+          persist-credentials: false
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: scverse/scverse.github.io
+          path: .upstream/website
+          persist-credentials: false
+      - &setup-uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      - run: >
+          uv run --with pyyaml scripts/build_registry.py
+          --ecosystem .upstream/ecosystem-packages --website .upstream/website --check
+      - run: uv run scripts/sync_brand_tokens.py --website .upstream/website --check
+
+  inventories:
+    name: Inventories are reachable
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - *checkout
+      - *setup-uv
+      - run: uv run scripts/check_inventories.py --core-only | tee -a $GITHUB_STEP_SUMMARY
+      - if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title='Broken intersphinx inventory in the package registry'
+          if [ -z "$(gh issue list --label registry --state open --search "$title" --json number --jq '.[].number')" ]; then
+            gh issue create --title "$title" --label registry --body "A registry inventory stopped resolving. See $RUN_URL."
+          fi
