@@ -1,8 +1,7 @@
-"""Build-time hooks.
+"""The Sphinx extension.
 
-Only things that genuinely need to run during the build live here: the accent stylesheet (which depends on the
-package's colour and so cannot be a static file), the registry-driven navbar dropdown, and the guard that keeps
-packages from reaching past the config layer into base-theme options.
+Registers the theme, pulls in the extension stack, and fills in everything a scverse `conf.py` would otherwise
+repeat.
 """
 
 from __future__ import annotations
@@ -12,26 +11,21 @@ from shutil import rmtree
 from tempfile import mkdtemp
 from typing import TYPE_CHECKING, Any
 
-from sphinx.util import logging
-
 from ._color import derive_readable
-from .registry import DEFAULT_ACCENT, get, packages
+from .config import EXTENSIONS, _is_set_by_user, apply_defaults
+from .registry import DEFAULT_ACCENT, get, intersphinx, packages
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-logger = logging.getLogger(__name__)
-
 THEME_PATH = Path(__file__).parent / "theme" / "scverse"
 
-#: The backgrounds the derived accents must be readable on.
-#: These are `pydata-sphinx-theme`'s own page backgrounds; :mod:`scverse_doc._color` targets WCAG AA against them.
+#: `pydata-sphinx-theme`'s page backgrounds, which the derived accents must be readable on.
 LIGHT_BACKGROUND = "#ffffff"
 DARK_BACKGROUND = "#14181e"
 
 _ACCENT_CSS = """\
-/* GENERATED per build from the package accent — see scverse_doc._color. */
 html[data-theme="light"] {{
   --scverse-color-accent-decorative: {accent};
   --scverse-color-accent-text: {light};
@@ -42,30 +36,57 @@ html[data-theme="dark"] {{
 }}
 """
 
+_ICON_LINKS = (
+    {"name": "Discourse", "url": "https://discourse.scverse.org/", "icon": "fa-brands fa-discourse"},
+    {"name": "scverse", "url": "https://scverse.org/", "icon": "fa-solid fa-house"},
+)
+
+
+def _package_name(config: Config) -> str:
+    return str(config.html_theme_options.get("package") or config.project or "")
+
 
 def _accent(config: Config) -> str:
-    """Resolve the accent for this build, preferring an explicit override over the registry."""
-    options: dict[str, Any] = config.html_theme_options
-    if accent := options.get("scverse_accent"):
+    if accent := config.html_theme_options.get("accent"):
         return str(accent)
-    if (pkg := get(str(options.get("scverse_package", "")))) is not None:
+    if (pkg := get(_package_name(config))) is not None:
         return pkg.accent
     return DEFAULT_ACCENT
 
 
-def write_accent_stylesheet(app: Sphinx, config: Config) -> None:
-    """Emit the per-package accent stylesheet and register it.
+def _expand_repo(config: Config) -> None:
+    """Turn the single ``repo`` theme option into the GitHub chrome pydata expects."""
+    options = config.html_theme_options
+    icon_links = list(options.get("icon_links", []))
+    if repo := str(options.get("repo", "")):
+        owner, _, name = repo.partition("/")
+        icon_links.insert(0, {"name": "GitHub", "url": f"https://github.com/{repo}", "icon": "fa-brands fa-github"})
+        options.setdefault("use_edit_page_button", True)
+        config.html_context = {
+            "github_user": owner,
+            "github_repo": name,
+            "github_version": options.get("branch", "main"),
+            "doc_path": options.get("doc_path", "docs/"),
+            "default_mode": "auto",
+            **config.html_context,
+        }
+    options["icon_links"] = [*icon_links, *_ICON_LINKS]
 
-    The accent cannot be a static file because the readable variants depend on the package's colour, and it cannot be
-    inlined into the page because that would defeat caching.
-    So it is generated into a build-local static directory that is appended to `html_static_path`.
-    """
+
+def configure(app: Sphinx, config: Config) -> None:
+    """Apply the scverse defaults to a build that opted in via `html_theme`."""
     if config.html_theme != "scverse":
         return
 
+    apply_defaults(config)
+    _expand_repo(config)
+
+    if not _is_set_by_user(config, "intersphinx_mapping"):
+        config.intersphinx_mapping = intersphinx()
+    if not _is_set_by_user(config, "html_title"):
+        config.html_title = config.project
+
     accent = _accent(config)
-    # Not under outdir: Sphinx warns about static paths inside the output directory, and not under the source tree
-    # either, since generated files have no business being there.
     static_dir = Path(mkdtemp(prefix="scverse-doc-"))
     (static_dir / "scverse-accent.css").write_text(
         _ACCENT_CSS.format(
@@ -80,23 +101,6 @@ def write_accent_stylesheet(app: Sphinx, config: Config) -> None:
     app.connect("build-finished", lambda *_: rmtree(static_dir, ignore_errors=True))
 
 
-def check_owned_options(app: Sphinx, config: Config) -> None:
-    """Warn when a package configures the theme without going through the config layer.
-
-    A package that sets base-theme options directly stops inheriting improvements to them, which is the failure mode
-    this whole package exists to prevent.
-    """
-    if config.html_theme != "scverse":
-        return
-    if "scverse_package" not in config.html_theme_options:
-        logger.warning(
-            "html_theme_options was not produced by scverse_doc.config.theme_options(); "
-            "base-theme options set by hand will not track changes to the scverse theme",
-            type="scverse",
-            subtype="theme_options",
-        )
-
-
 def add_ecosystem_context(
     app: Sphinx,
     pagename: str,
@@ -107,7 +111,7 @@ def add_ecosystem_context(
     """Expose the registry to the navbar dropdown template."""
     if app.config.html_theme != "scverse":
         return
-    current = str(app.config.html_theme_options.get("scverse_package", "")).lower()
+    current = _package_name(app.config).lower()
     groups: dict[str, list[dict[str, Any]]] = {"core": [], "ecosystem": []}
     for pkg in packages().values():
         groups[pkg.kind].append({"name": pkg.name, "docs": pkg.docs, "current": pkg.name.lower() == current})
@@ -115,12 +119,14 @@ def add_ecosystem_context(
 
 
 def setup(app: Sphinx) -> dict[str, Any]:
-    """Register the theme and its build hooks."""
+    """Register the theme, the extension stack, and the build hooks."""
     app.add_html_theme("scverse", str(THEME_PATH))
     app.config.templates_path.append(str(THEME_PATH / "components"))
 
-    app.connect("config-inited", write_accent_stylesheet)
-    app.connect("config-inited", check_owned_options)
+    for extension in EXTENSIONS:
+        app.setup_extension(extension)
+
+    app.connect("config-inited", configure)
     app.connect("html-page-context", add_ecosystem_context)
 
     return {"parallel_read_safe": True, "parallel_write_safe": True}

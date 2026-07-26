@@ -1,6 +1,6 @@
 # API
 
-## Configuring a package
+## Configuration
 
 ```{eval-rst}
 .. currentmodule:: scverse_doc
@@ -8,9 +8,7 @@
 .. autosummary::
     :toctree: generated
 
-    setup_docs
-    config.defaults
-    config.theme_options
+    config.apply_defaults
 ```
 
 ## Registry

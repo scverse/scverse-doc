@@ -1,3 +1,4 @@
-from scverse_doc import setup_docs
-
-globals().update(setup_docs(package="pertpy", repo="scverse/pertpy", announcement=None))
+project = "pertpy"
+extensions = ["scverse_doc"]
+html_theme = "scverse"
+html_theme_options = {"repo": "scverse/pertpy", "announcement": ""}

@@ -11,9 +11,10 @@ The shared Sphinx theme and documentation configuration for scverse packages.
 Install it, and a package's `conf.py` becomes:
 
 ```python
-from scverse_doc import setup_docs
+extensions = ["scverse_doc"]
+html_theme = "scverse"
 
-globals().update(setup_docs(package="pertpy", repo="scverse/pertpy"))
+html_theme_options = {"repo": "scverse/pertpy"}
 ```
 
 That gets you the scverse brand and dark mode, the shared navbar, footer, and announcement banner, a "scverse packages" dropdown generated from the package registry, cross-links to every core package, and the standard extension stack.

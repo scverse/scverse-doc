@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING
 import pytest
 from sphinx.application import Sphinx
 
-from scverse_doc import setup_docs
-from scverse_doc.config import OWNED_THEME_OPTIONS
+from scverse_doc.config import DEFAULTS
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -87,16 +86,6 @@ def test_edit_button_is_derived_from_repo(minimal: tuple[Sphinx, str]) -> None:
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
 
 
-def test_hand_written_theme_options_warn(tmp_path: Path) -> None:
-    """A package that bypasses the config layer stops inheriting ecosystem-wide changes, so it is warned about."""
-    _, warnings = build_capturing_warnings(
-        ROOTS / "minimal",
-        tmp_path,
-        html_theme_options={"navbar_start": ["navbar-logo"]},
-    )
-    assert "not produced by scverse_doc.config.theme_options()" in warnings
-
-
 def test_config_layer_produces_no_warnings(tmp_path: Path) -> None:
     _, warnings = build_capturing_warnings(ROOTS / "minimal", tmp_path)
     # Building several Sphinx apps in one process re-registers nodes and directives; that noise is the harness.
@@ -104,12 +93,20 @@ def test_config_layer_produces_no_warnings(tmp_path: Path) -> None:
     assert real == []
 
 
-def test_owned_options_are_what_theme_options_sets() -> None:
-    """`OWNED_THEME_OPTIONS` must not drift from what the config layer actually produces."""
-    produced = setup_docs(package="pertpy", repo="scverse/pertpy")["html_theme_options"]
-    assert OWNED_THEME_OPTIONS - {"logo"} <= produced.keys()
+def test_defaults_are_applied(minimal: tuple[Sphinx, str]) -> None:
+    app, _ = minimal
+    assert app.config.napoleon_numpy_docstring is True
+    assert app.config.nb_execution_mode == "off"
 
 
-def test_theme_options_extra_warns_on_owned_keys() -> None:
-    with pytest.warns(UserWarning, match="owned by the scverse theme"):
-        setup_docs(package="pertpy", theme_options_extra={"navbar_start": []})
+def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
+    app, _ = build(ROOTS / "override", tmp_path)
+    assert app.config.nb_execution_mode == "force"
+    assert app.config.html_theme_options["show_toc_level"] == 4
+    assert app.config.napoleon_numpy_docstring is DEFAULTS["napoleon_numpy_docstring"]
+
+
+def test_theme_works_without_a_registry_entry(tmp_path: Path) -> None:
+    app, html = build(ROOTS / "override", tmp_path / "unregistered")
+    assert app.config.html_theme == "scverse"
+    assert "scverse-ecosystem-dropdown" in html
