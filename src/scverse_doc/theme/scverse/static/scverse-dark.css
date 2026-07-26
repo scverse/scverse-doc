@@ -10,21 +10,21 @@
  */
 
 html[data-theme="dark"] {
-  /* Lightened brand primary: #4557c4 only reaches 1.6:1 on #14181e, this reaches 4.5:1 while keeping the hue. */
-  --scverse-color-primary: #6b7ad0;
-  --scverse-color-gradient-start: #4557c4;
-  --scverse-color-gradient-end: #74c8fa;
+    /* Lightened brand primary: #4557c4 only reaches 1.6:1 on #14181e, this reaches 4.5:1 while keeping the hue. */
+    --scverse-color-primary: #6b7ad0;
+    --scverse-color-gradient-start: #4557c4;
+    --scverse-color-gradient-end: #74c8fa;
 
-  --scverse-color-heading: #f0f2f5;
-  --scverse-color-text-secondary: #ced6dd;
-  --scverse-color-text-muted: #9ca4af;
+    --scverse-color-heading: #f0f2f5;
+    --scverse-color-text-secondary: #ced6dd;
+    --scverse-color-text-muted: #9ca4af;
 
-  --scverse-color-surface: #222832;
-  --scverse-color-surface-alt: #1a1f27;
-  --scverse-color-border: #48566b;
+    --scverse-color-surface: #222832;
+    --scverse-color-surface-alt: #1a1f27;
+    --scverse-color-border: #48566b;
 
-  --scverse-color-code-bg: #1a1f27;
-  --scverse-color-code-text: #e7eaf0;
+    --scverse-color-code-bg: #1a1f27;
+    --scverse-color-code-text: #e7eaf0;
 
-  --scverse-color-footer-bg: #10141a;
+    --scverse-color-footer-bg: #10141a;
 }

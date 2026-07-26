@@ -33,7 +33,7 @@ TOKEN_MAP = {
     "tilebg4": "--scverse-color-surface-alt",
     "overline": "--scverse-color-border",
     "backtickbg": "--scverse-color-code-bg",
-    "backticktext": "--scverse-color-code-text",
+    "tiletext": "--scverse-color-code-text",
     "footerbg": "--scverse-color-footer-bg",
 }
 

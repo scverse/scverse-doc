@@ -16,7 +16,7 @@ import json
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
@@ -24,6 +24,13 @@ if TYPE_CHECKING:
 __all__ = ["Package", "core_packages", "get", "intersphinx", "packages"]
 
 _REGISTRY_PATH = Path(__file__).parent / "registry.json"
+
+
+class _RegistryFile(TypedDict):
+    core_intersphinx: list[str]
+    external: dict[str, str]
+    packages: dict[str, dict[str, Any]]
+
 
 #: The brand primary, used when a package has no accent of its own.
 DEFAULT_ACCENT = "#4557c4"
@@ -65,10 +72,11 @@ class Package:
 
 
 @cache
-def _load() -> dict[str, object]:
+def _load() -> _RegistryFile:
     """Read and cache the generated registry file."""
     with _REGISTRY_PATH.open() as f:
-        return json.load(f)
+        registry: _RegistryFile = json.load(f)
+    return registry
 
 
 @cache
@@ -79,8 +87,7 @@ def packages() -> Mapping[str, Package]:
     -------
     A mapping from package name to :class:`Package`, ordered case-insensitively by name.
     """
-    raw: dict[str, dict[str, str]] = _load()["packages"]  # type: ignore[assignment]
-    return {name: Package(**entry) for name, entry in raw.items()}
+    return {name: Package(**entry) for name, entry in _load()["packages"].items()}
 
 
 def core_packages() -> Mapping[str, Package]:
@@ -142,9 +149,9 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> dict[s
     data = _load()
     mapping: dict[str, tuple[str, None]] = {}
     if external:
-        mapping.update({name: (url, None) for name, url in data["external"].items()})  # type: ignore[union-attr]
+        mapping.update({name: (url, None) for name, url in data["external"].items()})
 
-    names: Iterable[str] = (*(data["core_intersphinx"] if core else ()), *extra)  # type: ignore[misc]
+    names: Iterable[str] = (*(data["core_intersphinx"] if core else ()), *extra)
     for name in names:
         if (pkg := get(name)) is None:
             msg = f"{name!r} is not in the scverse registry. Known packages: {', '.join(sorted(packages()))}"

@@ -89,7 +89,9 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
-          fail_ci_if_error: true
+          # Codecov answers "Repository not found" until scverse/scverse-doc is added there.
+          # Flip back to true once it is.
+          fail_ci_if_error: false
           use_oidc: true
 
   lint:

@@ -7,6 +7,12 @@ import pytest
 from scverse_doc.registry import DEFAULT_ACCENT, Package, core_packages, get, intersphinx, packages
 
 
+def require(name: str) -> Package:
+    pkg = get(name)
+    assert pkg is not None, name
+    return pkg
+
+
 def test_registry_is_populated() -> None:
     assert len(packages()) > 50
     assert set(core_packages()) < set(packages())
@@ -43,12 +49,12 @@ def test_lookup_is_case_insensitive() -> None:
 
 
 def test_accent_defaults_to_the_brand_primary() -> None:
-    assert get("annsel").accent == DEFAULT_ACCENT
-    assert get("scanpy").accent == "#de367b"
+    assert require("annsel").accent == DEFAULT_ACCENT
+    assert require("scanpy").accent == "#de367b"
 
 
 def test_inventory_override_is_used_where_the_listed_url_is_wrong() -> None:
-    mudata = get("mudata")
+    mudata = require("mudata")
     assert mudata.docs != mudata.inventory[0]
     assert mudata.inventory[0] == "https://mudata.readthedocs.io/stable/"
 
