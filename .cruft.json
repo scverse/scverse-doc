@@ -1,0 +1,44 @@
+{
+  "template": "https://github.com/scverse/cookiecutter-scverse",
+  "commit": "31733e798d89018e590c2586962c153d38057dad",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "scverse-doc",
+      "package_name": "scverse_doc",
+      "project_description": "Scverse documentation theme and utilities.",
+      "author_full_name": "Lukas Heumos",
+      "author_email": "lukas.heumos@scverse.org",
+      "github_user": "scverse",
+      "github_repo": "scverse-doc",
+      "license": "MIT License",
+      "ide_integration": true,
+      "issue_categorization": "issue types",
+      "_copy_without_render": [
+        ".github/workflows/build.yaml",
+        ".github/workflows/test.yaml",
+        "docs/_templates/autosummary/**.rst"
+      ],
+      "_exclude_on_template_update": [
+        "CHANGELOG.md",
+        "LICENSE",
+        "README.md",
+        "docs/api.md",
+        "docs/index.md",
+        "docs/notebooks/example.ipynb",
+        "docs/references.bib",
+        "docs/references.md",
+        "src/**",
+        "tests/**"
+      ],
+      "_render_devdocs": false,
+      "_jinja2_env_vars": {
+        "lstrip_blocks": true,
+        "trim_blocks": true
+      },
+      "_template": "https://github.com/scverse/cookiecutter-scverse",
+      "_commit": "31733e798d89018e590c2586962c153d38057dad"
+    }
+  },
+  "directory": null
+}
