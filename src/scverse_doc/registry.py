@@ -58,17 +58,10 @@ class Package:
     accent: str = DEFAULT_ACCENT
     """The package's brand accent, falling back to the scverse primary."""
 
-    inventory_url: str | None = None
-    """Base URL of ``objects.inv`` where it is not directly under `docs`.
-
-    Several packages list a landing page rather than the built documentation, or use Read the Docs' newer URL scheme
-    without the ``/en/`` segment.
-    """
-
     @property
     def inventory(self) -> tuple[str, None]:
         """The package's `intersphinx` target."""
-        return (self.inventory_url or self.docs, None)
+        return (self.docs, None)
 
 
 @cache

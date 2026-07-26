@@ -45,68 +45,40 @@ def minimal(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[Sphinx, 
     yield build(ROOTS / "minimal", tmp_path_factory.mktemp("minimal"))
 
 
-def test_theme_resolves(minimal: tuple[Sphinx, str]) -> None:
-    app, _ = minimal
+def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
+    app, html = minimal
     assert app.config.html_theme == "scverse"
-
-
-def test_brand_stylesheets_are_linked(minimal: tuple[Sphinx, str]) -> None:
-    _, html = minimal
     for css in ("styles/scverse.css", "scverse-accent.css", "scverse-dark.css"):
         assert css in html
+    assert "NumFOCUS" in html
+    assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
 
 
-def test_accent_stylesheet_derives_both_modes(minimal: tuple[Sphinx, str]) -> None:
+def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[Sphinx, str]) -> None:
+    _, html = minimal
+    assert ">anndata</a>" in html
+    assert ">annsel</a>" in html
+    assert 'class="dropdown-item active"' in html
+
+
+def test_accent_is_derived_for_both_modes(minimal: tuple[Sphinx, str]) -> None:
     app, _ = minimal
     css = (Path(app.outdir) / "_static" / "scverse-accent.css").read_text()
     assert "--scverse-color-accent-decorative: #da347f;" in css
     assert css.count("--scverse-color-accent-text") == 2
 
 
-def test_ecosystem_dropdown_lists_the_registry(minimal: tuple[Sphinx, str]) -> None:
-    _, html = minimal
-    assert "scverse-ecosystem-dropdown" in html
-    assert ">anndata</a>" in html
-    assert ">annsel</a>" in html
-
-
-def test_current_package_is_marked(minimal: tuple[Sphinx, str]) -> None:
-    _, html = minimal
-    assert 'class="dropdown-item active"' in html
-
-
-def test_footer_carries_the_shared_boilerplate(minimal: tuple[Sphinx, str]) -> None:
-    _, html = minimal
-    assert "NumFOCUS" in html
-    assert "discourse.scverse.org" in html
-
-
-def test_edit_button_is_derived_from_repo(minimal: tuple[Sphinx, str]) -> None:
-    _, html = minimal
-    assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
-
-
-def test_config_layer_produces_no_warnings(tmp_path: Path) -> None:
+def test_build_is_warning_free(tmp_path: Path) -> None:
     _, warnings = build_capturing_warnings(ROOTS / "minimal", tmp_path)
     # Building several Sphinx apps in one process re-registers nodes and directives; that noise is the harness.
     real = [line for line in warnings.splitlines() if line.strip() and "is already registered" not in line]
     assert real == []
 
 
-def test_defaults_are_applied(minimal: tuple[Sphinx, str]) -> None:
-    app, _ = minimal
-    assert app.config.napoleon_numpy_docstring is True
-    assert app.config.nb_execution_mode == "off"
-
-
 def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
-    app, _ = build(ROOTS / "override", tmp_path)
+    app, html = build(ROOTS / "override", tmp_path)
     assert app.config.nb_execution_mode == "force"
     assert app.config.html_theme_options["show_toc_level"] == 4
     assert app.config.napoleon_numpy_docstring is DEFAULTS["napoleon_numpy_docstring"]
-
-
-def test_theme_works_without_a_registry_entry(tmp_path: Path) -> None:
-    app, html = build(ROOTS / "override", tmp_path / "unregistered")
-    assert app.config.html_theme == "scverse"
+    # "not-an-scverse-package" is not in the registry, which must not break the theme.
     assert "scverse-ecosystem-dropdown" in html

@@ -32,7 +32,7 @@
     "AnnData": {
       "name": "AnnData",
       "kind": "ecosystem",
-      "docs": "https://anndata.readthedocs.io/",
+      "docs": "https://anndata.scverse.org/en/stable/",
       "repo": "https://github.com/scverse/anndata",
       "description": "anndata is a Python package for handling annotated data matrices in memory and on disk, positioned between pandas and xarray. anndata offers a broad range of computationally efficient features including, among others, sparse data support, lazy operations, and GPU support.",
       "accent": "#e5864b"
@@ -40,7 +40,7 @@
     "anndata": {
       "name": "anndata",
       "kind": "core",
-      "docs": "https://anndata.readthedocs.io/en/latest/",
+      "docs": "https://anndata.scverse.org/en/stable/",
       "repo": "https://github.com/theislab/anndata",
       "description": "Standard for annotated matrices",
       "accent": "#e5864b"
@@ -370,20 +370,18 @@
     "MuData": {
       "name": "MuData",
       "kind": "ecosystem",
-      "docs": "https://mudata.readthedocs.io/",
+      "docs": "https://mudata.readthedocs.io/stable/",
       "repo": "https://github.com/scverse/mudata",
       "description": "MuData is a format for annotated multimodal datasets where each modality is represented by an AnnData object. MuData's reference implementation is in Python, and the cross-language functionality is achieved via HDF5-based .h5mu files with libraries in R and Julia.",
-      "accent": "#4ab274",
-      "inventory_url": "https://mudata.readthedocs.io/stable/"
+      "accent": "#4ab274"
     },
     "mudata": {
       "name": "mudata",
       "kind": "core",
-      "docs": "https://mudata.readthedocs.io/en/latest/",
+      "docs": "https://mudata.readthedocs.io/stable/",
       "repo": "https://github.com/scverse/mudata",
       "description": "Multimodal data format",
-      "accent": "#4ab274",
-      "inventory_url": "https://mudata.readthedocs.io/stable/"
+      "accent": "#4ab274"
     },
     "Multivelo": {
       "name": "Multivelo",
@@ -602,7 +600,7 @@
     "Scanpy": {
       "name": "Scanpy",
       "kind": "ecosystem",
-      "docs": "https://scanpy.readthedocs.io/",
+      "docs": "https://scanpy.scverse.org/en/stable/",
       "repo": "https://github.com/scverse/scanpy",
       "description": "Scanpy is a scalable toolkit for analyzing single-cell gene expression data built jointly with anndata. It includes preprocessing, visualization, clustering, trajectory inference and differential expression testing. The Python-based implementation efficiently deals with datasets of more than one million cells.",
       "accent": "#de367b"
@@ -610,7 +608,7 @@
     "scanpy": {
       "name": "scanpy",
       "kind": "core",
-      "docs": "https://scanpy.readthedocs.io/en/latest/",
+      "docs": "https://scanpy.scverse.org/en/stable/",
       "repo": "https://github.com/theislab/scanpy",
       "description": "Single-cell analysis framework",
       "accent": "#de367b"
@@ -667,20 +665,18 @@
     "Scirpy": {
       "name": "Scirpy",
       "kind": "ecosystem",
-      "docs": "https://scirpy.scverse.org/",
+      "docs": "https://scirpy.scverse.org/en/stable/",
       "repo": "https://github.com/scverse/scirpy",
       "description": "Scirpy is a scalable toolkit to analyse T-cell receptor or B-cell receptor repertoires from single-cell RNA sequencing data. It seamlessly integrates with scanpy and provides various modules for data import, analysis and visualization.",
-      "accent": "#da347f",
-      "inventory_url": "https://scirpy.scverse.org/en/latest/"
+      "accent": "#da347f"
     },
     "scirpy": {
       "name": "scirpy",
       "kind": "core",
-      "docs": "https://scirpy.scverse.org/",
+      "docs": "https://scirpy.scverse.org/en/stable/",
       "repo": "https://github.com/icbi-lab/scirpy",
       "description": "Single-cell immune sequencing framework",
-      "accent": "#da347f",
-      "inventory_url": "https://scirpy.scverse.org/en/latest/"
+      "accent": "#da347f"
     },
     "scmcp": {
       "name": "scmcp",
@@ -734,11 +730,10 @@
     "scvi-tools": {
       "name": "scvi-tools",
       "kind": "core",
-      "docs": "https://scvi-tools.org/",
+      "docs": "https://docs.scvi-tools.org/en/stable/",
       "repo": "https://github.com/yoseflab/scvi-tools",
       "description": "Machine learning model development library and model zoo",
-      "accent": "#fbb822",
-      "inventory_url": "https://docs.scvi-tools.org/en/stable/"
+      "accent": "#fbb822"
     },
     "scxmatch": {
       "name": "scxmatch",
@@ -806,7 +801,7 @@
     "SpatialData": {
       "name": "SpatialData",
       "kind": "ecosystem",
-      "docs": "https://spatialdata.scverse.org/",
+      "docs": "https://spatialdata.scverse.org/en/stable/",
       "repo": "https://github.com/scverse/spatialdata",
       "description": "SpatialData is a data framework that comprises a FAIR storage format and a collection of python libraries for performant access, alignment, and processing of uni- and multi-modal spatial omics datasets.",
       "accent": "#40a9ff"
@@ -814,7 +809,7 @@
     "spatialdata": {
       "name": "spatialdata",
       "kind": "core",
-      "docs": "https://spatialdata.scverse.org/en/latest/",
+      "docs": "https://spatialdata.scverse.org/en/stable/",
       "repo": "https://github.com/scverse/spatialdata",
       "description": "Data format for data with spatial resolution",
       "accent": "#40a9ff"
@@ -836,20 +831,18 @@
     "Squidpy": {
       "name": "Squidpy",
       "kind": "ecosystem",
-      "docs": "https://squidpy.readthedocs.io/",
+      "docs": "https://squidpy.readthedocs.io/en/stable/",
       "repo": "https://github.com/scverse/squidpy",
       "description": "Squidpy is a tool for the analysis and visualization of spatial molecular data. It builds on top of scanpy and anndata, from which it inherits modularity and scalability. It provides analysis tools that leverages the spatial coordinates of the data, as well as tissue images if available.",
-      "accent": "#969dea",
-      "inventory_url": "https://squidpy.readthedocs.io/en/stable/"
+      "accent": "#969dea"
     },
     "squidpy": {
       "name": "squidpy",
       "kind": "core",
-      "docs": "https://squidpy.readthedocs.io/",
+      "docs": "https://squidpy.readthedocs.io/en/stable/",
       "repo": "https://github.com/theislab/squidpy",
       "description": "Spatial Single Cell Analysis",
-      "accent": "#969dea",
-      "inventory_url": "https://squidpy.readthedocs.io/en/stable/"
+      "accent": "#969dea"
     },
     "stats": {
       "name": "stats",

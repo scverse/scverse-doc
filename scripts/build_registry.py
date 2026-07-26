@@ -49,17 +49,15 @@ ACCENTS = {
     "squidpy": "#969dea",
 }
 
-#: Packages whose ``objects.inv`` does not sit under the documentation URL the upstream listings record.
-#: Usually because the listing points at a landing page or at Read the Docs' older ``/en/<version>/`` URL scheme.
-#: Verified with :mod:`urllib` against the live sites; the nightly inventory check keeps them honest.
-INVENTORY_OVERRIDES = {
-    # Read the Docs' newer URL scheme drops the /en/ segment.
+#: Canonical documentation URLs, where the upstream listing records a landing page, an outdated host, or a
+#: version scheme its ``objects.inv`` does not live under. Verified against the live sites.
+CANONICAL_DOCS = {
+    "anndata": "https://anndata.scverse.org/en/stable/",
     "mudata": "https://mudata.readthedocs.io/stable/",
-    # scirpy.scverse.org/ serves a landing page; the built docs are one level down.
-    "scirpy": "https://scirpy.scverse.org/en/latest/",
-    # scvi-tools.org is the project website, the docs are on a separate host.
+    "scanpy": "https://scanpy.scverse.org/en/stable/",
+    "scirpy": "https://scirpy.scverse.org/en/stable/",
     "scvi-tools": "https://docs.scvi-tools.org/en/stable/",
-    # squidpy.readthedocs.io/ redirects to the versioned root, which the listing omits.
+    "spatialdata": "https://spatialdata.scverse.org/en/stable/",
     "squidpy": "https://squidpy.readthedocs.io/en/stable/",
 }
 
@@ -117,8 +115,7 @@ def build(ecosystem: Path, website: Path) -> dict[str, Any]:
         entry["docs"] = entry["docs"].rstrip("/") + "/"
         if accent := ACCENTS.get(entry["name"].lower()):
             entry["accent"] = accent
-        if inventory := INVENTORY_OVERRIDES.get(entry["name"].lower()):
-            entry["inventory_url"] = inventory
+        entry["docs"] = CANONICAL_DOCS.get(entry["name"].lower(), entry["docs"])
         packages[entry["name"]] = entry
     # Every core package is cross-linkable out of the box: they are the ones scverse docs actually link to, and the
     # ecosystem's 80 entries stay opt-in so a cold build does not fetch 92 inventories.
