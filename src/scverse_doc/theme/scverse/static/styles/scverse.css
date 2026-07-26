@@ -1,0 +1,129 @@
+/*
+ * scverse theme — brand tokens mapped onto pydata-sphinx-theme, plus component styling.
+ *
+ * Rules of the road for editing this file:
+ *
+ * 1. Never hardcode a hex value here. Use a token from _tokens.css, which is generated from the website.
+ * 2. Dark mode overrides *tokens*, not component rules. If a component needs a dark-specific rule, the token
+ *    vocabulary is missing something — add the token instead.
+ * 3. The raw package accent is decorative only. Text and links use the derived --scverse-color-accent-text, which
+ *    the build guarantees meets WCAG AA against the current background. See scverse_doc._color.
+ */
+
+@import url("../_tokens.css");
+
+html[data-theme="light"] {
+  --pst-color-primary: var(--scverse-color-primary);
+  --pst-color-secondary: var(--scverse-color-accent-text);
+  --pst-color-link: var(--scverse-color-accent-text);
+  --pst-color-link-hover: var(--scverse-color-primary);
+  --pst-color-inline-code: var(--scverse-color-code-text);
+  --pst-color-surface: var(--scverse-color-surface);
+  --pst-color-border: var(--scverse-color-border);
+  --pst-color-text-muted: var(--scverse-color-text-muted);
+  --pst-heading-color: var(--scverse-color-heading);
+}
+
+html[data-theme="dark"] {
+  --pst-color-primary: var(--scverse-color-primary);
+  --pst-color-secondary: var(--scverse-color-accent-text);
+  --pst-color-link: var(--scverse-color-accent-text);
+  --pst-color-link-hover: var(--scverse-color-primary);
+  --pst-color-inline-code: var(--scverse-color-code-text);
+  --pst-color-surface: var(--scverse-color-surface);
+  --pst-color-border: var(--scverse-color-border);
+  --pst-color-text-muted: var(--scverse-color-text-muted);
+  --pst-heading-color: var(--scverse-color-heading);
+}
+
+html {
+  --pst-font-family-base: var(--scverse-font-body);
+  --pst-font-family-heading: var(--scverse-font-body);
+  --pst-font-family-monospace: var(--scverse-font-mono);
+}
+
+/* --- Navbar ------------------------------------------------------------- */
+
+.bd-header .navbar-nav > li.current > a,
+.bd-header .navbar-nav > li > a:hover {
+  border-bottom: 2px solid var(--scverse-color-accent-decorative);
+}
+
+.navbar-brand img {
+  max-height: 2.2rem;
+}
+
+.scverse-ecosystem-dropdown .dropdown-menu {
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: var(--scverse-radius);
+  box-shadow: var(--scverse-shadow);
+}
+
+.scverse-ecosystem-dropdown .dropdown-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pst-color-text-muted);
+}
+
+/* --- Cards -------------------------------------------------------------- */
+
+.sd-card {
+  border-radius: var(--scverse-radius);
+  border-color: var(--pst-color-border);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.sd-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--scverse-shadow);
+}
+
+.sd-card .sd-card-title {
+  color: var(--pst-heading-color);
+}
+
+.bd-content .sd-card:hover .sd-card-title {
+  color: var(--scverse-color-accent-text);
+}
+
+/* --- Code --------------------------------------------------------------- */
+
+code.literal {
+  background-color: var(--scverse-color-code-bg);
+  border-color: var(--pst-color-border);
+  border-radius: calc(var(--scverse-radius) / 2);
+}
+
+/* --- Footer ------------------------------------------------------------- */
+
+.bd-footer {
+  background-color: var(--scverse-color-footer-bg);
+  border-top: 1px solid var(--pst-color-border);
+}
+
+.scverse-footer-brand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--pst-color-text-muted);
+}
+
+/* --- Version badges ----------------------------------------------------- */
+
+.sd-badge.scverse-experimental {
+  background-color: var(--scverse-color-gradient-end);
+  color: #000;
+}
+
+.sd-badge.scverse-deprecated {
+  background-color: var(--scverse-color-text-muted);
+  color: #fff;
+}

@@ -1,0 +1,20 @@
+{#- Shared footer: the boilerplate every scverse README already carries, rendered identically on every docs site. -#}
+<div class="scverse-footer-brand">
+  <span>
+    {%- if show_copyright and copyright %}&copy; {{ copyright }}{% endif -%}
+  </span>
+  <span>
+    <a href="https://scverse.org/">scverse</a> is a
+    <a href="https://numfocus.org/">NumFOCUS</a> affiliated project.
+  </span>
+  <span>
+    <a href="https://scverse.org/about/roles/">Governance</a>
+    &middot;
+    <a href="https://discourse.scverse.org/">Discourse</a>
+    &middot;
+    <a href="https://scverse.org/join/">Get involved</a>
+  </span>
+  {%- if last_updated %}
+  <span>{% trans last_updated=last_updated|e %}Last updated on {{ last_updated }}.{% endtrans %}</span>
+  {%- endif %}
+</div>
