@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["pyyaml"]
+# ///
 """Regenerate `scverse_doc/registry.json` from the upstream sources of truth.
 
 There are two of them, and neither is this repository:
@@ -13,7 +17,7 @@ package listing.
 
 Usage
 -----
-    python scripts/build_registry.py --ecosystem ../ecosystem-packages --website ../scverse.github.io
+    uv run scripts/build_registry.py --ecosystem ../ecosystem-packages --website ../scverse.github.io
 """
 
 from __future__ import annotations

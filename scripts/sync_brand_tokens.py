@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = []
+# ///
 """Regenerate the light-mode brand tokens from the scverse website's SCSS.
 
 The website is the brand's source of truth, so transcribing its hex values into this repository by hand would create
@@ -11,7 +15,7 @@ and ``theme/scverse/static/scverse-dark.css`` is hand-authored design work inste
 
 Usage
 -----
-    python scripts/sync_brand_tokens.py --website ../scverse.github.io
+    uv run scripts/sync_brand_tokens.py --website ../scverse.github.io
 """
 
 from __future__ import annotations

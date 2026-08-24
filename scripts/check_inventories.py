@@ -1,4 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["scverse-doc"]
+#
+# [tool.uv.sources]
+# scverse-doc = { path = "..", editable = true }
+# ///
 """Check that every registry package still publishes a reachable ``objects.inv``.
 
 Cross-package links break silently today: a package moves its documentation, and every other package's links to it
