@@ -1,11 +1,11 @@
 /*
- * scverse theme — brand tokens mapped onto pydata-sphinx-theme, plus component styling.
+ * scverse theme – brand tokens mapped onto pydata-sphinx-theme, plus component styling.
  *
  * Rules of the road for editing this file:
  *
  * 1. Never hardcode a hex value here. Use a token from _tokens.css, which is generated from the website.
  * 2. Dark mode overrides *tokens*, not component rules. If a component needs a dark-specific rule, the token
- *    vocabulary is missing something — add the token instead.
+ *    vocabulary is missing something – add the token instead.
  * 3. The raw package accent is decorative only. Text and links use the derived --scverse-color-accent-text, which
  *    the build guarantees meets WCAG AA against the current background. See scverse_doc._color.
  */

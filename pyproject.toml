@@ -7,12 +7,14 @@ name = "scverse-doc"
 version = "0.0.1"
 description = "Scverse documentation theme and utilities."
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MPL-2.0"
 maintainers = [
   { name = "Lukas Heumos", email = "lukas.heumos@scverse.org" },
+  { name = "Philipp Angerer", email = "philipp.angerer@helmholtz-munich.de" },
 ]
 authors = [
   { name = "Lukas Heumos" },
+  { name = "Philipp Angerer" },
 ]
 requires-python = ">=3.12"
 classifiers = [

@@ -1,4 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["scverse-doc"]
+#
+# [tool.uv.sources]
+# scverse-doc = { path = "..", editable = true }
+# ///
 """Check that every registry package still publishes a reachable ``objects.inv``.
 
 Cross-package links break silently today: a package moves its documentation, and every other package's links to it
@@ -45,7 +52,7 @@ def main() -> int:
     failures = [(pkg, status) for pkg, status in results if status != "ok"]
     print(f"## Inventories\n\n{len(results) - len(failures)}/{len(results)} reachable\n")
     for pkg, status in failures:
-        print(f"- **{pkg.name}** — `{pkg.inventory[0]}objects.inv` — {status}")
+        print(f"- **{pkg.name}** – `{pkg.inventory[0]}objects.inv` – {status}")
     return 1 if failures else 0
 
 
