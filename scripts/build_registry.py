@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["httpx", "httpx-limiter[aiolimiter]", "httpx-retries", "pyyaml"]
+# dependencies = ["httpx2", "httpx-limiter[aiolimiter]", "httpx-retries>=0.6", "pyyaml"]
 # ///
 """Regenerate `scverse_doc/registry.json` from the upstream source of truth.
 
@@ -31,11 +31,15 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, override
 
-import httpx
+import httpx2
 import yaml
-from httpx_limiter import AbstractRateLimiterRepository, AsyncMultiRateLimitedTransport, Rate
-from httpx_limiter.aiolimiter import AiolimiterAsyncLimiter
-from httpx_retries import Retry, RetryTransport
+
+# `httpx-limiter` and `httpx-retries` are written against `httpx`
+sys.modules["httpx"] = httpx2
+
+from httpx_limiter import AbstractRateLimiterRepository, AsyncMultiRateLimitedTransport, Rate  # noqa: E402
+from httpx_limiter.aiolimiter import AiolimiterAsyncLimiter  # noqa: E402
+from httpx_retries import Retry, RetryTransport  # noqa: E402
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -97,7 +101,7 @@ def _iter_packages(ecosystem: Path) -> Iterator[dict[str, Any]]:
         }
 
 
-async def _inventory_root(http: httpx.AsyncClient, docs: str) -> str | None:
+async def _inventory_root(http: httpx2.AsyncClient, docs: str) -> str | None:
     """Return the documentation root whose ``objects.inv`` resolves, or `None` if the package publishes no inventory.
 
     This is *not* ``documentation_home``, which is a link for humans: upstream is free to point it at whichever page
@@ -115,7 +119,7 @@ async def _inventory_root(http: httpx.AsyncClient, docs: str) -> str | None:
     for candidate, resolve in ((f"{root}page/", True), (root, False)):
         try:
             response = await http.head(f"{candidate}objects.inv")
-        except httpx.HTTPError:
+        except httpx2.HTTPError:
             continue
         if response.is_success:
             # ``response.url`` is where the redirect landed, i.e. the version the project currently serves.
@@ -127,22 +131,23 @@ class DomainRateLimiters(AbstractRateLimiterRepository):
     """Rate-limit per host, so that the thirty packages on readthedocs.io do not arrive there all at once."""
 
     @override
-    def get_identifier(self, request: httpx.Request) -> str:
+    def get_identifier(self, request: httpx2.Request) -> str:
         return request.url.host
 
     @override
-    def create(self, request: httpx.Request) -> AiolimiterAsyncLimiter:
+    def create(self, request: httpx2.Request) -> AiolimiterAsyncLimiter:
         return AiolimiterAsyncLimiter.create(Rate.create(magnitude=25))
 
 
-def client() -> httpx.AsyncClient:
-    """An HTTP client that survives a flaky mirror, since its answers get committed to the registry.
+def client() -> httpx2.AsyncClient:
+    """A client shaped like the one in ecosystem-packages' ``validate_registry``, for the same reasons.
 
-    Same shape as the one in ecosystem-packages' ``validate_registry``, for the same reason: a global connection cap
-    would throttle the hundred *other* hosts too, and it is per-host politeness that these sites care about.
+    Rate limited per host, because a global connection cap would throttle the hundred *other* hosts too and it is
+    per-host politeness these sites care about; retried, because a blip must not be committed to the registry as
+    "publishes no inventory".
     """
     transport = AsyncMultiRateLimitedTransport.create(repository=DomainRateLimiters())
-    return httpx.AsyncClient(
+    return httpx2.AsyncClient(
         follow_redirects=True,
         timeout=30,
         headers={"User-Agent": USER_AGENT},

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["httpx", "httpx-limiter[aiolimiter]", "httpx-retries", "pyyaml", "scverse-doc"]
+# dependencies = ["httpx2", "httpx-limiter[aiolimiter]", "httpx-retries>=0.6", "pyyaml", "scverse-doc"]
 #
 # [tool.uv.sources]
 # scverse-doc = { path = "..", editable = true }
@@ -20,7 +20,7 @@ import asyncio
 import sys
 from typing import TYPE_CHECKING
 
-import httpx
+import httpx2
 
 # Its sibling owns how we talk to documentation sites: rate limited per host, retried, redirects followed.
 from build_registry import client
@@ -31,11 +31,11 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-async def probe(http: httpx.AsyncClient, pkg: Package) -> tuple[Package, str]:
+async def probe(http: httpx2.AsyncClient, pkg: Package) -> tuple[Package, str]:
     """Return the package and either ``"ok"`` or a description of what went wrong."""
     try:
         response = await http.head(f"{pkg.inventory}objects.inv")
-    except httpx.HTTPError as e:
+    except httpx2.HTTPError as e:
         return pkg, f"{type(e).__name__}: {e}"
     return pkg, "ok" if response.is_success else f"HTTP {response.status_code}"
 
