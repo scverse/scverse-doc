@@ -36,7 +36,7 @@ jobs:
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
       - run: >
           uv run scripts/build_registry.py
-          --ecosystem .upstream/ecosystem-packages --website .upstream/website --check
+          --ecosystem .upstream/ecosystem-packages --check
       - run: uv run scripts/sync_brand_tokens.py --website .upstream/website --check
 
   inventories:
@@ -48,7 +48,7 @@ jobs:
     steps:
       - *checkout
       - *setup-uv
-      - run: uv run scripts/check_inventories.py --core-only | tee -a $GITHUB_STEP_SUMMARY
+      - run: uv run scripts/check_inventories.py | tee -a $GITHUB_STEP_SUMMARY
       - if: failure() && github.event_name == 'schedule'
         env:
           GH_TOKEN: ${{ github.token }}

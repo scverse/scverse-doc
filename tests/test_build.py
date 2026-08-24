@@ -56,7 +56,8 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
 
 def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[Sphinx, str]) -> None:
     _, html = minimal
-    assert ">anndata</a>" in html
+    # Display names are the upstream ``name`` verbatim, inconsistent casing and all.
+    assert ">AnnData</a>" in html
     assert ">annsel</a>" in html
     assert 'class="dropdown-item active"' in html
 

@@ -16,7 +16,7 @@ CORE = {
     "scanpy",
     "scirpy",
     "scvi-tools",
-    "SnapATAC2",
+    "snapatac2",
     "spatialdata",
     "squidpy",
 }
@@ -28,9 +28,18 @@ def test_core_packages_are_the_ones_the_website_lists() -> None:
 
 def test_entries_are_well_formed() -> None:
     for pkg in packages().values():
+        # ``docs`` is upstream's link for humans, so it may well name a page. An inventory root may not.
         assert pkg.docs.startswith("https://"), pkg
-        assert pkg.docs.endswith("/"), pkg
         assert pkg.accent.startswith("#"), pkg
+        if pkg.inventory is not None:
+            assert pkg.inventory.startswith("https://"), pkg
+            assert pkg.inventory.endswith("/"), pkg
+            assert "#" not in pkg.inventory, pkg
+
+
+def test_every_core_package_is_linkable() -> None:
+    for pkg in core_packages().values():
+        assert pkg.inventory is not None, pkg
 
 
 def test_intersphinx_covers_core_and_keeps_the_ecosystem_opt_in() -> None:
