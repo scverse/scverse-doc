@@ -8,9 +8,8 @@
 # ///
 """Check that every registry package still publishes a reachable ``objects.inv``.
 
-Cross-package links break silently today: a package moves its documentation, and every other package's links to it
-rot without anything failing.
-This runs nightly so the registry finds out before readers do.
+A package moving its documentation rots every other package's links to it without failing anything, so this runs
+nightly.
 """
 
 from __future__ import annotations
@@ -51,11 +50,7 @@ class DomainRateLimiters(AbstractRateLimiterRepository):
 
 
 def client() -> httpx2.AsyncClient:
-    """A client shaped like the one in ecosystem-packages' ``validate_registry``, for the same reasons.
-
-    Rate limited per host, because a global connection cap would throttle the hundred *other* hosts too and it is
-    per-host politeness these sites care about; retried, because a blip must not be reported as a broken inventory.
-    """
+    """Build the client: rate limited per host, retried so a blip is not reported as a broken inventory."""
     transport = AsyncMultiRateLimitedTransport.create(repository=DomainRateLimiters())
     return httpx2.AsyncClient(
         follow_redirects=True,
@@ -87,8 +82,7 @@ def main() -> int:
     args = parser.parse_args()
 
     selected = (core_packages() if args.core_only else packages()).values()
-    # Packages that publish no inventory have no cross-package links to rot, and build_registry.py already named
-    # them. Probing them anyway is what used to make this report permanently red.
+    # Packages publishing no inventory have no links to rot; probing them anyway would keep this report red.
     linkable = [pkg for pkg in selected if pkg.inventory]
     results = sorted(asyncio.run(probe_all(linkable)), key=lambda r: r[0].name.lower())
 
