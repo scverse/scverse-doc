@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["httpx2", "httpx-limiter[aiolimiter]", "httpx-retries>=0.6", "pyyaml", "scverse-doc"]
+# dependencies = ["httpx2", "httpx-limiter[aiolimiter]", "httpx-retries>=0.6", "scverse-doc"]
 #
 # [tool.uv.sources]
 # scverse-doc = { path = "..", editable = true }
@@ -18,17 +18,51 @@ from __future__ import annotations
 import argparse
 import asyncio
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 import httpx2
 
-# Its sibling owns how we talk to documentation sites: rate limited per host, retried, redirects followed.
-from build_registry import client
+# `httpx-limiter` and `httpx-retries` are written against `httpx`
+sys.modules["httpx"] = httpx2
 
-from scverse_doc.registry import Package, core_packages, packages
+from httpx_limiter import AbstractRateLimiterRepository, AsyncMultiRateLimitedTransport, Rate  # noqa: E402
+from httpx_limiter.aiolimiter import AiolimiterAsyncLimiter  # noqa: E402
+from httpx_retries import Retry, RetryTransport  # noqa: E402
+
+from scverse_doc.registry import Package, core_packages, packages  # noqa: E402
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
+#: Read the Docs and Cloudflare answer 403 to httpx's default agent.
+USER_AGENT = "scverse-doc registry check (+https://github.com/scverse/scverse-doc)"
+
+
+class DomainRateLimiters(AbstractRateLimiterRepository):
+    """Rate-limit per host, so that the thirty packages on readthedocs.io do not arrive there all at once."""
+
+    @override
+    def get_identifier(self, request: httpx2.Request) -> str:
+        return request.url.host
+
+    @override
+    def create(self, request: httpx2.Request) -> AiolimiterAsyncLimiter:
+        return AiolimiterAsyncLimiter.create(Rate.create(magnitude=25))
+
+
+def client() -> httpx2.AsyncClient:
+    """A client shaped like the one in ecosystem-packages' ``validate_registry``, for the same reasons.
+
+    Rate limited per host, because a global connection cap would throttle the hundred *other* hosts too and it is
+    per-host politeness these sites care about; retried, because a blip must not be reported as a broken inventory.
+    """
+    transport = AsyncMultiRateLimitedTransport.create(repository=DomainRateLimiters())
+    return httpx2.AsyncClient(
+        follow_redirects=True,
+        timeout=30,
+        headers={"User-Agent": USER_AGENT},
+        transport=RetryTransport(transport, Retry(total=3, backoff_factor=2)),
+    )
 
 
 async def probe(http: httpx2.AsyncClient, pkg: Package) -> tuple[Package, str]:
