@@ -97,7 +97,7 @@ Greenfield replacement, one direction. No shim, no absorption, no dependency eit
 
 ### D2 – Base theme – **decided: `pydata-sphinx-theme`** (RFC option B)
 
-- `sphinx-book-theme` 1.1.4 sits on `pydata-sphinx-theme` 0.15.4 and lags it. Every pydata feature the RFC wants (top navbar, header dropdowns, announcement bar, version switcher) arrives through a layer whose model — one book, one left rail — is the wrong IA for "one ecosystem, many packages". Two upstreams instead of one, the slower one extra.
+- `sphinx-book-theme` 1.1.4 sits on `pydata-sphinx-theme` 0.15.4 and lags it. Every pydata feature the RFC wants (top navbar, header dropdowns, announcement bar, version switcher) arrives through a layer whose model – one book, one left rail – is the wrong IA for "one ecosystem, many packages". Two upstreams instead of one, the slower one extra.
 - Continuity for the six book-theme-via-scanpydoc packages is real but outweighed: the design is a rebrand anyway (new tokens, new dark mode).
 - Phil's experience: working directly against pydata was preferable.
 - Cost: week one is slightly harder, since book-theme defaults (left rail, page chrome, repository buttons) must be composed from pydata's `navbar_*` / `footer_*` lists. One-time, lands in M1/M4.
@@ -115,7 +115,7 @@ Enforcement: the theme warns (and fails under `-W`) on any `html_theme_options` 
 
 Options: vendor tokens here and sync from the website, or publish a `scverse-brand` token artifact (JSON + CSS) both consume.
 
-Recommendation: **vendor with a generator script and a test** — `scripts/sync_brand_tokens.py` reads `main.scss`, emits `tokens.json` + `_tokens.css`; a test fails on divergence. Extract a separate artifact only if the website team wants to consume it back.
+Recommendation: **vendor with a generator script and a test** – `scripts/sync_brand_tokens.py` reads `main.scss`, emits `tokens.json` + `_tokens.css`; a test fails on divergence. Extract a separate artifact only if the website team wants to consume it back.
 
 ## 2. Architecture
 
@@ -280,7 +280,7 @@ Write `scripts/migrate_conf.py` *during* wave 2, from wave 1's diffs.
 - **Build tests.** Fixture roots under `tests/roots/` built with `-W` via `sphinx.testing`: theme resolves, expected CSS/JS injected, navbar dropdown contains registry entries, `switcher.json` emitted, `intersphinx_mapping` shape, accent override applied, theme-owned-key warning fires.
 - **Token tests.** Contrast ratios for all derived accents in both modes; drift check against `main.scss`.
 - **Registry tests.** Schema validation per commit; `objects.inv` reachability nightly only (network).
-- **Upstream-drift job.** Weekly build against `pydata-sphinx-theme` `main` — template partial renames are the main breakage risk for the two overrides.
+- **Upstream-drift job.** Weekly build against `pydata-sphinx-theme` `main` – template partial renames are the main breakage risk for the two overrides.
 - **Visual regression (optional, after M5).** Playwright screenshots of the kitchen-sink page in light and dark, compared per PR.
 
 ## 7. Risks

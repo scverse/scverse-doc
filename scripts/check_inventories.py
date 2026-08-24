@@ -45,7 +45,7 @@ def main() -> int:
     failures = [(pkg, status) for pkg, status in results if status != "ok"]
     print(f"## Inventories\n\n{len(results) - len(failures)}/{len(results)} reachable\n")
     for pkg, status in failures:
-        print(f"- **{pkg.name}** — `{pkg.inventory[0]}objects.inv` — {status}")
+        print(f"- **{pkg.name}** – `{pkg.inventory[0]}objects.inv` – {status}")
     return 1 if failures else 0
 
 
