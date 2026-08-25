@@ -6,7 +6,7 @@ from scverse_doc._color import WCAG_AA_NORMAL, contrast_ratio, derive_readable
 from scverse_doc._ext import DARK_BACKGROUND, LIGHT_BACKGROUND
 from scverse_doc.registry import packages
 
-ACCENTS = sorted({pkg.accent for pkg in packages().values()})
+ACCENTS = sorted({pkg.accent for pkg in packages.values()})
 
 
 def test_every_derived_accent_meets_aa() -> None:

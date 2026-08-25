@@ -12,17 +12,16 @@ becomes a second place to edit package metadata.
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
-from functools import cache
-from pathlib import Path
+from functools import cache, cached_property
+from importlib.resources import files
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
+    from collections.abc import Iterable
 
-__all__ = ["Package", "core_packages", "get", "intersphinx", "packages"]
-
-_REGISTRY_PATH = Path(__file__).parent / "registry.json"
+__all__ = ["Package", "core_packages", "intersphinx", "packages"]
 
 
 class _RegistryFile(TypedDict):
@@ -71,43 +70,33 @@ class Package:
 @cache
 def _load() -> _RegistryFile:
     """Read and cache the generated registry file."""
-    with _REGISTRY_PATH.open() as f:
+    with (files(__name__) / "registry.json").open() as f:
         registry: _RegistryFile = json.load(f)
     return registry
 
 
-@cache
-def packages() -> Mapping[str, Package]:
-    """Return every registered package, keyed by name.
+class Packages(Mapping[str, Package]):
+    @cached_property
+    def data(self) -> Mapping[str, Package]:
+        return {name: Package(**entry) for name, entry in _load()["packages"].items()}
 
-    Returns
-    -------
-    A mapping from package name to :class:`Package`, ordered case-insensitively by name.
-    """
-    return {name: Package(**entry) for name, entry in _load()["packages"].items()}
+    def __getitem__(self, name: str) -> Package:
+        return self.data[name.casefold()]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.data)
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+
+#: Every registered package, keyed and ordered by case-folded name.
+packages: Mapping[str, Package] = Packages()
 
 
 def core_packages() -> Mapping[str, Package]:
     """Return only the core packages, in the order the website lists them."""
-    return {name: pkg for name, pkg in packages().items() if pkg.kind == "core"}
-
-
-def get(name: str) -> Package | None:
-    """Look up a package by name, case-insensitively.
-
-    Parameters
-    ----------
-    name
-        The package name, e.g. ``"pertpy"``.
-
-    Returns
-    -------
-    The registry entry, or :data:`None` if the package is not registered.
-    """
-    if (pkg := packages().get(name)) is not None:
-        return pkg
-    lowered = name.lower()
-    return next((pkg for key, pkg in packages().items() if key.lower() == lowered), None)
+    return {name: pkg for name, pkg in packages.items() if pkg.kind == "core"}
 
 
 def intersphinx(*extra: str, external: bool = True, core: bool = True) -> dict[str, tuple[str, None]]:
@@ -152,8 +141,8 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> dict[s
 
     names: Iterable[str] = (*(data["core_intersphinx"] if core else ()), *extra)
     for name in names:
-        if (pkg := get(name)) is None:
-            msg = f"{name!r} is not in the scverse registry. Known packages: {', '.join(sorted(packages()))}"
+        if (pkg := packages.get(name)) is None:
+            msg = f"{name!r} is not in the scverse registry. Known packages: {', '.join(packages)}"
             raise KeyError(msg)
         if pkg.inventory is None:
             msg = f"{pkg.name} publishes no objects.inv at {pkg.docs}, so there is nothing to link against."

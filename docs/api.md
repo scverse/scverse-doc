@@ -21,7 +21,6 @@
 
     registry.packages
     registry.core_packages
-    registry.get
     registry.intersphinx
 ```
 

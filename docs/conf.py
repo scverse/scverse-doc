@@ -1,3 +1,5 @@
+"""Sphinx docs configuration."""
+
 project = "scverse-doc"
 extensions = ["scverse_doc", "sphinxcontrib.bibtex"]
 html_theme = "scverse"

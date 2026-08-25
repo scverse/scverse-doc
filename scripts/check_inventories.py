@@ -41,17 +41,18 @@ class DomainRateLimiters(AbstractRateLimiterRepository):
     """Rate-limit per host, so that the thirty packages on readthedocs.io do not arrive there all at once."""
 
     @override
-    def get_identifier(self, request: httpx2.Request) -> str:
+    def get_identifier(self, request: httpx2.Request) -> str:  # type: ignore[override]
         return request.url.host
 
     @override
-    def create(self, request: httpx2.Request) -> AiolimiterAsyncLimiter:
+    def create(self, request: httpx2.Request) -> AiolimiterAsyncLimiter:  # type: ignore[override]
         return AiolimiterAsyncLimiter.create(Rate.create(magnitude=25))
 
 
 def client() -> httpx2.AsyncClient:
     """Build the client: rate limited per host, retried so a blip is not reported as a broken inventory."""
     transport = AsyncMultiRateLimitedTransport.create(repository=DomainRateLimiters())
+    assert isinstance(transport, httpx2.AsyncBaseTransport)
     return httpx2.AsyncClient(
         follow_redirects=True,
         timeout=30,
@@ -81,7 +82,7 @@ def main() -> int:
     parser.add_argument("--core-only", action="store_true", help="skip the ecosystem packages")
     args = parser.parse_args()
 
-    selected = (core_packages() if args.core_only else packages()).values()
+    selected = (core_packages() if args.core_only else packages).values()
     # Packages publishing no inventory have no links to rot; probing them anyway would keep this report red.
     linkable = [pkg for pkg in selected if pkg.inventory]
     results = sorted(asyncio.run(probe_all(linkable)), key=lambda r: r[0].name.lower())
