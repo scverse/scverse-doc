@@ -33,9 +33,10 @@ _ACCENT_CSS = """\
 }}
 """
 
+#: ``fa-scverse`` is not a real Font Awesome glyph – the theme stylesheet masks the synced logo into it.
 _ICON_LINKS = (
     {"name": "Discourse", "url": "https://discourse.scverse.org/", "icon": "fa-brands fa-discourse"},
-    {"name": "scverse", "url": "https://scverse.org/", "icon": "fa-solid fa-house"},
+    {"name": "scverse", "url": "https://scverse.org/", "icon": "fa-scverse"},
 )
 
 

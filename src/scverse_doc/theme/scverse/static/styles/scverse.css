@@ -45,6 +45,19 @@ html {
     max-height: 2.2rem;
 }
 
+/* Sized like the real glyphs beside it:
+ * https://github.com/pydata/pydata-sphinx-theme/blob/main/src/pydata_sphinx_theme/assets/styles/components/_icon-links.scss
+ */
+.navbar-icon-links .fa-scverse {
+    display: inline-block;
+    font-size: var(--pst-font-size-icon);
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    background-color: currentColor;
+    mask: url("../scverse-fa.svg") center / contain no-repeat;
+}
+
 .scverse-ecosystem-dropdown {
     .dropdown-menu {
         max-height: 70vh;
