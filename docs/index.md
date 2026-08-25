@@ -9,6 +9,7 @@
 api.md
 changelog.md
 contributing.md
+kitchen-sink.md
 references.md
 
 notebooks/example
