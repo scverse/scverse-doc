@@ -6,10 +6,11 @@ and fills in everything a scverse `conf.py` would otherwise repeat.
 
 from __future__ import annotations
 
+from collections import ChainMap
 from pathlib import Path
-from shutil import rmtree
-from tempfile import mkdtemp
 from typing import TYPE_CHECKING, Any
+
+from sphinx.util.typing import ExtensionMetadata
 
 from . import registry
 from ._color import derive_readable
@@ -38,6 +39,10 @@ _ICON_LINKS = (
     {"name": "Discourse", "url": "https://discourse.scverse.org/", "icon": "fa-brands fa-discourse"},
     {"name": "scverse", "url": "https://scverse.org/", "icon": "fa-scverse"},
 )
+
+
+def _build_cache(app: Sphinx) -> Path:
+    return Path(app.doctreedir) / "__scverse__"
 
 
 def _package_name(config: Config) -> str:
@@ -71,6 +76,12 @@ def _expand_repo(config: Config) -> None:
     options["icon_links"] = [*icon_links, *_ICON_LINKS]
 
 
+def resolve_intersphinx(app: Sphinx, config: Config) -> None:
+    """Resolve the lazy mapping `intersphinx` returns, now that `registry.cache_dir` is set."""
+    if isinstance(config.intersphinx_mapping, ChainMap):
+        config.intersphinx_mapping = dict(config.intersphinx_mapping)
+
+
 def configure(app: Sphinx, config: Config) -> None:
     """Apply the scverse defaults to a build that opted in via `html_theme`."""
     if config.html_theme != "scverse":
@@ -80,12 +91,13 @@ def configure(app: Sphinx, config: Config) -> None:
     _expand_repo(config)
 
     if not _is_set_by_user(config, "intersphinx_mapping"):
-        config.intersphinx_mapping = intersphinx()
+        config.intersphinx_mapping = dict(intersphinx())
     if not _is_set_by_user(config, "html_title"):
         config.html_title = config.project
 
     accent = _accent(config)
-    static_dir = Path(mkdtemp(prefix="scverse-doc-"))
+    static_dir = _build_cache(app) / "static"
+    static_dir.mkdir(parents=True, exist_ok=True)
     (static_dir / "scverse-accent.css").write_text(
         _ACCENT_CSS.format(
             accent=accent,
@@ -93,9 +105,8 @@ def configure(app: Sphinx, config: Config) -> None:
             dark=derive_readable(accent, DARK_BACKGROUND),
         )
     )
-    config.html_static_path.append(str(static_dir))
+    config.html_static_path = [*config.html_static_path, str(static_dir)]
     app.add_css_file("scverse-accent.css")
-    app.connect("build-finished", lambda *_: rmtree(static_dir, ignore_errors=True))
 
 
 def add_ecosystem_context(
@@ -115,19 +126,19 @@ def add_ecosystem_context(
     context["scverse_ecosystem"] = groups
 
 
-def setup(app: Sphinx) -> dict[str, Any]:
+def setup(app: Sphinx) -> ExtensionMetadata:
     """Register the theme, the extension stack, and the build hooks."""
     app.add_html_theme("scverse", str(THEME_PATH))
-    app.config.templates_path.append(str(THEME_PATH / "components"))
+    app.config.templates_path = [*app.config.templates_path, str(THEME_PATH / "components")]
 
-    # Cache the upstream package listing where intersphinx caches its inventories
-    # (``doctreedir/__intersphinx_cache__``), so cleaning the build directory fetches it again.
-    registry.cache_dir = Path(app.doctreedir)
+    # Set here, i.e. after `conf.py` ran: nothing may touch the registry before this – see `intersphinx`.
+    registry.cache_dir = _build_cache(app)
 
     for extension in EXTENSIONS:
         app.setup_extension(extension)
 
+    app.connect("config-inited", resolve_intersphinx)
     app.connect("config-inited", configure)
     app.connect("html-page-context", add_ecosystem_context)
 
-    return {"parallel_read_safe": True, "parallel_write_safe": True}
+    return ExtensionMetadata(parallel_read_safe=True)
