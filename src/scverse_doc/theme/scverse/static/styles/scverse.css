@@ -34,58 +34,62 @@ html {
 
 /* --- Navbar ------------------------------------------------------------- */
 
-.bd-header .navbar-nav > li.current > a,
-.bd-header .navbar-nav > li > a:hover {
-    border-bottom: 2px solid var(--scverse-color-accent-decorative);
+.bd-header ul.navbar-nav > li.nav-item {
+    &.current > .nav-link::before,
+    & > .nav-link:hover::before {
+        border-bottom-color: var(--scverse-color-accent-decorative);
+    }
 }
 
 .navbar-brand img {
     max-height: 2.2rem;
 }
 
-.scverse-ecosystem-dropdown .dropdown-menu {
-    max-height: 70vh;
-    overflow-y: auto;
-    border-radius: var(--scverse-radius);
-    box-shadow: var(--scverse-shadow);
-}
+.scverse-ecosystem-dropdown {
+    .dropdown-menu {
+        max-height: 70vh;
+        overflow-y: auto;
+        border-radius: var(--scverse-radius);
+        box-shadow: var(--scverse-shadow);
+    }
 
-.scverse-ecosystem-dropdown .dropdown-header {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--pst-color-text-muted);
+    .dropdown-header {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--pst-color-text-muted);
+    }
 }
 
 /* --- Cards -------------------------------------------------------------- */
 
-.sd-card {
+/* .bd-content exists to beat sphinx-design in selector specificity */
+.bd-content .sd-card {
     border-radius: var(--scverse-radius);
     border-color: var(--pst-color-border);
     transition:
         transform 0.15s ease,
         box-shadow 0.15s ease;
-}
 
-.sd-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--scverse-shadow);
-}
+    .sd-card-title {
+        color: var(--pst-heading-color);
+    }
 
-.sd-card .sd-card-title {
-    color: var(--pst-heading-color);
-}
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--scverse-shadow);
 
-.bd-content .sd-card:hover .sd-card-title {
-    color: var(--scverse-color-accent-text);
+        .sd-card-title {
+            color: var(--scverse-color-accent-text);
+        }
+    }
 }
 
 /* --- Code --------------------------------------------------------------- */
 
 code.literal {
     background-color: var(--scverse-color-code-bg);
-    border-color: var(--pst-color-border);
     border-radius: calc(var(--scverse-radius) / 2);
 }
 
@@ -104,16 +108,4 @@ code.literal {
     justify-content: center;
     font-size: 0.85rem;
     color: var(--pst-color-text-muted);
-}
-
-/* --- Version badges ----------------------------------------------------- */
-
-.sd-badge.scverse-experimental {
-    background-color: var(--scverse-color-gradient-end);
-    color: #000;
-}
-
-.sd-badge.scverse-deprecated {
-    background-color: var(--scverse-color-text-muted);
-    color: #fff;
 }
