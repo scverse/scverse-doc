@@ -48,7 +48,7 @@ def minimal(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[Sphinx, 
 def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
     app, html = minimal
     assert app.config.html_theme == "scverse"
-    for css in ("styles/scverse.css", "scverse-accent.css", "scverse-dark.css"):
+    for css in ("styles/scverse.css", "scverse-accent.css"):
         assert css in html
     assert "NumFOCUS" in html
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
@@ -66,7 +66,7 @@ def test_accent_is_derived_for_both_modes(minimal: tuple[Sphinx, str]) -> None:
     app, _ = minimal
     css = (Path(app.outdir) / "_static" / "scverse-accent.css").read_text()
     assert "--scverse-color-accent-decorative: #da347f;" in css
-    assert css.count("--scverse-color-accent-text") == 2
+    assert "--scverse-color-accent-text: light-dark(#" in css
 
 
 def test_build_is_warning_free(tmp_path: Path) -> None:
