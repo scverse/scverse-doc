@@ -271,6 +271,7 @@ This project uses [sphinx][] with the following features:
 - Citations (like {cite:p}`Virshup_2023`) can be included with [sphinxcontrib-bibtex](https://sphinxcontrib-bibtex.readthedocs.io/)
 
 See scanpy’s {doc}`scanpy:dev/documentation` for more information on how to write your own.
+{doc}`kitchen-sink` renders each of these constructs, and is the page to check when changing the theme.
 
 [sphinx]: https://www.sphinx-doc.org/
 [myst]: https://myst-parser.readthedocs.io/page/intro.html
@@ -335,3 +336,17 @@ sphinx-build -M html . _build -W
 
 ::::
 :::::
+
+### Changing the theme
+
+The theme lives in `src/scverse_doc/theme/scverse`: brand tokens in `static/_tokens.css`,
+component styling in `static/styles/scverse.css`, and the navbar and footer parts in `components/`.
+
+After a change, build the docs and check {doc}`kitchen-sink` – it renders every construct the theme
+styles – in both colour schemes, using the theme switcher in the navbar.
+This package sets no `accent`, so it inherits the scverse brand colour as its default;
+to see the accent-driven parts, build with one:
+
+```bash
+hatch run docs:build -D html_theme_options.accent=#de367b
+```
