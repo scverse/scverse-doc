@@ -23,6 +23,7 @@ That gets you the scverse brand and dark mode, the shared navbar, footer, and an
 
 Please refer to the [documentation][],
 in particular, the [API documentation][].
+The [kitchen sink][] shows every construct the theme styles, in both colour schemes.
 
 ## Installation
 
@@ -75,5 +76,6 @@ If you found a bug, please use the [issue tracker][].
 [documentation]: https://scverse-doc.readthedocs.io
 [changelog]: https://scverse-doc.readthedocs.io/page/changelog.html
 [api documentation]: https://scverse-doc.readthedocs.io/page/api.html
+[kitchen sink]: https://scverse-doc.readthedocs.io/page/kitchen-sink.html
 [pypi]: https://pypi.org/project/scverse-doc
 [venv]: https://docs.python.org/3/tutorial/venv.html
