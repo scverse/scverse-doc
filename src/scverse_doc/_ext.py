@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 from ._color import derive_readable
 from .config import EXTENSIONS, _is_set_by_user, apply_defaults
-from .registry import DEFAULT_ACCENT, get, intersphinx, packages
+from .registry import DEFAULT_ACCENT, intersphinx, packages
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
@@ -43,13 +43,13 @@ _ICON_LINKS = (
 
 
 def _package_name(config: Config) -> str:
-    return str(config.html_theme_options.get("package") or config.project or "")
+    return str(config.html_theme_options.get("package") or config.project)
 
 
 def _accent(config: Config) -> str:
     if accent := config.html_theme_options.get("accent"):
         return str(accent)
-    if (pkg := get(_package_name(config))) is not None:
+    if (pkg := packages.get(_package_name(config))) is not None:
         return pkg.accent
     return DEFAULT_ACCENT
 
@@ -113,7 +113,7 @@ def add_ecosystem_context(
         return
     current = _package_name(app.config).lower()
     groups: dict[str, list[dict[str, Any]]] = {"core": [], "ecosystem": []}
-    for pkg in packages().values():
+    for pkg in packages.values():
         groups[pkg.kind].append({"name": pkg.name, "docs": pkg.docs, "current": pkg.name.lower() == current})
     context["scverse_ecosystem"] = groups
 

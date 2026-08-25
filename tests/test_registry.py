@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from scverse_doc.registry import core_packages, get, intersphinx, packages
+from scverse_doc.registry import core_packages, intersphinx, packages
 
 CORE = {
     "anndata",
@@ -27,7 +27,7 @@ def test_core_packages_are_the_ones_the_website_lists() -> None:
 
 
 def test_entries_are_well_formed() -> None:
-    for pkg in packages().values():
+    for pkg in packages.values():
         # ``docs`` is upstream's link for humans, so it may well name a page. An inventory root may not.
         assert pkg.docs.startswith("https://"), pkg
         assert pkg.accent.startswith("#"), pkg
@@ -56,5 +56,5 @@ def test_unknown_extra_fails_loudly() -> None:
 
 
 def test_lookup_is_case_insensitive() -> None:
-    assert get("SNAPATAC2") is get("SnapATAC2")
-    assert get("nope") is None
+    assert packages["SNAPATAC2"] is packages["SnapATAC2"]
+    assert "nope" not in packages
