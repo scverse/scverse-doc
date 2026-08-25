@@ -1,6 +1,6 @@
 """The scverse Sphinx theme and shared documentation configuration.
 
-A package's `conf.py` needs two lines:
+A package’s `conf.py` needs two lines:
 
 .. code:: python
 
@@ -9,7 +9,8 @@ A package's `conf.py` needs two lines:
 
    html_theme_options = {"repo": "scverse/pertpy"}
 
-The extension stack, the brand, the navigation conventions, and cross-links to every core package come from here.
+The extension stack, the brand, the navigation conventions,
+and cross-links to every core package come from here.
 Anything set in `conf.py` wins.
 """
 

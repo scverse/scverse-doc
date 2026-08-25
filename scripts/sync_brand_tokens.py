@@ -3,14 +3,16 @@
 # requires-python = ">=3.12"
 # dependencies = []
 # ///
-"""Regenerate the light-mode brand tokens from the scverse website's SCSS.
+"""Regenerate the light-mode brand tokens from the scverse website’s SCSS.
 
-The website is the brand's source of truth, so transcribing its hex values into this repository by hand would create
-exactly the kind of drift this package exists to remove.
-This script extracts the handful of SCSS variables that make up the brand and writes them out as CSS custom
-properties.
+The website is the brand’s source of truth,
+so transcribing its hex values into this repository by hand
+would create exactly the kind of drift this package exists to remove.
+This script extracts the handful of SCSS variables that make up the brand
+and writes them out as CSS custom properties.
 
-Dark-mode tokens are *not* generated: the website has no dark mode at all, so there is nothing upstream to extract
+Dark-mode tokens are *not* generated:
+the website has no dark mode at all, so there is nothing upstream to extract,
 and ``theme/scverse/static/scverse-dark.css`` is hand-authored design work instead.
 
 Usage
@@ -41,7 +43,8 @@ TOKEN_MAP = {
     "footerbg": "--scverse-color-footer-bg",
 }
 
-#: Values that are written as literals in the SCSS rather than as variables, so they cannot be looked up by name.
+#: Values that are written as literals in the SCSS rather than as variables,
+#: so they cannot be looked up by name.
 #: Verified against ``assets/main.scss`` by :func:`check_literals`.
 LITERALS = {
     "--scverse-color-primary": "#4557c4",
@@ -66,8 +69,8 @@ def parse_scss(scss: str) -> dict[str, str]:
 def check_literals(scss: str) -> list[str]:
     """Return the literal token values that no longer appear in the SCSS.
 
-    The primary and the gradient stops are written inline in the website's CSS rules, so they cannot be resolved by
-    variable name.
+    The primary and the gradient stops are written inline in the website’s CSS rules,
+    so they cannot be resolved by variable name.
     Checking that they still occur at all is a cheap guard against the brand changing underneath us.
     """
     return [f"{name} ({value})" for name, value in LITERALS.items() if value.lower() not in scss.lower()]

@@ -1,7 +1,7 @@
 """The Sphinx extension.
 
-Registers the theme, pulls in the extension stack, and fills in everything a scverse `conf.py` would otherwise
-repeat.
+Registers the theme, pulls in the extension stack,
+and fills in everything a scverse `conf.py` would otherwise repeat.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 from typing import TYPE_CHECKING, Any
 
+from . import registry
 from ._color import derive_readable
 from .config import EXTENSIONS, _is_set_by_user, apply_defaults
 from .registry import DEFAULT_ACCENT, intersphinx, packages
@@ -21,7 +22,7 @@ if TYPE_CHECKING:
 
 THEME_PATH = Path(__file__).parent / "theme" / "scverse"
 
-#: `pydata-sphinx-theme`'s page backgrounds, which the derived accents must be readable on.
+#: `pydata-sphinx-theme`’s page backgrounds, which the derived accents must be readable on.
 LIGHT_BACKGROUND = "#ffffff"
 DARK_BACKGROUND = "#14181e"
 
@@ -122,6 +123,10 @@ def setup(app: Sphinx) -> dict[str, Any]:
     """Register the theme, the extension stack, and the build hooks."""
     app.add_html_theme("scverse", str(THEME_PATH))
     app.config.templates_path.append(str(THEME_PATH / "components"))
+
+    # Cache the upstream package listing where intersphinx caches its inventories
+    # (``doctreedir/__intersphinx_cache__``), so cleaning the build directory fetches it again.
+    registry.cache_dir = Path(app.doctreedir)
 
     for extension in EXTENSIONS:
         app.setup_extension(extension)

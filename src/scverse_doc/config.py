@@ -1,6 +1,7 @@
 """Shared defaults applied to every scverse documentation build.
 
-Everything here is a *default*: a value set in `conf.py` always wins.
+Everything here is a *default*:
+a value set in `conf.py` always wins.
 """
 
 from __future__ import annotations
@@ -12,7 +13,8 @@ if TYPE_CHECKING:
 
 __all__ = ["DEFAULTS", "EXTENSIONS", "MYST_ENABLE_EXTENSIONS", "apply_defaults"]
 
-#: Extensions set up alongside this one, so packages list only ``scverse_doc``.
+#: Extensions set up alongside this one,
+#: so packages list only ``scverse_doc``.
 EXTENSIONS = (
     "myst_nb",
     "sphinx.ext.autodoc",
@@ -45,11 +47,13 @@ DEFAULTS: dict[str, Any] = {
     "myst_enable_extensions": list(MYST_ENABLE_EXTENSIONS),
     "myst_heading_anchors": 6,
     "source_suffix": {".rst": "restructuredtext", ".md": "myst-nb", ".ipynb": "myst-nb"},
-    # Off by default: tutorials needing a GPU or a large download must not gate a docs build.
+    # Off by default:
+    # tutorials needing a GPU or a large download must not gate a docs build.
     "nb_execution_mode": "off",
     "nb_output_stderr": "remove",
     "nb_merge_streams": True,
-    # 17 inventories resolve by default, so one unreachable host must not stall the build.
+    # 17 inventories resolve by default,
+    # so one unreachable host must not stall the build.
     "intersphinx_timeout": 10,
     "exclude_patterns": ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"],
     "nitpicky": True,

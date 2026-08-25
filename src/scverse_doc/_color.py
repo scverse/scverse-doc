@@ -1,11 +1,11 @@
 """Colour maths for deriving accessible accent shades.
 
 Package accents are chosen for brand recognition, not for contrast.
-Several of the accents scverse already uses (``#6cf1a1`` for muon, ``#fbb822`` for scvi-tools) fail WCAG AA as text
-colours on white, and others fail on a dark background.
-So the raw accent is only ever used for decorative surfaces, and text/link colours are *derived* from it here by
-moving lightness until the contrast target is met, keeping hue and saturation intact so the result still reads as the
-package's colour.
+Several of the accents scverse already uses (``#6cf1a1`` for muon, ``#fbb822`` for scvi-tools)
+fail WCAG AA as text colours on white, and others fail on a dark background.
+So the raw accent is only ever used for decorative surfaces,
+and text/link colours are *derived* from it here by moving lightness until the contrast target is met,
+keeping hue and saturation intact so the result still reads as the package’s colour.
 """
 
 from __future__ import annotations
@@ -145,8 +145,10 @@ def _from_hsl(hue: float, saturation: float, lightness: float) -> RGB:
 def derive_readable(accent: str, background: str, *, target: float = WCAG_AA_NORMAL) -> str:
     """Derive a text-safe variant of `accent` that meets `target` contrast against `background`.
 
-    Hue and saturation are preserved and only lightness is moved, so the result still reads as the same colour.
-    Lightness moves away from the background: darker on a light background, lighter on a dark one.
+    Hue and saturation are preserved and only lightness is moved,
+    so the result still reads as the same colour.
+    Lightness moves away from the background:
+    darker on a light background, lighter on a dark one.
 
     Parameters
     ----------
@@ -159,8 +161,8 @@ def derive_readable(accent: str, background: str, *, target: float = WCAG_AA_NOR
 
     Returns
     -------
-    A hex colour meeting `target` where that is achievable by lightness alone, otherwise the closest achievable
-    colour, which is black or white.
+    A hex colour meeting `target` where that is achievable by lightness alone,
+    otherwise the closest achievable colour, which is black or white.
 
     Examples
     --------
@@ -174,8 +176,9 @@ def derive_readable(accent: str, background: str, *, target: float = WCAG_AA_NOR
     darken = relative_luminance(background) > 0.5
     step = -1 / 512 if darken else 1 / 512
 
-    # Candidates are checked after rounding to 8-bit hex: a float lightness that clears the target can fall back
-    # under it once quantized, which is how #e5864b and #fbb822 ended up one hundredth short of AA.
+    # Candidates are checked after rounding to 8-bit hex:
+    # a float lightness that clears the target can fall back under it once quantized,
+    # which is how #e5864b and #fbb822 ended up one hundredth short of AA.
     while 0.0 <= (lightness := lightness + step) <= 1.0:
         candidate = parse_hex(_from_hsl(hue, saturation, lightness).to_hex())
         if contrast_ratio(candidate, background) >= target:
