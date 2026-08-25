@@ -24,3 +24,4 @@ __pycache__/
 .venv/
 docs/generated/
 docs/jupyter_execute/
+*.lock

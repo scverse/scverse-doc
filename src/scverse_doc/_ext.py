@@ -27,13 +27,9 @@ LIGHT_BACKGROUND = "#ffffff"
 DARK_BACKGROUND = "#14181e"
 
 _ACCENT_CSS = """\
-html[data-theme="light"] {{
+:root {{
   --scverse-color-accent-decorative: {accent};
-  --scverse-color-accent-text: {light};
-}}
-html[data-theme="dark"] {{
-  --scverse-color-accent-decorative: {accent};
-  --scverse-color-accent-text: {dark};
+  --scverse-color-accent-text: light-dark({light}, {dark});
 }}
 """
 
@@ -98,7 +94,6 @@ def configure(app: Sphinx, config: Config) -> None:
     )
     config.html_static_path.append(str(static_dir))
     app.add_css_file("scverse-accent.css")
-    app.add_css_file("scverse-dark.css")
     app.connect("build-finished", lambda *_: rmtree(static_dir, ignore_errors=True))
 
 

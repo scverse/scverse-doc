@@ -3,28 +3,18 @@
  *
  * Rules of the road for editing this file:
  *
- * 1. Never hardcode a hex value here. Use a token from _tokens.css, which is generated from the website.
- * 2. Dark mode overrides *tokens*, not component rules. If a component needs a dark-specific rule, the token
- *    vocabulary is missing something – add the token instead.
+ * 1. Never hardcode a hex value here. Use a token from _tokens.css, whose light halves come from the website.
+ * 2. Tokens resolve per colour scheme via light-dark(), so component rules are written once and never branch on
+ *    the mode. If a component needs a dark-specific rule, the token vocabulary is missing something – add the
+ *    token in _tokens.css instead.
  * 3. The raw package accent is decorative only. Text and links use the derived --scverse-color-accent-text, which
  *    the build guarantees meets WCAG AA against the current background. See scverse_doc._color.
  */
 
 @import url("../_tokens.css");
 
-html[data-theme="light"] {
-    --pst-color-primary: var(--scverse-color-primary);
-    --pst-color-secondary: var(--scverse-color-accent-text);
-    --pst-color-link: var(--scverse-color-accent-text);
-    --pst-color-link-hover: var(--scverse-color-primary);
-    --pst-color-inline-code: var(--scverse-color-code-text);
-    --pst-color-surface: var(--scverse-color-surface);
-    --pst-color-border: var(--scverse-color-border);
-    --pst-color-text-muted: var(--scverse-color-text-muted);
-    --pst-heading-color: var(--scverse-color-heading);
-}
-
-html[data-theme="dark"] {
+/* Specific enough to beat pydata’s own html[data-theme="…"] token blocks. */
+html[data-theme] {
     --pst-color-primary: var(--scverse-color-primary);
     --pst-color-secondary: var(--scverse-color-accent-text);
     --pst-color-link: var(--scverse-color-accent-text);
