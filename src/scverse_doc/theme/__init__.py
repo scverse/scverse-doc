@@ -1,27 +1,25 @@
-"""The Sphinx extension.
+"""The theme: brand chrome, the per-package accent, and the ecosystem dropdown.
 
-Registers the theme, pulls in the extension stack,
-and fills in everything a scverse `conf.py` would otherwise repeat.
+Registers ``html_theme = "scverse"`` and translates the options a package declares
+(:confval:`package`, :confval:`repo`, :confval:`accent`) into what `pydata-sphinx-theme` expects.
 """
 
 from __future__ import annotations
 
-from collections import ChainMap
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from sphinx.util.typing import ExtensionMetadata
 
-from . import registry
-from ._color import derive_readable
-from .config import EXTENSIONS, _is_set_by_user, apply_defaults
-from .registry import DEFAULT_ACCENT, intersphinx, packages
+from .._color import derive_readable
+from ..registry import DEFAULT_ACCENT, build_cache, packages
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-THEME_PATH = Path(__file__).parent / "theme" / "scverse"
+THEME_PATH = Path(__file__).parent / "scverse"
 
 #: `pydata-sphinx-theme`’s page backgrounds, which the derived accents must be readable on.
 LIGHT_BACKGROUND = "#ffffff"
@@ -41,10 +39,6 @@ _ICON_LINKS = (
 )
 
 
-def _build_cache(app: Sphinx) -> Path:
-    return Path(app.doctreedir) / "__scverse__"
-
-
 def _package_name(config: Config) -> str:
     return str(config.html_theme_options.get("package") or config.project)
 
@@ -55,6 +49,18 @@ def _accent(config: Config) -> str:
     if (pkg := packages.get(_package_name(config))) is not None:
         return pkg.accent
     return DEFAULT_ACCENT
+
+
+def _branch(options: dict[str, Any]) -> str:
+    """The ref edit links point at: the option, else what Read the Docs is building, else ``main``."""
+    if branch := options.get("branch"):
+        return str(branch)
+    # On pull request builds the identifier is the PR number, not a ref.
+    if os.environ.get("READTHEDOCS_VERSION_TYPE") != "external" and (
+        ref := os.environ.get("READTHEDOCS_GIT_IDENTIFIER")
+    ):
+        return ref
+    return "main"
 
 
 def _expand_repo(config: Config) -> None:
@@ -68,7 +74,7 @@ def _expand_repo(config: Config) -> None:
         config.html_context = {
             "github_user": owner,
             "github_repo": name,
-            "github_version": options.get("branch", "main"),
+            "github_version": _branch(options),
             "doc_path": options.get("doc_path", "docs/"),
             "default_mode": "auto",
             **config.html_context,
@@ -76,27 +82,18 @@ def _expand_repo(config: Config) -> None:
     options["icon_links"] = [*icon_links, *_ICON_LINKS]
 
 
-def resolve_intersphinx(app: Sphinx, config: Config) -> None:
-    """Resolve the lazy mapping `intersphinx` returns, now that `registry.cache_dir` is set."""
-    if isinstance(config.intersphinx_mapping, ChainMap):
-        config.intersphinx_mapping = dict(config.intersphinx_mapping)
-
-
 def configure(app: Sphinx, config: Config) -> None:
-    """Apply the scverse defaults to a build that opted in via `html_theme`."""
+    """Expand the declared theme options and generate the accent stylesheet.
+
+    Only for `html_theme = "scverse"`: the options written here are `pydata-sphinx-theme`’s.
+    """
     if config.html_theme != "scverse":
         return
 
-    apply_defaults(config)
     _expand_repo(config)
 
-    if not _is_set_by_user(config, "intersphinx_mapping"):
-        config.intersphinx_mapping = dict(intersphinx())
-    if not _is_set_by_user(config, "html_title"):
-        config.html_title = config.project
-
     accent = _accent(config)
-    static_dir = _build_cache(app) / "static"
+    static_dir = build_cache(app) / "static"
     static_dir.mkdir(parents=True, exist_ok=True)
     (static_dir / "scverse-accent.css").write_text(
         _ACCENT_CSS.format(
@@ -127,17 +124,10 @@ def add_ecosystem_context(
 
 
 def setup(app: Sphinx) -> ExtensionMetadata:
-    """Register the theme, the extension stack, and the build hooks."""
+    """Register the theme, its templates, and the build hooks."""
     app.add_html_theme("scverse", str(THEME_PATH))
     app.config.templates_path = [*app.config.templates_path, str(THEME_PATH / "components")]
 
-    # Set here, i.e. after `conf.py` ran: nothing may touch the registry before this – see `intersphinx`.
-    registry.cache_dir = _build_cache(app)
-
-    for extension in EXTENSIONS:
-        app.setup_extension(extension)
-
-    app.connect("config-inited", resolve_intersphinx)
     app.connect("config-inited", configure)
     app.connect("html-page-context", add_ecosystem_context)
 

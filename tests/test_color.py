@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from scverse_doc._color import WCAG_AA_NORMAL, contrast_ratio, derive_readable, parse_hex
-from scverse_doc._ext import DARK_BACKGROUND, LIGHT_BACKGROUND
 from scverse_doc.registry import packages
+from scverse_doc.theme import DARK_BACKGROUND, LIGHT_BACKGROUND
 
 ACCENTS = sorted({pkg.accent for pkg in packages.values()})
 
