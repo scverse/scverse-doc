@@ -10,6 +10,7 @@ keeping hue and saturation intact so the result still reads as the package’s c
 
 from __future__ import annotations
 
+import colorsys
 import re
 from typing import NamedTuple
 
@@ -17,9 +18,6 @@ __all__ = ["contrast_ratio", "derive_readable", "parse_hex", "relative_luminance
 
 #: Minimum contrast ratio for normal-size body text under WCAG 2.1 AA.
 WCAG_AA_NORMAL = 4.5
-
-#: Minimum contrast ratio for large text and non-text UI components under WCAG 2.1 AA.
-WCAG_AA_LARGE = 3.0
 
 _HEX_RE = re.compile(r"\A#?(?P<digits>[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\Z")
 
@@ -59,7 +57,7 @@ def parse_hex(color: str) -> RGB:
     digits = m["digits"]
     if len(digits) == 3:
         digits = "".join(d * 2 for d in digits)
-    return RGB(*(int(digits[i : i + 2], 16) / 255 for i in (0, 2, 4)))
+    return RGB(*(c / 255 for c in bytes.fromhex(digits)))
 
 
 def _to_linear(channel: float) -> float:
@@ -102,46 +100,6 @@ def contrast_ratio(fg: RGB | str, bg: RGB | str) -> float:
     return (lighter + 0.05) / (darker + 0.05)
 
 
-def _to_hsl(color: RGB) -> tuple[float, float, float]:
-    """Convert sRGB to HSL, with hue in degrees and the rest in ``[0, 1]``."""
-    r, g, b = color
-    high, low = max(r, g, b), min(r, g, b)
-    lightness = (high + low) / 2
-    if high == low:
-        return 0.0, 0.0, lightness
-    delta = high - low
-    saturation = delta / (2 - high - low) if lightness > 0.5 else delta / (high + low)
-    match high:
-        case _ if high == r:
-            hue = ((g - b) / delta) % 6
-        case _ if high == g:
-            hue = (b - r) / delta + 2
-        case _:
-            hue = (r - g) / delta + 4
-    return hue * 60, saturation, lightness
-
-
-def _from_hsl(hue: float, saturation: float, lightness: float) -> RGB:
-    """Convert HSL back to sRGB."""
-    chroma = (1 - abs(2 * lightness - 1)) * saturation
-    secondary = chroma * (1 - abs((hue / 60) % 2 - 1))
-    offset = lightness - chroma / 2
-    match hue % 360:
-        case h if h < 60:
-            triple = (chroma, secondary, 0.0)
-        case h if h < 120:
-            triple = (secondary, chroma, 0.0)
-        case h if h < 180:
-            triple = (0.0, chroma, secondary)
-        case h if h < 240:
-            triple = (0.0, secondary, chroma)
-        case h if h < 300:
-            triple = (secondary, 0.0, chroma)
-        case _:
-            triple = (chroma, 0.0, secondary)
-    return RGB(*(c + offset for c in triple))
-
-
 def derive_readable(accent: str, background: str, *, target: float = WCAG_AA_NORMAL) -> str:
     """Derive a text-safe variant of `accent` that meets `target` contrast against `background`.
 
@@ -172,7 +130,7 @@ def derive_readable(accent: str, background: str, *, target: float = WCAG_AA_NOR
     if contrast_ratio(accent, background) >= target:
         return parse_hex(accent).to_hex()
 
-    hue, saturation, lightness = _to_hsl(parse_hex(accent))
+    hue, lightness, saturation = colorsys.rgb_to_hls(*parse_hex(accent))
     darken = relative_luminance(background) > 0.5
     step = -1 / 512 if darken else 1 / 512
 
@@ -180,7 +138,7 @@ def derive_readable(accent: str, background: str, *, target: float = WCAG_AA_NOR
     # a float lightness that clears the target can fall back under it once quantized,
     # which is how #e5864b and #fbb822 ended up one hundredth short of AA.
     while 0.0 <= (lightness := lightness + step) <= 1.0:
-        candidate = parse_hex(_from_hsl(hue, saturation, lightness).to_hex())
+        candidate = parse_hex(RGB(*colorsys.hls_to_rgb(hue, lightness, saturation)).to_hex())
         if contrast_ratio(candidate, background) >= target:
             return candidate.to_hex()
 

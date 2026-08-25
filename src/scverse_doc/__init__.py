@@ -16,8 +16,6 @@ Anything set in `conf.py` wins.
 
 from __future__ import annotations
 
-from importlib.metadata import PackageNotFoundError, version
-
 from . import config, registry
 from ._ext import setup
 from .registry import intersphinx
