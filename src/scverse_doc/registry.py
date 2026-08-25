@@ -20,27 +20,36 @@ from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 from functools import cache, cached_property
 from operator import itemgetter
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from sphinx.application import Sphinx  # noqa: TC002  # `build_cache`’s annotations must resolve at runtime
 from sphinx.util import requests
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping
-    from pathlib import Path
 
-__all__ = ["Package", "core_packages", "intersphinx", "packages"]
+__all__ = ["Package", "build_cache", "core_packages", "intersphinx", "packages"]
 
 #: The published upstream listing.
 SOURCE = "https://scverse.org/ecosystem-packages/packages.json"
 
-#: Where the fetched listing is cached.
-#: The extension points this at its cache directory inside the Sphinx build,
-#: so cleaning the build directory drops the cache too.
-#: :data:`None` fetches every time.
+#: Where the fetched listing is cached; :data:`None` fetches every time. See :func:`build_cache`.
 cache_dir: Path | None = None
 
 #: How long a cached listing is reused before it is fetched again.
 MAX_AGE_SECONDS = 24 * 60 * 60
+
+
+def build_cache(app: Sphinx) -> Path:
+    """Point :data:`~scverse_doc.registry.cache_dir` at a directory inside the build and return it.
+
+    Call from ``setup``, i.e. after `conf.py` ran: nothing may touch the registry before that – see :func:`intersphinx`.
+    """
+    global cache_dir
+    cache_dir = Path(app.doctreedir) / "__scverse__"
+    return cache_dir
+
 
 #: The brand primary, used when a package has no accent of its own.
 DEFAULT_ACCENT = "#4557c4"
@@ -88,20 +97,10 @@ class Package:
     """Whether the package is maintained by the core team or listed as an ecosystem package."""
 
     docs: str
-    """Where to send a reader, exactly as the upstream listing records it.
-
-    This is a link for humans,
-    so it may name a particular page rather than a documentation root.
-    """
+    """Where to send a reader, verbatim from upstream – a link for humans, possibly not a docs root."""
 
     inventory: str | None = None
-    """Root URL under which the package’s ``objects.inv`` resolves,
-    or :data:`None` if it publishes no inventory.
-
-    Distinct from :attr:`docs`:
-    a versioned Read the Docs site serves its inventory and pages under ``en/stable/`` or the like,
-    while its documentation home is the bare domain.
-    """
+    """Root URL under which ``objects.inv`` resolves, or :data:`None` if the package publishes none."""
 
     repo: str | None = None
     """URL of the source repository, if the upstream listing records one."""
@@ -177,38 +176,18 @@ def core_packages() -> Mapping[str, Package]:
 def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainMap[str, tuple[str, None]]:
     """Build an `intersphinx_mapping` for this package.
 
-    Deliberately not “every scverse package by default”:
-    each entry is an inventory fetched on every build,
-    and all 100+ of them would make a cold docs build slow
-    and give it 100+ chances to fail on someone else’s outage.
-    The default is the handful of packages that almost every scverse docs build actually links to,
-    and anything else is opted into by name.
+    Every entry is an inventory fetched on every build, so the ecosystem is opt-in by name.
 
     Parameters
     ----------
     extra
         Additional registry package names to include, e.g. ``intersphinx("scanpy", "muon")``.
-        Unknown names raise,
-        so a typo or a renamed package fails the build instead of silently dropping links.
+        Unknown names raise :exc:`KeyError`, ones without an inventory :exc:`ValueError` –
+        on first access, not here, since a `conf.py` calls this before the extension is loaded.
     external
         Whether to include the non-scverse inventories (Python, NumPy, SciPy, pandas, Matplotlib).
     core
         Whether to include the core packages that publish an inventory.
-
-    Returns
-    -------
-    A mapping ready to assign to `intersphinx_mapping`.
-
-    Its registry-derived half is resolved on first access, not here –
-    a `conf.py` calls this before the extension is loaded,
-    so `Raises` below applies to that first access rather than to this call.
-
-    Raises
-    ------
-    KeyError
-        If a name in `extra` is not in the registry.
-    ValueError
-        If a name in `extra` is registered but publishes no ``objects.inv`` to link against.
 
     Examples
     --------
@@ -226,9 +205,7 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainM
 class _RegistryInventories(Mapping[str, tuple[str, None]]):
     """The registry-derived half of an `intersphinx_mapping`, resolved on first access.
 
-    :func:`intersphinx` is meant to be called at `conf.py` module level,
-    which happens before the extension is loaded and thus before :data:`cache_dir` is set,
-    so nothing may touch the registry until Sphinx reads the mapping back.
+    Lazy because `conf.py` calls :func:`intersphinx` before :data:`cache_dir` is set.
     """
 
     def __init__(self, extra: tuple[str, ...], *, core: bool) -> None:

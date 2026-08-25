@@ -11,6 +11,3 @@ bibtex_bibfiles = ["references.bib"]
 from scverse_doc import intersphinx  # noqa: E402
 
 intersphinx_mapping = intersphinx() | {"sphinx": ("https://www.sphinx-doc.org/en/master/", None)}
-
-# Autodoc renders the annotation unqualified, so it cannot be resolved against Sphinx's inventory.
-nitpick_ignore = [("py:class", "Config")]

@@ -37,7 +37,7 @@ urls.Documentation = "https://scverse-doc.readthedocs.io/"
 urls.Homepage = "https://github.com/scverse/scverse-doc"
 urls.Source = "https://github.com/scverse/scverse-doc"
 # Makes `html_theme = "scverse"` resolve after installation.
-entry-points."sphinx.html_themes".scverse = "scverse_doc"
+entry-points."sphinx.html_themes".scverse = "scverse_doc.theme"
 
 [dependency-groups]
 dev = [
@@ -107,17 +107,18 @@ lint.select = [
   "W",      # Warning detected by Pycodestyle
 ]
 lint.ignore = [
-  "B008", # Errors from function calls in argument defaults. These are fine when the result is immutable.
-  "D105", # __magic__ methods are often self-explanatory, allow missing docstrings
-  "D107", # Missing docstring in __init__
+  "B008",   # Errors from function calls in argument defaults. These are fine when the result is immutable.
+  "D105",   # __magic__ methods are often self-explanatory, allow missing docstrings
+  "D107",   # Missing docstring in __init__
   # Disable one in each pair of mutually incompatible rules
-  "D203", # We don’t want a blank line before a class docstring
-  "D213", # <> We want docstrings to start immediately after the opening triple quote
-  "D400", # first line should end with a period [Bug: doesn’t work with single-line docstrings]
-  "D401", # First line should be in imperative mood; try rephrasing
-  "E501", # line too long -> we accept long comment lines; formatter gets rid of long code lines
-  "E731", # Do not assign a lambda expression, use a def -> lambda expression assignments are convenient
-  "E741", # allow I, O, l as variable names -> I is the identity matrix
+  "D203",   # We don’t want a blank line before a class docstring
+  "D213",   # <> We want docstrings to start immediately after the opening triple quote
+  "D400",   # first line should end with a period [Bug: doesn’t work with single-line docstrings]
+  "D401",   # First line should be in imperative mood; try rephrasing
+  "E501",   # line too long -> we accept long comment lines; formatter gets rid of long code lines
+  "E731",   # Do not assign a lambda expression, use a def -> lambda expression assignments are convenient
+  "E741",   # allow I, O, l as variable names -> I is the identity matrix
+  "TID252", # Allow relative imports
 ]
 lint.per-file-ignores."docs/*" = [ "I" ]
 lint.per-file-ignores."tests/*" = [ "D" ]

@@ -1,30 +1,42 @@
 # API
 
-## Configuration
+`extensions = ["scverse_doc"]` sets up every subextension below; each also works on its own.
 
 ```{eval-rst}
-.. currentmodule:: scverse_doc
-
-.. autosummary::
-    :toctree: generated
-
-    config.apply_defaults
+.. automodule:: scverse_doc
 ```
 
-## Registry
+```{toctree}
+:hidden:
+
+api/config.md
+api/theme.md
+api/registry.md
+```
+
+## {doc}`api/config`
 
 ```{eval-rst}
-.. currentmodule:: scverse_doc
-
 .. autosummary::
-    :toctree: generated
+
+    config.EXTENSIONS
+    config.MYST_ENABLE_EXTENSIONS
+    config.DEFAULTS
+```
+
+## {doc}`api/theme`
+
+Registers the theme and its {ref}`theme options <theme-options>`.
+
+## {doc}`api/registry`
+
+```{eval-rst}
+.. autosummary::
 
     registry.packages
     registry.core_packages
     registry.intersphinx
-```
-
-```{eval-rst}
-.. autoclass:: scverse_doc.registry.Package
-    :members:
+    registry.Package
+    registry.cache_dir
+    registry.build_cache
 ```

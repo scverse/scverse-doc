@@ -9,7 +9,7 @@ like on any other – switch the theme with the toggle in the navbar.
 
 Body copy with **bold**, *italic*, `inline literal` (the default role), an
 [external link](https://scverse.org), an [internal one](api.md), a footnote[^fn] and a
-cross-reference to {func}`~scverse_doc.config.apply_defaults`.
+cross-reference to {func}`~scverse_doc.registry.intersphinx`.
 
 [^fn]: Footnotes land here.
 
