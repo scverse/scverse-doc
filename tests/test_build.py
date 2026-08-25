@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from sphinx.application import Sphinx
+from sphinx.environment import CONFIG_OK
 
 from scverse_doc.config import DEFAULTS
 
@@ -17,13 +18,15 @@ if TYPE_CHECKING:
 ROOTS = Path(__file__).parent / "roots"
 
 
-def build(root: Path, out: Path, **overrides: object) -> tuple[Sphinx, str]:
+def build(root: Path, out: Path, *, freshenv: bool = True, **overrides: object) -> tuple[Sphinx, str]:
     """Build `root` into `out` and return the app and the rendered index page."""
-    app, _ = build_capturing_warnings(root, out, **overrides)
+    app, _ = build_capturing_warnings(root, out, freshenv=freshenv, **overrides)
     return app, (out / "html" / "index.html").read_text()
 
 
-def build_capturing_warnings(root: Path, out: Path, **overrides: object) -> tuple[Sphinx, str]:
+def build_capturing_warnings(
+    root: Path, out: Path, *, freshenv: bool = True, **overrides: object
+) -> tuple[Sphinx, str]:
     """Build `root` into `out` and return the app and everything it wrote to the warning stream."""
     warnings = StringIO()
     app = Sphinx(
@@ -34,7 +37,7 @@ def build_capturing_warnings(root: Path, out: Path, **overrides: object) -> tupl
         buildername="html",
         confoverrides={"intersphinx_mapping": {}, "nitpicky": False, **overrides},
         warning=warnings,
-        freshenv=True,
+        freshenv=freshenv,
     )
     app.build()
     return app, warnings.getvalue()
@@ -74,6 +77,17 @@ def test_build_is_warning_free(tmp_path: Path) -> None:
     # Building several Sphinx apps in one process re-registers nodes and directives; that noise is the harness.
     real = [line for line in warnings.splitlines() if line.strip() and "is already registered" not in line]
     assert real == []
+
+
+def test_rebuilding_reuses_everything(tmp_path: Path) -> None:
+    """The config we inject must hash the same next build, or every page is written again."""
+    build(ROOTS / "minimal", tmp_path)
+    buildinfo = (tmp_path / "html" / ".buildinfo").read_text()
+
+    app, _ = build(ROOTS / "minimal", tmp_path, freshenv=False)
+    assert (tmp_path / "html" / ".buildinfo").read_text() == buildinfo
+    assert app.env.config_status == CONFIG_OK
+    assert list(app.builder.get_outdated_docs()) == []
 
 
 def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:

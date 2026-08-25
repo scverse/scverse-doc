@@ -15,16 +15,17 @@ from __future__ import annotations
 
 import json
 import time
+from collections import ChainMap
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
-from functools import cache
+from functools import cache, cached_property
 from operator import itemgetter
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from sphinx.util import requests
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import MutableMapping
     from pathlib import Path
 
 __all__ = ["Package", "core_packages", "intersphinx", "packages"]
@@ -33,8 +34,8 @@ __all__ = ["Package", "core_packages", "intersphinx", "packages"]
 SOURCE = "https://scverse.org/ecosystem-packages/packages.json"
 
 #: Where the fetched listing is cached.
-#: The extension points this at the Sphinx build’s doctree directory – where intersphinx caches its inventories –
-#: so cleaning the build directory drops it too.
+#: The extension points this at its cache directory inside the Sphinx build,
+#: so cleaning the build directory drops the cache too.
 #: :data:`None` fetches every time.
 cache_dir: Path | None = None
 
@@ -173,7 +174,7 @@ def core_packages() -> Mapping[str, Package]:
     return {name: pkg for name, pkg in packages.items() if pkg.kind == "core"}
 
 
-def intersphinx(*extra: str, external: bool = True, core: bool = True) -> dict[str, tuple[str, None]]:
+def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainMap[str, tuple[str, None]]:
     """Build an `intersphinx_mapping` for this package.
 
     Deliberately not “every scverse package by default”:
@@ -198,6 +199,10 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> dict[s
     -------
     A mapping ready to assign to `intersphinx_mapping`.
 
+    Its registry-derived half is resolved on first access, not here –
+    a `conf.py` calls this before the extension is loaded,
+    so `Raises` below applies to that first access rather than to this call.
+
     Raises
     ------
     KeyError
@@ -211,19 +216,45 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> dict[s
     >>> mapping["scanpy"]  # doctest: +ELLIPSIS
     ('https://scanpy.scverse.org/...', None)
     """
-    mapping: dict[str, tuple[str, None]] = {}
-    if external:
-        mapping.update({name: (url, None) for name, url in EXTERNAL.items()})
+    external_mapping: dict[str, tuple[str, None]] = (
+        {name: (url, None) for name, url in EXTERNAL.items()} if external else {}
+    )
+    registry_half = cast("MutableMapping[str, tuple[str, None]]", _RegistryInventories(extra, core=core))
+    return ChainMap(external_mapping, registry_half)
 
-    core_names = (name for name, pkg in core_packages().items() if pkg.inventory) if core else ()
-    names: Iterable[str] = (*core_names, *extra)
-    for name in names:
-        if (pkg := packages.get(name)) is None:
-            msg = f"{name!r} is not in the scverse registry. Known packages: {', '.join(packages)}"
-            raise KeyError(msg)
-        if pkg.inventory is None:
-            msg = f"{pkg.name} publishes no objects.inv at {pkg.docs}, so there is nothing to link against."
-            raise ValueError(msg)
-        # Key on the requested name so `:doc:`scanpy:...`` reads the way the author wrote it.
-        mapping[name] = (pkg.inventory, None)
-    return mapping
+
+class _RegistryInventories(Mapping[str, tuple[str, None]]):
+    """The registry-derived half of an `intersphinx_mapping`, resolved on first access.
+
+    :func:`intersphinx` is meant to be called at `conf.py` module level,
+    which happens before the extension is loaded and thus before :data:`cache_dir` is set,
+    so nothing may touch the registry until Sphinx reads the mapping back.
+    """
+
+    def __init__(self, extra: tuple[str, ...], *, core: bool) -> None:
+        self._extra = extra
+        self._core = core
+
+    @cached_property
+    def _resolved(self) -> dict[str, tuple[str, None]]:
+        core_names = (name for name, pkg in core_packages().items() if pkg.inventory) if self._core else ()
+        mapping: dict[str, tuple[str, None]] = {}
+        for name in (*core_names, *self._extra):
+            if (pkg := packages.get(name)) is None:
+                msg = f"{name!r} is not in the scverse registry. Known packages: {', '.join(packages)}"
+                raise KeyError(msg)
+            if pkg.inventory is None:
+                msg = f"{pkg.name} publishes no objects.inv at {pkg.docs}, so there is nothing to link against."
+                raise ValueError(msg)
+            # Key on the requested name so `:doc:`scanpy:...`` reads the way the author wrote it.
+            mapping[name] = (pkg.inventory, None)
+        return mapping
+
+    def __getitem__(self, name: str) -> tuple[str, None]:
+        return self._resolved[name]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._resolved)
+
+    def __len__(self) -> int:
+        return len(self._resolved)

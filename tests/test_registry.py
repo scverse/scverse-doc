@@ -60,8 +60,16 @@ def test_intersphinx_covers_core_and_keeps_the_ecosystem_opt_in() -> None:
 
 
 def test_unknown_extra_fails_loudly() -> None:
+    mapping = intersphinx("scnapy")  # lazy: nothing is resolved yet
     with pytest.raises(KeyError, match="not in the scverse registry"):
-        intersphinx("scnapy")
+        dict(mapping)
+
+
+def test_intersphinx_does_not_touch_the_registry_before_it_is_read(monkeypatch: pytest.MonkeyPatch) -> None:
+    # A `conf.py` calls `intersphinx` before the extension sets `cache_dir`, so the registry must stay untouched.
+    for name in ("_fetch", "_load"):
+        monkeypatch.setattr(registry, name, pytest.fail)
+    intersphinx("annsel")
 
 
 def test_lookup_is_case_insensitive() -> None:
