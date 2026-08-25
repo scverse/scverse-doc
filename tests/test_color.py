@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from scverse_doc._color import WCAG_AA_NORMAL, contrast_ratio, derive_readable
+from scverse_doc._color import WCAG_AA_NORMAL, contrast_ratio, derive_readable, parse_hex
 from scverse_doc._ext import DARK_BACKGROUND, LIGHT_BACKGROUND
 from scverse_doc.registry import packages
 
@@ -23,3 +23,8 @@ def test_derivation_is_load_bearing() -> None:
 
 def test_readable_accent_is_left_alone() -> None:
     assert derive_readable("#000000", LIGHT_BACKGROUND) == "#000000"
+
+
+def test_short_hex_is_expanded() -> None:
+    """Users can write ``accent = "#c0f"`` in ``html_theme_options``."""
+    assert parse_hex("#c0f") == parse_hex("#cc00ff")
