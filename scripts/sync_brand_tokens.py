@@ -3,7 +3,7 @@
 # requires-python = ">=3.12"
 # dependencies = []
 # ///
-"""Refresh the generated region of the brand token stylesheet from the scverse website’s SCSS.
+"""Refresh the generated brand assets from the scverse website.
 
 The website is the brand’s source of truth,
 so transcribing its hex values into this repository by hand
@@ -14,6 +14,8 @@ and writes them into ``_tokens.css`` as ``--scverse-color-x-light`` values.
 Only the region between the marker comments is touched; it holds upstream hex values and nothing else.
 The rest of the file is hand-authored – including the ``light-dark()`` tokens that pair each generated
 light value with a dark one, because the website has no dark mode to extract those from.
+
+The scverse logo used for the navbar link back to the website is copied verbatim for the same reason.
 
 Usage
 -----
@@ -28,7 +30,11 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
-TARGET = HERE.parent / "src" / "scverse_doc" / "theme" / "scverse" / "static" / "_tokens.css"
+STATIC = HERE.parent / "src" / "scverse_doc" / "theme" / "scverse" / "static"
+TARGET = STATIC / "_tokens.css"
+
+#: Website file -> theme static file, copied verbatim.
+ASSETS = {Path("static/img/logo/scverse-fa.svg"): STATIC / "scverse-fa.svg"}
 
 #: SCSS variable in ``assets/main.scss`` -> CSS custom property emitted here.
 TOKEN_MAP = {
@@ -106,15 +112,18 @@ def main() -> int:
         print(f"literal brand colours no longer found in main.scss: {', '.join(stale)}", file=sys.stderr)
         return 1
 
-    current = TARGET.read_text()
-    rendered = render(scss, current)
+    updates = {
+        TARGET: render(scss, TARGET.read_text()).encode(),
+        **{dst: (args.website / src).read_bytes() for src, dst in ASSETS.items()},
+    }
     if args.check:
-        if current != rendered:
-            print(f"{TARGET} is out of date; rerun scripts/sync_brand_tokens.py", file=sys.stderr)
+        if outdated := [str(dst) for dst, new in updates.items() if not dst.is_file() or dst.read_bytes() != new]:
+            print(f"{', '.join(outdated)} out of date; rerun scripts/sync_brand_tokens.py", file=sys.stderr)
             return 1
         return 0
-    TARGET.write_text(rendered)
-    print(f"wrote {TARGET}")
+    for dst, new in updates.items():
+        dst.write_bytes(new)
+        print(f"wrote {dst}")
     return 0
 
 

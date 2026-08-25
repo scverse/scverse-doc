@@ -23,8 +23,3 @@ from ._ext import setup
 from .registry import intersphinx
 
 __all__ = ["config", "intersphinx", "registry", "setup"]
-
-try:
-    __version__ = version("scverse-doc")
-except PackageNotFoundError:  # pragma: no cover
-    __version__ = "0.0.0"
