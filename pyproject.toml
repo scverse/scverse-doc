@@ -43,6 +43,7 @@ entry-points."sphinx.html_themes".scverse = "scverse_doc.theme"
 
 [dependency-groups]
 dev = [
+  "prek",
   "twine>=4.0.2",
 ]
 test = [
