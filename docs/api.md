@@ -27,6 +27,8 @@ api/registry.md
 ## {doc}`api/theme`
 
 Registers the theme and its {ref}`theme options <theme-options>`.
+Selecting it with `html_theme = "scverse"` is enough on its own –
+it is a registered Sphinx theme, so it needs no `extensions` entry.
 
 ## {doc}`api/registry`
 
