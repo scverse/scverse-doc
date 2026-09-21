@@ -77,7 +77,6 @@ envs.hatch-check-fmt.scripts.format-check = "echo 'try `hatch check fmt --fix`';
 envs.hatch-check-fmt.scripts.format-fix = "prek run -a --group=format --no-group=typecheck"
 envs.hatch-check-types.scripts.check = [ "mypy" ]
 envs.hatch-check-types.dependency-groups = [ "typecheck", "doc", "test" ]
-envs.hatch-test.default-args = []
 envs.hatch-test.matrix = [
   # Test the lowest and highest supported Python versions with normal deps
   { deps = [ "stable" ], python = [ "3.12", "3.14" ] },
@@ -89,6 +88,7 @@ envs.hatch-test.matrix = [
 envs.hatch-test.overrides.matrix.deps.env-vars = [
   { value = "allow", key = "UV_PRERELEASE", if = [ "pre" ] },
 ]
+envs.hatch-test.default-args = []
 envs.hatch-test.dependency-groups = [ "dev", "test" ]
 
 [tool.ruff]
