@@ -1,7 +1,8 @@
 """The scverse theme: brand chrome, the per-package accent, and the ecosystem dropdown.
 
-Set ``html_theme = "scverse"`` and declare the package with the
-:ref:`theme options <theme-options>`; `pydata-sphinx-theme`’s own options work as well.
+:mod:`scverse_doc` selects this theme; on its own, set ``html_theme = "scverse"``.
+Declare the package with the :ref:`theme options <theme-options>`;
+`pydata-sphinx-theme`’s own options work as well.
 The accent colour and the “scverse packages” dropdown come from the
 :mod:`registry <scverse_doc.registry>`, without any configuration.
 """
@@ -86,11 +87,17 @@ def _expand_repo(config: Config) -> None:
     options["icon_links"] = [*icon_links, *_ICON_LINKS]
 
 
-def _configure(app: Sphinx, config: Config) -> None:
+def _configure(app: Sphinx) -> None:
     """Expand the declared theme options and generate the accent stylesheet.
 
     Only for `html_theme = "scverse"`: the options written here are `pydata-sphinx-theme`’s.
+
+    On ``builder-inited``, not ``config-inited``: selecting the theme without listing this
+    extension loads it from the ``sphinx.html_themes`` entry point, which Sphinx only does
+    when the builder creates the theme – long after ``config-inited``.
+    `pydata-sphinx-theme` reads these options from the same event, but connects later.
     """
+    config = app.config
     if config.html_theme != "scverse":
         return
 
@@ -132,7 +139,7 @@ def setup(app: Sphinx) -> ExtensionMetadata:
     app.add_html_theme("scverse", str(_THEME_PATH))
     app.config.templates_path = [*app.config.templates_path, str(_THEME_PATH / "components")]
 
-    app.connect("config-inited", _configure)
+    app.connect("builder-inited", _configure)
     app.connect("html-page-context", _add_ecosystem_context)
 
     return ExtensionMetadata(parallel_read_safe=True)

@@ -2,7 +2,6 @@
 
 project = "scverse-doc"
 extensions = ["scverse_doc", "sphinxcontrib.bibtex"]
-html_theme = "scverse"
 html_theme_options = {"repo": "scverse/scverse-doc", "announcement": ""}
 
 bibtex_bibfiles = ["references.bib"]

@@ -90,6 +90,20 @@ def test_rebuilding_reuses_everything(tmp_path: Path) -> None:
     assert list(app.builder.get_outdated_docs()) == []
 
 
+def test_theme_works_without_being_listed_as_an_extension(tmp_path: Path) -> None:
+    """Selecting the theme loads it from the entry point, which happens after ``config-inited``."""
+    app, html = build(ROOTS / "theme-only", tmp_path)
+    assert "scverse_doc.theme" in app.extensions
+    assert "scverse-accent.css" in html
+    assert "github.com/scverse/pertpy" in html
+    assert "scverse-ecosystem-dropdown" in html
+
+
+def test_conf_py_can_pick_another_theme(tmp_path: Path) -> None:
+    app, _ = build(ROOTS / "minimal", tmp_path, html_theme="alabaster")
+    assert app.config.html_theme == "alabaster"
+
+
 def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
     app, html = build(ROOTS / "override", tmp_path)
     assert app.config.nb_execution_mode == "force"

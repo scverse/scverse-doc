@@ -12,12 +12,19 @@ Install it, and a package's `conf.py` becomes:
 
 ```python
 extensions = ["scverse_doc"]
-html_theme = "scverse"
 
 html_theme_options = {"repo": "scverse/pertpy"}
 ```
 
 That gets you the scverse brand and dark mode, the shared navbar, footer, and announcement banner, a "scverse packages" dropdown generated from the package registry, cross-links to every core package, and the standard extension stack.
+
+Every piece also works on its own. For the theme without the extension stack or the shared defaults, select it and leave `extensions` alone – it is a registered Sphinx theme, so installing the package is enough:
+
+```python
+html_theme = "scverse"
+
+html_theme_options = {"repo": "scverse/pertpy"}
+```
 
 ## Getting started
 
