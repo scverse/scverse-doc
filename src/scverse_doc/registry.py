@@ -5,6 +5,7 @@
 
 Set up as an extension, it defaults `intersphinx_mapping` to :func:`intersphinx()`,
 so linking into the core packages needs nothing in `conf.py`.
+See :func:`intersphinx()` for more.
 
 .. _listed packages: https://scverse.org/packages/
 """
@@ -192,9 +193,13 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainM
 
     Examples
     --------
-    >>> mapping = intersphinx("scanpy")
-    >>> mapping["scanpy"]  # doctest: +ELLIPSIS
+    >>> intersphinx_mapping = intersphinx("scanpy")
+    >>> intersphinx_mapping["scanpy"]  # doctest: +ELLIPSIS
     ('https://scanpy.scverse.org/...', None)
+
+    >>> intersphinx_mapping = {**intersphinx(), "my_package": ("...", None)}
+    >>> intersphinx_mapping["my_package"]
+    ('...', None)
     """
     external_mapping: dict[str, tuple[str, None]] = (
         {name: (url, None) for name, url in _EXTERNAL.items()} if external else {}
