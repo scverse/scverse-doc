@@ -88,6 +88,7 @@ envs.hatch-test.matrix = [
 envs.hatch-test.overrides.matrix.deps.env-vars = [
   { value = "allow", key = "UV_PRERELEASE", if = [ "pre" ] },
 ]
+envs.hatch-test.default-args = []
 envs.hatch-test.dependency-groups = [ "dev", "test" ]
 
 [tool.ruff]
@@ -135,9 +136,10 @@ exclude = [ "tests/roots/" ]
 [tool.pytest]
 addopts = [
   "--import-mode=importlib", # allow using test files with same name
+  "--doctest-modules",
 ]
 strict = true
-testpaths = [ "tests" ]
+testpaths = [ "tests", "src" ]
 
 [tool.coverage]
 run.source = [ "scverse_doc" ]

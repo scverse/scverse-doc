@@ -11,8 +11,4 @@
 
 .. autoclass:: Package
     :members:
-
-.. autodata:: cache_dir
-
-.. autofunction:: build_cache
 ```

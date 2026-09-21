@@ -1,7 +1,7 @@
 """The extension stack and the shared defaults.
 
-:data:`EXTENSIONS` are set up on top of this one, :data:`DEFAULTS` are applied to the config.
-Both are *defaults*: a value set in `conf.py` always wins.
+Sets up the extensions in :data:`EXTENSIONS`, so `conf.py` lists only ``scverse_doc``,
+and fills in :data:`DEFAULTS`. Anything set in `conf.py` always wins.
 """
 
 from __future__ import annotations

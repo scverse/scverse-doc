@@ -1,4 +1,7 @@
 {
+    "[python][json][jsonc]": {
+        "editor.formatOnSave": true,
+    },
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.codeActionsOnSave": {
@@ -6,6 +9,11 @@
             "source.organizeImports.ruff": "always",
         },
     },
+    "[json][jsonc]": {
+        "editor.defaultFormatter": "biomejs.biome",
+    },
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["-vv", "--color=yes"],
     "python-envs.defaultEnvManager": "pypa.hatch:hatch",
     "python-envs.defaultPackageManager": "pypa.hatch:hatch",
 }

@@ -8,6 +8,6 @@ html_theme_options = {"repo": "scverse/scverse-doc", "announcement": ""}
 bibtex_bibfiles = ["references.bib"]
 
 # This package documents Sphinx internals, which no other scverse package needs.
-from scverse_doc import intersphinx  # noqa: E402
+from scverse_doc.registry import intersphinx  # noqa: E402
 
 intersphinx_mapping = intersphinx() | {"sphinx": ("https://www.sphinx-doc.org/en/master/", None)}
