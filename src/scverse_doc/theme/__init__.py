@@ -1,7 +1,9 @@
-"""The theme: brand chrome, the per-package accent, and the ecosystem dropdown.
+"""The scverse theme: brand chrome, the per-package accent, and the ecosystem dropdown.
 
-Registers ``html_theme = "scverse"`` and translates the options a package declares
-(:confval:`package`, :confval:`repo`, :confval:`accent`) into what `pydata-sphinx-theme` expects.
+Set ``html_theme = "scverse"`` and declare the package with the
+:ref:`theme options <theme-options>`; `pydata-sphinx-theme`’s own options work as well.
+The accent colour and the “scverse packages” dropdown come from the
+:mod:`registry <scverse_doc.registry>`, without any configuration.
 """
 
 from __future__ import annotations
@@ -13,17 +15,19 @@ from typing import TYPE_CHECKING, Any
 from sphinx.util.typing import ExtensionMetadata
 
 from .._color import derive_readable
-from ..registry import DEFAULT_ACCENT, build_cache, packages
+from ..registry import DEFAULT_ACCENT, _build_cache, packages
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-THEME_PATH = Path(__file__).parent / "scverse"
+__all__ = ["setup"]
+
+_THEME_PATH = Path(__file__).parent / "scverse"
 
 #: `pydata-sphinx-theme`’s page backgrounds, which the derived accents must be readable on.
-LIGHT_BACKGROUND = "#ffffff"
-DARK_BACKGROUND = "#14181e"
+_LIGHT_BACKGROUND = "#ffffff"
+_DARK_BACKGROUND = "#14181e"
 
 _ACCENT_CSS = """\
 :root {{
@@ -82,7 +86,7 @@ def _expand_repo(config: Config) -> None:
     options["icon_links"] = [*icon_links, *_ICON_LINKS]
 
 
-def configure(app: Sphinx, config: Config) -> None:
+def _configure(app: Sphinx, config: Config) -> None:
     """Expand the declared theme options and generate the accent stylesheet.
 
     Only for `html_theme = "scverse"`: the options written here are `pydata-sphinx-theme`’s.
@@ -93,20 +97,20 @@ def configure(app: Sphinx, config: Config) -> None:
     _expand_repo(config)
 
     accent = _accent(config)
-    static_dir = build_cache(app) / "static"
+    static_dir = _build_cache(app) / "static"
     static_dir.mkdir(parents=True, exist_ok=True)
     (static_dir / "scverse-accent.css").write_text(
         _ACCENT_CSS.format(
             accent=accent,
-            light=derive_readable(accent, LIGHT_BACKGROUND),
-            dark=derive_readable(accent, DARK_BACKGROUND),
+            light=derive_readable(accent, _LIGHT_BACKGROUND),
+            dark=derive_readable(accent, _DARK_BACKGROUND),
         )
     )
     config.html_static_path = [*config.html_static_path, str(static_dir)]
     app.add_css_file("scverse-accent.css")
 
 
-def add_ecosystem_context(
+def _add_ecosystem_context(
     app: Sphinx,
     pagename: str,
     templatename: str,
@@ -125,10 +129,10 @@ def add_ecosystem_context(
 
 def setup(app: Sphinx) -> ExtensionMetadata:
     """Register the theme, its templates, and the build hooks."""
-    app.add_html_theme("scverse", str(THEME_PATH))
-    app.config.templates_path = [*app.config.templates_path, str(THEME_PATH / "components")]
+    app.add_html_theme("scverse", str(_THEME_PATH))
+    app.config.templates_path = [*app.config.templates_path, str(_THEME_PATH / "components")]
 
-    app.connect("config-inited", configure)
-    app.connect("html-page-context", add_ecosystem_context)
+    app.connect("config-inited", _configure)
+    app.connect("html-page-context", _add_ecosystem_context)
 
     return ExtensionMetadata(parallel_read_safe=True)

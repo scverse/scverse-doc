@@ -80,7 +80,7 @@ def test_lookup_is_case_insensitive() -> None:
 @pytest.fixture
 def cache_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[Path]:
     """Point the registry at an empty cache directory, and leave the real one behind for the other tests."""
-    monkeypatch.setattr(registry, "cache_dir", tmp_path)
+    monkeypatch.setattr(registry, "_cache_dir", tmp_path)
     for fn in (registry._fetch, registry._load):
         fn.cache_clear()
     yield tmp_path

@@ -37,6 +37,4 @@ Registers the theme and its {ref}`theme options <theme-options>`.
     registry.core_packages
     registry.intersphinx
     registry.Package
-    registry.cache_dir
-    registry.build_cache
 ```

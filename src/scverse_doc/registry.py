@@ -1,14 +1,12 @@
 """The scverse package registry.
 
-One mapping drives the “scverse packages” navbar dropdown,
-the per-package accent colour, and `intersphinx_mapping`.
+:data:`packages` and :func:`core_packages` give the `listed packages`_ as :class:`Package` objects;
+:func:`intersphinx` turns them into an `intersphinx_mapping`, whole or in part.
 
-Its data is `scverse/ecosystem-packages`’ published `packages.json`_,
-the same listing the website renders, fetched once per build and cached.
-Only the accent colours are added here, because they live in the website’s SCSS instead.
+Set up as an extension, it defaults `intersphinx_mapping` to :func:`intersphinx()`,
+so linking into the core packages needs nothing in `conf.py`.
 
-.. _scverse/ecosystem-packages: https://github.com/scverse/ecosystem-packages
-.. _packages.json: https://scverse.org/ecosystem-packages/packages.json
+.. _listed packages: https://scverse.org/packages/
 """
 
 from __future__ import annotations
@@ -23,39 +21,42 @@ from operator import itemgetter
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from sphinx.application import Sphinx  # noqa: TC002  # `build_cache`’s annotations must resolve at runtime
+from sphinx.application import Sphinx  # noqa: TC002  # `_build_cache`’s annotations must resolve at runtime
 from sphinx.util import requests
+from sphinx.util.typing import ExtensionMetadata
+
+from .config import _is_set_by_user
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping
 
-__all__ = ["Package", "build_cache", "core_packages", "intersphinx", "packages"]
+    from sphinx.config import Config
+
+
+__all__ = ["Package", "core_packages", "intersphinx", "packages"]
 
 #: The published upstream listing.
-SOURCE = "https://scverse.org/ecosystem-packages/packages.json"
+_SOURCE = "https://scverse.org/ecosystem-packages/packages.json"
 
-#: Where the fetched listing is cached; :data:`None` fetches every time. See :func:`build_cache`.
-cache_dir: Path | None = None
+#: Where the fetched listing is cached; :data:`None` fetches every time.
+_cache_dir: Path | None = None
 
 #: How long a cached listing is reused before it is fetched again.
-MAX_AGE_SECONDS = 24 * 60 * 60
+_MAX_AGE_SECONDS = 24 * 60 * 60
 
 
-def build_cache(app: Sphinx) -> Path:
-    """Point :data:`~scverse_doc.registry.cache_dir` at a directory inside the build and return it.
-
-    Call from ``setup``, i.e. after `conf.py` ran: nothing may touch the registry before that – see :func:`intersphinx`.
-    """
-    global cache_dir
-    cache_dir = Path(app.doctreedir) / "__scverse__"
-    return cache_dir
+def _build_cache(app: Sphinx) -> Path:
+    """Point `_cache_dir` at a directory inside the build and return it."""
+    global _cache_dir
+    _cache_dir = Path(app.doctreedir) / "__scverse__"
+    return _cache_dir
 
 
 #: The brand primary, used when a package has no accent of its own.
 DEFAULT_ACCENT = "#4557c4"
 
 #: Brand accents, transcribed from ``assets/main.scss`` in the website repository.
-ACCENTS = {
+_ACCENTS = {
     "anndata": "#e5864b",
     "mudata": "#4ab274",
     "muon": "#6cf1a1",
@@ -70,14 +71,14 @@ ACCENTS = {
 #: Upstream ``category`` -> the ``kind`` recorded here.
 #: ``core-infrastructure`` is skipped:
 #: those entries are repositories (governance, stats, the website), not packages.
-KINDS: dict[str, Literal["core", "ecosystem"]] = {
+_KINDS: dict[str, Literal["core", "ecosystem"]] = {
     "core-datastructure": "core",
     "core-framework": "core",
     "ecosystem": "ecosystem",
 }
 
 #: Non-scverse inventories that essentially every scverse package needs.
-EXTERNAL = {
+_EXTERNAL = {
     "python": "https://docs.python.org/3",
     "numpy": "https://numpy.org/doc/stable/",
     "scipy": "https://docs.scipy.org/doc/scipy/",
@@ -97,16 +98,16 @@ class Package:
     """Whether the package is maintained by the core team or listed as an ecosystem package."""
 
     docs: str
-    """Where to send a reader, verbatim from upstream – a link for humans, possibly not a docs root."""
+    """Where to send a reader – a link for humans, not necessarily a documentation root."""
 
     inventory: str | None = None
     """Root URL under which ``objects.inv`` resolves, or :data:`None` if the package publishes none."""
 
     repo: str | None = None
-    """URL of the source repository, if the upstream listing records one."""
+    """URL of the source repository, if the package lists one."""
 
     description: str = ""
-    """One-line summary, as recorded upstream."""
+    """One-line summary of the package."""
 
     accent: str = DEFAULT_ACCENT
     """The package’s brand accent, falling back to the scverse primary."""
@@ -114,12 +115,12 @@ class Package:
 
 @cache
 def _fetch() -> list[dict[str, Any]]:
-    """Fetch the upstream listing, going through :data:`cache_dir` if one is set."""
-    cached = cache_dir / "scverse-packages.json" if cache_dir is not None else None
-    if cached is not None and cached.is_file() and time.time() - cached.stat().st_mtime < MAX_AGE_SECONDS:
+    """Fetch the upstream listing, going through `_cache_dir` if one is set."""
+    cached = _cache_dir / "scverse-packages.json" if _cache_dir is not None else None
+    if cached is not None and cached.is_file() and time.time() - cached.stat().st_mtime < _MAX_AGE_SECONDS:
         return json.loads(cached.read_text())
     try:
-        response = requests.get(SOURCE, timeout=30)
+        response = requests.get(_SOURCE, timeout=30)
         response.raise_for_status()
     except OSError:  # `requests.RequestException` is an `OSError`, so this covers both it and the file system
         if cached is not None and cached.is_file():
@@ -143,15 +144,15 @@ def _load() -> Mapping[str, Package]:
             inventory=meta.get("inventory"),
             repo=meta.get("project_home"),
             description=" ".join(meta.get("description", "").split()),
-            accent=ACCENTS.get(name, DEFAULT_ACCENT),
+            accent=_ACCENTS.get(name, DEFAULT_ACCENT),
         )
         # Sorted here, because upstream’s listing order is not stable.
         for name, meta in sorted(((meta["name"].casefold(), meta) for meta in _fetch()), key=itemgetter(0))
-        if (kind := KINDS.get(meta.get("category", "")))
+        if (kind := _KINDS.get(meta.get("category", "")))
     }
 
 
-class Packages(Mapping[str, Package]):
+class _Packages(Mapping[str, Package]):
     """Every registered package, looked up case-insensitively."""
 
     def __getitem__(self, name: str) -> Package:
@@ -165,7 +166,7 @@ class Packages(Mapping[str, Package]):
 
 
 #: Every registered package, keyed and ordered by case-folded name.
-packages: Mapping[str, Package] = Packages()
+packages: Mapping[str, Package] = _Packages()
 
 
 def core_packages() -> Mapping[str, Package]:
@@ -182,8 +183,8 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainM
     ----------
     extra
         Additional registry package names to include, e.g. ``intersphinx("scanpy", "muon")``.
-        Unknown names raise :exc:`KeyError`, ones without an inventory :exc:`ValueError` –
-        on first access, not here, since a `conf.py` calls this before the extension is loaded.
+        Unknown names raise :exc:`KeyError`, ones without an inventory :exc:`ValueError`,
+        both on first use of the mapping rather than here.
     external
         Whether to include the non-scverse inventories (Python, NumPy, SciPy, pandas, Matplotlib).
     core
@@ -196,7 +197,7 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainM
     ('https://scanpy.scverse.org/...', None)
     """
     external_mapping: dict[str, tuple[str, None]] = (
-        {name: (url, None) for name, url in EXTERNAL.items()} if external else {}
+        {name: (url, None) for name, url in _EXTERNAL.items()} if external else {}
     )
     registry_half = cast("MutableMapping[str, tuple[str, None]]", _RegistryInventories(extra, core=core))
     return ChainMap(external_mapping, registry_half)
@@ -205,7 +206,7 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainM
 class _RegistryInventories(Mapping[str, tuple[str, None]]):
     """The registry-derived half of an `intersphinx_mapping`, resolved on first access.
 
-    Lazy because `conf.py` calls :func:`intersphinx` before :data:`cache_dir` is set.
+    Lazy because `conf.py` calls :func:`intersphinx` before `_cache_dir` is set.
     """
 
     def __init__(self, extra: tuple[str, ...], *, core: bool) -> None:
@@ -235,3 +236,18 @@ class _RegistryInventories(Mapping[str, tuple[str, None]]):
 
     def __len__(self) -> int:
         return len(self._resolved)
+
+
+def _configure_intersphinx(_app: Sphinx, config: Config) -> None:
+    """Default `intersphinx_mapping` to :func:`intersphinx`, and resolve what a `conf.py` built with it."""
+    if not _is_set_by_user(config, "intersphinx_mapping"):
+        config.intersphinx_mapping = dict(intersphinx())
+    elif isinstance(config.intersphinx_mapping, ChainMap):
+        config.intersphinx_mapping = dict(config.intersphinx_mapping)
+
+
+def setup(app: Sphinx) -> ExtensionMetadata:
+    """Set up the registry and configure intersphinx."""
+    _build_cache(app)
+    app.connect("config-inited", _configure_intersphinx)
+    return ExtensionMetadata(parallel_read_safe=True)
