@@ -1,10 +1,12 @@
-# scverse-doc
-
 [![Tests][badge-tests]][tests]
 [![Documentation][badge-docs]][documentation]
 
 [badge-tests]: https://img.shields.io/github/actions/workflow/status/scverse/scverse-doc/test.yaml?branch=main
 [badge-docs]: https://app.readthedocs.org/projects/scverse-doc/badge/
+
+<!-- badges-end -->
+
+# scverse-doc
 
 The shared Sphinx theme and documentation configuration for scverse packages.
 

@@ -1,5 +1,5 @@
 ```{include} ../README.md
-
+:start-after: <!-- badges-end -->
 ```
 
 ```{toctree}
