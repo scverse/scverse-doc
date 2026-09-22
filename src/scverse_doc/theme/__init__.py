@@ -3,13 +3,13 @@
 :mod:`scverse_doc` selects this theme; on its own, set ``html_theme = "scverse"``.
 Declare the package with the :ref:`theme options <theme-options>`;
 `pydata-sphinx-theme`’s own options work as well.
+This theme sets up :mod:`scverse_doc.source`, which adds the repository links.
 The accent colour and the “scverse packages” dropdown come from the
 :mod:`registry <scverse_doc.registry>`, without any configuration.
 """
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -56,35 +56,12 @@ def _accent(config: Config) -> str:
     return DEFAULT_ACCENT
 
 
-def _branch(options: dict[str, Any]) -> str:
-    """The ref edit links point at: the option, else what Read the Docs is building, else ``main``."""
-    if branch := options.get("branch"):
-        return str(branch)
-    # On pull request builds the identifier is the PR number, not a ref.
-    if os.environ.get("READTHEDOCS_VERSION_TYPE") != "external" and (
-        ref := os.environ.get("READTHEDOCS_GIT_IDENTIFIER")
-    ):
-        return ref
-    return "main"
-
-
-def _expand_repo(config: Config) -> None:
-    """Turn the single ``repo`` theme option into the GitHub chrome pydata expects."""
+def _add_chrome(config: Config) -> None:
+    """Add the brand icon links and the colour mode, alongside whatever :mod:`scverse_doc.source` set."""
     options = config.html_theme_options
-    icon_links = list(options.get("icon_links", []))
-    if repo := str(options.get("repo", "")):
-        owner, _, name = repo.partition("/")
-        icon_links.insert(0, {"name": "GitHub", "url": f"https://github.com/{repo}", "icon": "fa-brands fa-github"})
-        options.setdefault("use_edit_page_button", True)
-        config.html_context = {
-            "github_user": owner,
-            "github_repo": name,
-            "github_version": _branch(options),
-            "doc_path": options.get("doc_path", "docs/"),
-            "default_mode": "auto",
-            **config.html_context,
-        }
-    options["icon_links"] = [*icon_links, *_ICON_LINKS]
+    # Appended, so this works whichever order `scverse_doc.source`’s hook runs in.
+    options["icon_links"] = [*options.get("icon_links", []), *_ICON_LINKS]
+    config.html_context = {"default_mode": "auto", **config.html_context}
 
 
 def _configure(app: Sphinx) -> None:
@@ -101,7 +78,7 @@ def _configure(app: Sphinx) -> None:
     if config.html_theme != "scverse":
         return
 
-    _expand_repo(config)
+    _add_chrome(config)
 
     accent = _accent(config)
     static_dir = _build_cache(app) / "static"
@@ -138,6 +115,7 @@ def setup(app: Sphinx) -> ExtensionMetadata:
     """Register the theme, its templates, and the build hooks."""
     app.add_html_theme("scverse", str(_THEME_PATH))
     app.config.templates_path = [*app.config.templates_path, str(_THEME_PATH / "components")]
+    app.setup_extension("scverse_doc.source")
 
     app.connect("builder-inited", _configure)
     app.connect("html-page-context", _add_ecosystem_context)

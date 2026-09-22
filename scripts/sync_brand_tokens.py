@@ -87,7 +87,7 @@ def render_region(scss: str, indent: str) -> str:
         msg = f"SCSS variables vanished from the website: {', '.join('$' + m for m in missing)}"
         raise KeyError(msg)
 
-    values = {**LITERALS, **{prop: variables[scss_name] for scss_name, prop in TOKEN_MAP.items()}}
+    values = LITERALS | {prop: variables[scss_name] for scss_name, prop in TOKEN_MAP.items()}
     lines = [BEGIN, *(f"{prop}-light: {value};" for prop, value in values.items()), END]
     return "\n".join(indent + line for line in lines)
 

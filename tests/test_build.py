@@ -55,6 +55,15 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
         assert css in html
     assert "NumFOCUS" in html
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
+    assert 'href="https://github.com/scverse/pertpy"' in html
+
+
+def test_linkcode_is_resolved_when_requested(minimal: tuple[Sphinx, str]) -> None:
+    app, _ = minimal
+    assert callable(app.config.linkcode_resolve)
+    assert app.config.linkcode_resolve("py", {"module": "scverse_doc.registry", "fullname": "Package"}).startswith(
+        "https://github.com/scverse/pertpy/blob/main/src/scverse_doc/registry.py#L"
+    )
 
 
 def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[Sphinx, str]) -> None:
@@ -92,16 +101,27 @@ def test_rebuilding_reuses_everything(tmp_path: Path) -> None:
 
 def test_theme_works_without_being_listed_as_an_extension(tmp_path: Path) -> None:
     """Selecting the theme loads it from the entry point, which happens after ``config-inited``."""
-    app, html = build(ROOTS / "theme-only", tmp_path)
+    app, html = build(ROOTS / "entry-point", tmp_path)
     assert "scverse_doc.theme" in app.extensions
     assert "scverse-accent.css" in html
-    assert "github.com/scverse/pertpy" in html
     assert "scverse-ecosystem-dropdown" in html
+    assert "scverse_doc.source" in app.extensions
+    assert "github.com/scverse/pertpy/edit/main/docs/index.rst" in html
+    assert callable(app.config.linkcode_resolve)
+
+
+@pytest.mark.parametrize("theme", ["furo", "sphinx_book_theme"])
+def test_source_links_reach_other_themes(tmp_path: Path, theme: str) -> None:
+    """The names `scverse_doc.source` fills in are the ones these themes really read."""
+    _, html = build(ROOTS / "minimal", tmp_path, html_theme=theme, html_theme_options={})
+    assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
 
 
 def test_conf_py_can_pick_another_theme(tmp_path: Path) -> None:
+    """A theme that declares none of the source options must not be given any."""
     app, _ = build(ROOTS / "minimal", tmp_path, html_theme="alabaster")
     assert app.config.html_theme == "alabaster"
+    assert app.config.html_theme_options.keys() == {"announcement"}
 
 
 def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:

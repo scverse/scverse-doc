@@ -6,7 +6,7 @@ A package’s `conf.py` needs few lines:
 
    extensions = ["scverse_doc"]
 
-   html_theme_options = {"repo": "scverse/pertpy"}
+   source_repository = "https://github.com/scverse/pertpy"
 
 This extension sets up the subextensions,
 each of which also works on its own:
@@ -15,6 +15,8 @@ each of which also works on its own:
     The extension stack and the shared defaults.
 :mod:`scverse_doc.registry`
     The package registry, usable as an :func:`~scverse_doc.registry.intersphinx` mapping.
+:mod:`scverse_doc.source`
+    The repository links: the navbar icon, “edit this page”, and ``[source]``.
 :mod:`scverse_doc.theme`
     The theme, its chrome, and the per-package accent.
 
@@ -27,14 +29,14 @@ from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
-from . import config, registry, theme
+from . import config, registry, source, theme
 from .config import _is_set_by_user
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-__all__ = ["config", "registry", "theme", "setup"]
+__all__ = ["config", "registry", "source", "theme", "setup"]
 
 
 def _default_theme(app: Sphinx, config: Config) -> None:
