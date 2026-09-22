@@ -11,6 +11,7 @@
 
 api/config.md
 api/theme.md
+api/source.md
 api/registry.md
 ```
 
@@ -29,6 +30,11 @@ api/registry.md
 Registers the theme and its {ref}`theme options <theme-options>`.
 Selecting it with `html_theme = "scverse"` is enough on its own –
 it is a registered Sphinx theme, so it needs no `extensions` entry.
+
+## {doc}`api/source`
+
+Repository links – the navbar icon, “edit this page”, and `[source]` –
+from the {ref}`source_* config values <source-options>`, for whichever theme is selected.
 
 ## {doc}`api/registry`
 

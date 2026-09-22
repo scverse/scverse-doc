@@ -48,9 +48,11 @@ dev = [
 ]
 test = [
   "coverage>=7.10",
-  "defusedxml",     # for sphinx.testing’s HTML assertions
+  "defusedxml",        # for sphinx.testing’s HTML assertions
+  "furo",              # to check `scverse_doc.source` against a non-pydata theme
   "pytest",
-  "pytest-cov",     # For VS Code’s coverage functionality
+  "pytest-cov",        # For VS Code’s coverage functionality
+  "sphinx-book-theme",
 ]
 doc = [
   "ipykernel",
@@ -137,6 +139,10 @@ exclude = [ "tests/roots/" ]
 addopts = [
   "--import-mode=importlib", # allow using test files with same name
   "--doctest-modules",
+]
+filterwarnings = [
+  "error",
+  "ignore::PendingDeprecationWarning:sphinx_book_theme",
 ]
 strict = true
 testpaths = [ "tests", "src" ]

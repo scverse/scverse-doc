@@ -1,3 +1,5 @@
 project = "pertpy"
-extensions = ["scverse_doc"]
-html_theme_options = {"repo": "scverse/pertpy", "branch": "main", "doc_path": "docs/", "announcement": ""}
+extensions = ["scverse_doc", "sphinx.ext.linkcode"]
+source_repository = "https://github.com/scverse/pertpy"
+source_branch = "main"
+html_theme_options = {"announcement": ""}

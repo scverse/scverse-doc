@@ -197,7 +197,7 @@ def intersphinx(*extra: str, external: bool = True, core: bool = True) -> ChainM
     >>> intersphinx_mapping["scanpy"]  # doctest: +ELLIPSIS
     ('https://scanpy.scverse.org/...', None)
 
-    >>> intersphinx_mapping = {**intersphinx(), "my_package": ("...", None)}
+    >>> intersphinx_mapping = intersphinx() | {"my_package": ("...", None)}
     >>> intersphinx_mapping["my_package"]
     ('...', None)
     """

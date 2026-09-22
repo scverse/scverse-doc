@@ -1,8 +1,9 @@
 """Sphinx docs configuration."""
 
 project = "scverse-doc"
-extensions = ["scverse_doc", "sphinxcontrib.bibtex"]
-html_theme_options = {"repo": "scverse/scverse-doc", "announcement": ""}
+extensions = ["scverse_doc", "sphinxcontrib.bibtex", "sphinx.ext.linkcode"]
+html_theme_options = {"announcement": ""}
+source_repository = "https://github.com/scverse/scverse-doc"
 
 bibtex_bibfiles = ["references.bib"]
 
