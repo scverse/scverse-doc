@@ -10,6 +10,11 @@
         ],
     },
     "formatter": { "useEditorconfig": true },
+    "javascript": {
+        "formatter": {
+            "semicolons": "asNeeded",
+        },
+    },
     "overrides": [
         {
             "includes": ["./.vscode/*.json", "**/*.jsonc"],

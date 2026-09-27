@@ -114,6 +114,7 @@ def _add_ecosystem_context(
 def setup(app: Sphinx) -> ExtensionMetadata:
     """Register the theme, its templates, and the build hooks."""
     app.add_html_theme("scverse", str(_THEME_PATH))
+    app.add_js_file("js/readthedocs.js", type="module")
     app.config.templates_path = [*app.config.templates_path, str(_THEME_PATH / "components")]
     app.setup_extension("scverse_doc.source")
 
