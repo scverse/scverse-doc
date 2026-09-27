@@ -75,6 +75,20 @@ html {
     }
 }
 
+/* --- Sidebar ------------------------------------------------------------ */
+
+.sidebar-primary-item readthedocs-flyout {
+    --readthedocs-flyout-background-color: transparent;
+    --readthedocs-flyout-font-family: inherit;
+    --readthedocs-flyout-item-link-color: var(--pst-color-link);
+    --readthedocs-flyout-color: var(--scverse-color-text-muted);
+    --readthedocs-flyout-section-heading-color: var(--scverse-color-text-muted);
+
+    .container {
+        position: static;
+    }
+}
+
 /* --- Cards -------------------------------------------------------------- */
 
 /* .bd-content exists to beat sphinx-design in selector specificity */
