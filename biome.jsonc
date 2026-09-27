@@ -26,5 +26,12 @@
                 },
             },
         },
+        // HTML formatting is opt-in; most templates contain Jinja inside tags, which Biome can't parse.
+        {
+            "includes": [
+                "src/scverse_doc/theme/scverse/components/sidebar-versions.html",
+            ],
+            "html": { "formatter": { "enabled": true } },
+        },
     ],
 }
