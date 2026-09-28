@@ -109,6 +109,12 @@ html {
 
 /* --- Sidebar ------------------------------------------------------------ */
 
+/* pydata hides the sidebar when it has no toctree (e.g. the root page), but the version selector should stay */
+@media (min-width: 960px) {
+    .bd-sidebar-primary.hide-on-wide:has(readthedocs-flyout) {
+        display: flex;
+    }
+}
 .sidebar-primary-item:has(> :only-child:empty) {
     display: none;
 }
