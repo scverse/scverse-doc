@@ -117,6 +117,8 @@ html {
     --readthedocs-flyout-section-heading-color: var(--scverse-color-text-muted);
     --readthedocs-flyout-link-color: var(--pst-color-link-higher-contrast);
     --readthedocs-flyout-item-link-color: var(--pst-color-link);
+
+    padding: 0;
 }
 
 /* --- Cards -------------------------------------------------------------- */
