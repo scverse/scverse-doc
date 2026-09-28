@@ -1,49 +1,29 @@
 /*
  * scverse brand tokens.
  *
- * The light halves come from the website (the brand’s source of truth) and live in the fenced
- * region below; everything outside it is hand-authored – including the dark halves, because the
- * website has no dark mode to extract one from.
- *
- * light-dark() picks between them following the used color-scheme,
+ * The colours come from the website (the brand’s source of truth) and live in the fenced region below;
+ * everything outside it is hand-authored. They are Bootstrap 6 tokens resolved to literals,
+ * so light-dark() picks the half matching the used color-scheme,
  * which pydata-sphinx-theme sets from html[data-theme].
  */
 
 :root {
     /* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */
-    --scverse-color-primary-light: #4557c4;
-    --scverse-color-gradient-start-light: #262fb5;
-    --scverse-color-gradient-end-light: #74c8fa;
-    --scverse-color-heading-light: #333333;
-    --scverse-color-text-secondary-light: #555555;
-    --scverse-color-text-muted-light: #777777;
-    --scverse-color-surface-light: #f0f0f0;
-    --scverse-color-surface-alt-light: #f5f5f5;
-    --scverse-color-border-light: #e0e0e0;
-    --scverse-color-code-bg-light: #f9f9f9;
-    --scverse-color-code-text-light: #333333;
-    --scverse-color-footer-bg-light: #f0f0f0;
+    --scverse-color-gradient-start: #262fb5;
+    --scverse-color-gradient-end: #74c8fa;
+    --scverse-color-background: light-dark(#fff,color-mix(in oklch, #000 76%, oklch(60% .02 245)));
+    --scverse-color-text: light-dark(color-mix(in oklch, #000 64%, oklch(60% .02 245)),color-mix(in oklch, #fff 90%, oklch(60% .02 245)));
+    --scverse-color-heading: light-dark(color-mix(in oklch, #000 48%, oklch(60% .02 245)),color-mix(in oklch, #fff 60%, oklch(60% .02 245)));
+    --scverse-color-text-secondary: light-dark(color-mix(in oklch, #000 32%, oklch(60% .02 245)),color-mix(in oklch, #fff 40%, oklch(60% .02 245)));
+    --scverse-color-text-muted: light-dark(color-mix(in oklch, #000 16%, oklch(60% .02 245)),oklch(60% .02 245));
+    --scverse-color-surface: light-dark(color-mix(in oklch, #fff 90%, oklch(60% .02 245)),color-mix(in oklch, #000 64%, oklch(60% .02 245)));
+    --scverse-color-surface-alt: light-dark(color-mix(in oklch, #fff 94%, oklch(60% .02 245)),color-mix(in oklch, #000 70%, oklch(60% .02 245)));
+    --scverse-color-border: light-dark(color-mix(in oklch, #fff 60%, oklch(60% .02 245)),color-mix(in oklch, #000 32%, oklch(60% .02 245)));
+    --scverse-color-border-muted: light-dark(color-mix(in oklch, #fff 60%, oklch(60% .02 245)),color-mix(in oklch, #000 48%, oklch(60% .02 245)));
+    --scverse-color-code-bg: light-dark(color-mix(in oklch, #fff 94%, oklch(60% .02 245)),color-mix(in oklch, #000 70%, oklch(60% .02 245)));
+    --scverse-color-code-text: light-dark(color-mix(in oklch, #000 48%, oklch(60% .02 245)),color-mix(in oklch, #fff 60%, oklch(60% .02 245)));
+    --scverse-color-footer-bg: light-dark(color-mix(in oklch, #fff 90%, oklch(60% .02 245)),color-mix(in oklch, #000 64%, oklch(60% .02 245)));
     /* END GENERATED BRAND TOKENS */
-
-    /*
-     * The tokens the theme actually uses: the generated light half above,
-     * and a dark half chosen to sit on pydata-sphinx-theme’s dark background (#14181e)
-     * and its on-background surface (#222832).
-     */
-
-    /* Lightened brand primary: #4557c4 only reaches 1.6:1 on #14181e, this reaches 4.5:1 while keeping the hue. */
-    --scverse-color-primary: light-dark(var(--scverse-color-primary-light), #6b7ad0);
-    --scverse-color-gradient-start: light-dark(var(--scverse-color-gradient-start-light), #4557c4);
-    --scverse-color-gradient-end: light-dark(var(--scverse-color-gradient-end-light), #74c8fa);
-    --scverse-color-heading: light-dark(var(--scverse-color-heading-light), #f0f2f5);
-    --scverse-color-text-secondary: light-dark(var(--scverse-color-text-secondary-light), #ced6dd);
-    --scverse-color-text-muted: light-dark(var(--scverse-color-text-muted-light), #9ca4af);
-    --scverse-color-surface: light-dark(var(--scverse-color-surface-light), #222832);
-    --scverse-color-surface-alt: light-dark(var(--scverse-color-surface-alt-light), #1a1f27);
-    --scverse-color-border: light-dark(var(--scverse-color-border-light), #48566b);
-    --scverse-color-code-bg: light-dark(var(--scverse-color-code-bg-light), #1a1f27);
-    --scverse-color-code-text: light-dark(var(--scverse-color-code-text-light), #e7eaf0);
-    --scverse-color-footer-bg: light-dark(var(--scverse-color-footer-bg-light), #10141a);
 
     /* Derived: the brand gradient used for hero surfaces and the active-nav underline. */
     --scverse-gradient: linear-gradient(

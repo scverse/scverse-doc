@@ -1,0 +1,12 @@
+{
+    "default": "#262fb5",
+    "anndata": "#e5864b",
+    "mudata": "#4ab274",
+    "muon": "#6cf1a1",
+    "pertpy": "#da347f",
+    "scanpy": "#de367b",
+    "scirpy": "#da347f",
+    "scvi-tools": "#fbb822",
+    "spatialdata": "#40a9ff",
+    "squidpy": "#969dea"
+}

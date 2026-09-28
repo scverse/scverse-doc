@@ -6,14 +6,17 @@
 """Refresh the generated brand assets from the scverse website.
 
 The website is the brand’s source of truth,
-so transcribing its hex values into this repository by hand
+so transcribing its colours into this repository by hand
 would create exactly the kind of drift this package exists to remove.
-This script extracts the handful of SCSS variables that make up the brand
-and writes them into ``_tokens.css`` as ``--scverse-color-x-light`` values.
 
-Only the region between the marker comments is touched; it holds upstream hex values and nothing else.
-The rest of the file is hand-authored – including the ``light-dark()`` tokens that pair each generated
-light value with a dark one, because the website has no dark mode to extract those from.
+The website takes its neutral colours from Bootstrap’s tokens (``--bs-fg-*``, ``--bs-bg-*``, …),
+which already carry dark values via ``light-dark()``, and defines only the brand hues itself.
+This script looks up the tokens the theme needs in the website’s vendored Bootstrap and ``assets/main.scss``,
+resolves every ``var()`` down to literals, and writes them into ``_tokens.css`` as ``--scverse-color-x``.
+The per-package accents go to ``_accents.json``, because the registry needs their values in Python
+to derive readable shades from them.
+
+Only the region between the marker comments is touched; the rest of the file is hand-authored.
 
 The scverse logo used for the navbar link back to the website is copied verbatim for the same reason.
 
@@ -25,6 +28,7 @@ Usage
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -32,30 +36,42 @@ from pathlib import Path
 HERE = Path(__file__).parent
 STATIC = HERE.parent / "src" / "scverse_doc" / "theme" / "scverse" / "static"
 TARGET = STATIC / "_tokens.css"
+ACCENTS_TARGET = HERE.parent / "src" / "scverse_doc" / "_accents.json"
 
 #: Website file -> theme static file, copied verbatim.
 ASSETS = {Path("static/img/logo/scverse-fa.svg"): STATIC / "scverse-fa.svg"}
 
-#: SCSS variable in ``assets/main.scss`` -> CSS custom property emitted here.
+#: CSS custom property emitted here -> website custom property it is resolved from.
+#: The pairing mirrors the one scverse/scverse.github.io#329 used when replacing its SCSS variables.
 TOKEN_MAP = {
-    "greyheader": "--scverse-color-heading",
-    "navtext": "--scverse-color-text-secondary",
-    "greydesc": "--scverse-color-text-muted",
-    "tilebg": "--scverse-color-surface",
-    "tilebg4": "--scverse-color-surface-alt",
-    "overline": "--scverse-color-border",
-    "backtickbg": "--scverse-color-code-bg",
-    "tiletext": "--scverse-color-code-text",
-    "footerbg": "--scverse-color-footer-bg",
+    "--scverse-color-gradient-start": "--scverse-deep-blue",
+    "--scverse-color-gradient-end": "--scverse-sky-blue",
+    "--scverse-color-background": "--bs-bg-body",
+    "--scverse-color-text": "--bs-fg-body",
+    "--scverse-color-heading": "--bs-fg-1",
+    "--scverse-color-text-secondary": "--bs-fg-2",
+    "--scverse-color-text-muted": "--bs-fg-3",
+    "--scverse-color-surface": "--bs-bg-2",
+    "--scverse-color-surface-alt": "--bs-bg-1",
+    "--scverse-color-border": "--bs-border-color",
+    "--scverse-color-border-muted": "--bs-border-muted",
+    "--scverse-color-code-bg": "--bs-bg-1",
+    "--scverse-color-code-text": "--bs-fg-1",
+    "--scverse-color-footer-bg": "--bs-bg-2",
 }
 
-#: Values that are written as literals in the SCSS rather than as variables,
-#: so they cannot be looked up by name.
-#: Verified against ``assets/main.scss`` by :func:`check_literals`.
-LITERALS = {
-    "--scverse-color-primary": "#4557c4",
-    "--scverse-color-gradient-start": "#262fb5",
-    "--scverse-color-gradient-end": "#74c8fa",
+#: Package -> website custom property holding its accent; ``default`` is for packages without one.
+ACCENT_MAP = {
+    "default": "--scverse-deep-blue",
+    "anndata": "--anndata-orange",
+    "mudata": "--mudata-green",
+    "muon": "--muon-aquamarine",
+    "pertpy": "--scirpy-purple",  # the website has no pertpy colour; it has always shared scirpy’s
+    "scanpy": "--scanpy-cerise",
+    "scirpy": "--scirpy-purple",
+    "scvi-tools": "--scvi-yellow",
+    "spatialdata": "--spatialdata-blue",
+    "squidpy": "--squidpy-violet",
 }
 
 BEGIN = "/* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */"
@@ -63,41 +79,45 @@ END = "/* END GENERATED BRAND TOKENS */"
 
 #: The fenced region, captured together with the indentation of its opening marker.
 REGION_RE = re.compile(rf"^([ \t]*){re.escape(BEGIN)}\n.*?^[ \t]*{re.escape(END)}$", re.DOTALL | re.MULTILINE)
+DECL_RE = re.compile(r"(--[\w-]+)\s*:\s*([^;{}]+?)\s*;")
+
+
+def parse_bootstrap(css: str) -> dict[str, str]:
+    """Extract the custom properties Bootstrap declares on ``:root``."""
+    blocks = re.findall(r":root,:host\{([^}]*)\}", css)
+    return dict(DECL_RE.findall(";".join(blocks) + ";"))
 
 
 def parse_scss(scss: str) -> dict[str, str]:
-    """Extract top-level ``$name: #value;`` declarations from SCSS source."""
-    return dict(re.findall(r"^\$([\w-]+):\s*(#[0-9a-fA-F]{3,8})\s*;", scss, re.MULTILINE))
+    """Extract custom property declarations from the website’s SCSS."""
+    return dict(DECL_RE.findall(scss))
 
 
-def check_literals(scss: str) -> list[str]:
-    """Return the literal token values that no longer appear in the SCSS.
-
-    The primary and the gradient stops are written inline in the website’s CSS rules,
-    so they cannot be resolved by variable name.
-    Checking that they still occur at all is a cheap guard against the brand changing underneath us.
-    """
-    return [f"{name} ({value})" for name, value in LITERALS.items() if value.lower() not in scss.lower()]
+def resolve(name: str, props: dict[str, str]) -> str:
+    """Return the value of `name` with every ``var()`` in it recursively substituted."""
+    return re.sub(r"var\((--[\w-]+)\)", lambda m: resolve(m[1], props), props[name])
 
 
-def render_region(scss: str, indent: str) -> str:
+def render_region(props: dict[str, str], indent: str) -> str:
     """Render the generated region – marker comments included – indented by `indent`."""
-    variables = parse_scss(scss)
-    if missing := sorted(set(TOKEN_MAP) - set(variables)):
-        msg = f"SCSS variables vanished from the website: {', '.join('$' + m for m in missing)}"
+    if missing := sorted(set(TOKEN_MAP.values()) - set(props)):
+        msg = f"custom properties vanished from the website: {', '.join(missing)}"
         raise KeyError(msg)
-
-    values = LITERALS | {prop: variables[scss_name] for scss_name, prop in TOKEN_MAP.items()}
-    lines = [BEGIN, *(f"{prop}-light: {value};" for prop, value in values.items()), END]
+    lines = [BEGIN, *(f"{prop}: {resolve(src, props)};" for prop, src in TOKEN_MAP.items()), END]
     return "\n".join(indent + line for line in lines)
 
 
-def render(scss: str, current: str) -> str:
-    """Return `current` with its generated region replaced by one rendered from `scss`."""
+def render_accents(props: dict[str, str]) -> str:
+    """Render the accent JSON read by ``scverse_doc.registry``."""
+    return json.dumps({pkg: resolve(src, props) for pkg, src in ACCENT_MAP.items()}, indent=4) + "\n"
+
+
+def render(props: dict[str, str], current: str) -> str:
+    """Return `current` with its generated region replaced by one rendered from `props`."""
     if (region := REGION_RE.search(current)) is None:
         msg = f"{TARGET} has no “{BEGIN}” … “{END}” region"
         raise LookupError(msg)
-    return current[: region.start()] + render_region(scss, region[1]) + current[region.end() :]
+    return current[: region.start()] + render_region(props, region[1]) + current[region.end() :]
 
 
 def main() -> int:
@@ -107,13 +127,12 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="fail instead of writing if the output would change")
     args = parser.parse_args()
 
-    scss = (args.website / "assets" / "main.scss").read_text()
-    if stale := check_literals(scss):
-        print(f"literal brand colours no longer found in main.scss: {', '.join(stale)}", file=sys.stderr)
-        return 1
-
+    props = parse_bootstrap(
+        (args.website / "static" / "bootstrap" / "css" / "bootstrap.min.css").read_text()
+    ) | parse_scss((args.website / "assets" / "main.scss").read_text())
     updates = {
-        TARGET: render(scss, TARGET.read_text()).encode(),
+        TARGET: render(props, TARGET.read_text()).encode(),
+        ACCENTS_TARGET: render_accents(props).encode(),
         **{dst: (args.website / src).read_bytes() for src, dst in ASSETS.items()},
     }
     if args.check:
