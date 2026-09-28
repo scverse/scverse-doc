@@ -15,14 +15,41 @@
 
 /* Specific enough to beat pydata’s own html[data-theme="…"] token blocks. */
 html[data-theme] {
-    --pst-color-primary: var(--scverse-color-primary);
-    --pst-color-secondary: var(--scverse-color-accent-text);
-    --pst-color-link: var(--scverse-color-accent-text);
-    --pst-color-link-hover: var(--scverse-color-primary);
+    /* Primary and secondary both follow the package accent; the website has no brand primary of its own. */
+    --pst-color-primary: var(--scverse-color-accent-text);
+    /* Mixing towards the text colour only raises the contrast accent-text already guarantees. */
+    --pst-color-primary-highlight: color-mix(
+        in oklch,
+        var(--scverse-color-accent-text) 80%,
+        var(--scverse-color-text)
+    );
+    --pst-color-primary-bg: color-mix(
+        in oklch,
+        var(--scverse-color-accent-decorative) 20%,
+        var(--scverse-color-background)
+    );
+    --sd-color-primary-bg: var(--pst-color-primary-bg);
+    --pst-color-secondary: var(--pst-color-primary);
+    --pst-color-secondary-highlight: var(--pst-color-primary-highlight);
+    --pst-color-secondary-bg: var(--pst-color-primary-bg);
+    --sd-color-secondary-bg: var(--pst-color-primary-bg);
+    --pst-color-link: var(--pst-color-primary);
+    --pst-color-link-hover: var(--pst-color-primary-highlight);
+    --pst-color-link-higher-contrast: color-mix(
+        in oklch,
+        var(--scverse-color-accent-text) 70%,
+        var(--scverse-color-text)
+    );
     --pst-color-inline-code: var(--scverse-color-code-text);
+    --pst-color-background: var(--scverse-color-background);
+    --pst-color-text-base: var(--scverse-color-text);
+    --pst-color-on-surface: var(--scverse-color-text);
     --pst-color-surface: var(--scverse-color-surface);
     --pst-color-border: var(--scverse-color-border);
+    --pst-color-border-muted: var(--scverse-color-border-muted);
+    --pst-color-table-row-hover-bg: var(--pst-color-secondary-bg);
     --pst-color-text-muted: var(--scverse-color-text-muted);
+    --pst-color-heading: var(--scverse-color-heading);
     --pst-heading-color: var(--scverse-color-heading);
 }
 
@@ -35,6 +62,11 @@ html {
 /* --- Navbar ------------------------------------------------------------- */
 
 .bd-header ul.navbar-nav > li.nav-item {
+    /* Like the website: the current link is plain text, marked only by its accent underline. */
+    &.current > .nav-link {
+        color: var(--scverse-color-text);
+    }
+
     &.current > .nav-link::before,
     & > .nav-link:hover::before {
         border-bottom-color: var(--scverse-color-accent-decorative);
