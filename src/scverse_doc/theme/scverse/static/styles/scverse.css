@@ -107,6 +107,29 @@ html {
     }
 }
 
+/* --- Sidebar ------------------------------------------------------------ */
+
+/* pydata hides the sidebar when it has no toctree (e.g. the root page), but the version selector should stay */
+@media (min-width: 960px) {
+    .bd-sidebar-primary.hide-on-wide:has(readthedocs-flyout) {
+        display: flex;
+    }
+}
+.sidebar-primary-item:has(> :only-child:empty) {
+    display: none;
+}
+.sidebar-primary-item readthedocs-flyout {
+    --readthedocs-flyout-background-color: transparent;
+    --readthedocs-flyout-font-family: inherit;
+    --readthedocs-flyout-divider-color: var(--scverse-color-border);
+    --readthedocs-flyout-color: var(--scverse-color-text-muted);
+    --readthedocs-flyout-section-heading-color: var(--scverse-color-text-muted);
+    --readthedocs-flyout-link-color: var(--pst-color-link-higher-contrast);
+    --readthedocs-flyout-item-link-color: var(--pst-color-link);
+
+    padding: 0;
+}
+
 /* --- Cards -------------------------------------------------------------- */
 
 /* .bd-content exists to beat sphinx-design in selector specificity */

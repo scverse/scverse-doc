@@ -97,6 +97,10 @@ envs.hatch-test.overrides.matrix.deps.env-vars = [
 envs.hatch-test.default-args = []
 envs.hatch-test.dependency-groups = [ "dev", "test" ]
 
+[tool.djlint]
+indent = 2
+single_attribute_per_line = true
+
 [tool.ruff]
 line-length = 120
 src = [ "src" ]

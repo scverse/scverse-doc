@@ -1,0 +1,20 @@
+<readthedocs-flyout></readthedocs-flyout>
+<script type="module">
+// flyout.css hardcodes `.container { position: fixed }` with no part/variable to override it,
+// and the logo is an <img> of a #fcfcfc SVG (made for dark backgrounds): dim it to the grey RTD uses for its icons
+customElements.whenDefined("readthedocs-flyout").then(() => {
+    const sheet = new CSSStyleSheet()
+    sheet.replaceSync(`
+        .container { position: static; max-width: none; max-height: none; }
+        header > img.logo { filter: brightness(0.5); }
+    `)
+    for (const { shadowRoot } of document.querySelectorAll(
+        "readthedocs-flyout",
+    )) {
+        shadowRoot.adoptedStyleSheets = [
+            ...shadowRoot.adoptedStyleSheets,
+            sheet,
+        ]
+    }
+})
+</script>
