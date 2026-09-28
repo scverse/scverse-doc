@@ -9,15 +9,17 @@
 
 :root {
     /* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */
-    --scverse-color-primary: light-dark(oklch(60% .24 240),light-dark(color-mix(in oklch, #000 16%, oklch(60% .24 240)),color-mix(in oklch, #fff 20%, oklch(60% .24 240))));
     --scverse-color-gradient-start: #262fb5;
     --scverse-color-gradient-end: #74c8fa;
+    --scverse-color-background: light-dark(#fff,color-mix(in oklch, #000 76%, oklch(60% .02 245)));
+    --scverse-color-text: light-dark(color-mix(in oklch, #000 64%, oklch(60% .02 245)),color-mix(in oklch, #fff 90%, oklch(60% .02 245)));
     --scverse-color-heading: light-dark(color-mix(in oklch, #000 48%, oklch(60% .02 245)),color-mix(in oklch, #fff 60%, oklch(60% .02 245)));
     --scverse-color-text-secondary: light-dark(color-mix(in oklch, #000 32%, oklch(60% .02 245)),color-mix(in oklch, #fff 40%, oklch(60% .02 245)));
     --scverse-color-text-muted: light-dark(color-mix(in oklch, #000 16%, oklch(60% .02 245)),oklch(60% .02 245));
     --scverse-color-surface: light-dark(color-mix(in oklch, #fff 90%, oklch(60% .02 245)),color-mix(in oklch, #000 64%, oklch(60% .02 245)));
     --scverse-color-surface-alt: light-dark(color-mix(in oklch, #fff 94%, oklch(60% .02 245)),color-mix(in oklch, #000 70%, oklch(60% .02 245)));
     --scverse-color-border: light-dark(color-mix(in oklch, #fff 60%, oklch(60% .02 245)),color-mix(in oklch, #000 32%, oklch(60% .02 245)));
+    --scverse-color-border-muted: light-dark(color-mix(in oklch, #fff 60%, oklch(60% .02 245)),color-mix(in oklch, #000 48%, oklch(60% .02 245)));
     --scverse-color-code-bg: light-dark(color-mix(in oklch, #fff 94%, oklch(60% .02 245)),color-mix(in oklch, #000 70%, oklch(60% .02 245)));
     --scverse-color-code-text: light-dark(color-mix(in oklch, #000 48%, oklch(60% .02 245)),color-mix(in oklch, #fff 60%, oklch(60% .02 245)));
     --scverse-color-footer-bg: light-dark(color-mix(in oklch, #fff 90%, oklch(60% .02 245)),color-mix(in oklch, #000 64%, oklch(60% .02 245)));

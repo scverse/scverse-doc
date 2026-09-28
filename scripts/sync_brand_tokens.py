@@ -40,15 +40,17 @@ ASSETS = {Path("static/img/logo/scverse-fa.svg"): STATIC / "scverse-fa.svg"}
 #: CSS custom property emitted here -> website custom property it is resolved from.
 #: The pairing mirrors the one scverse/scverse.github.io#329 used when replacing its SCSS variables.
 TOKEN_MAP = {
-    "--scverse-color-primary": "--bs-link-color",
     "--scverse-color-gradient-start": "--scverse-deep-blue",
     "--scverse-color-gradient-end": "--scverse-sky-blue",
+    "--scverse-color-background": "--bs-bg-body",
+    "--scverse-color-text": "--bs-fg-body",
     "--scverse-color-heading": "--bs-fg-1",
     "--scverse-color-text-secondary": "--bs-fg-2",
     "--scverse-color-text-muted": "--bs-fg-3",
     "--scverse-color-surface": "--bs-bg-2",
     "--scverse-color-surface-alt": "--bs-bg-1",
     "--scverse-color-border": "--bs-border-color",
+    "--scverse-color-border-muted": "--bs-border-muted",
     "--scverse-color-code-bg": "--bs-bg-1",
     "--scverse-color-code-text": "--bs-fg-1",
     "--scverse-color-footer-bg": "--bs-bg-2",
