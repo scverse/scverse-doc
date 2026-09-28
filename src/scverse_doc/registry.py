@@ -102,7 +102,7 @@ class Package:
     """One-line summary of the package."""
 
     accent: str = DEFAULT_ACCENT
-    """The package’s brand accent, falling back to :data:`DEFAULT_ACCENT`."""
+    """The package’s brand accent, falling back to the scverse deep blue."""
 
 
 @cache
