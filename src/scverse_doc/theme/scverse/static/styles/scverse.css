@@ -109,6 +109,9 @@ html {
 
 /* --- Sidebar ------------------------------------------------------------ */
 
+.sidebar-primary-item:has(> :only-child:empty) {
+    display: none;
+}
 .sidebar-primary-item readthedocs-flyout {
     --readthedocs-flyout-background-color: transparent;
     --readthedocs-flyout-font-family: inherit;
