@@ -115,7 +115,7 @@ html {
     --readthedocs-flyout-divider-color: var(--scverse-color-border);
     --readthedocs-flyout-color: var(--scverse-color-text-muted);
     --readthedocs-flyout-section-heading-color: var(--scverse-color-text-muted);
-    --readthedocs-flyout-link-color: var(--pst-color-link);
+    --readthedocs-flyout-link-color: var(--pst-color-link-higher-contrast);
     --readthedocs-flyout-item-link-color: var(--pst-color-link);
 }
 
