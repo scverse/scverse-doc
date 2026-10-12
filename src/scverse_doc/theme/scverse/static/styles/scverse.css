@@ -123,6 +123,9 @@ html {
     --readthedocs-flyout-font-family: inherit;
     --readthedocs-flyout-divider-color: var(--scverse-color-border);
     --readthedocs-flyout-color: var(--scverse-color-text-muted);
+    --readthedocs-flyout-current-version-color: var(
+        --scverse-color-accent-text
+    );
     --readthedocs-flyout-section-heading-color: var(--scverse-color-text-muted);
     --readthedocs-flyout-link-color: var(--pst-color-link-higher-contrast);
     --readthedocs-flyout-item-link-color: var(--pst-color-link);
