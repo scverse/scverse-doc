@@ -88,7 +88,8 @@ html:not(:has(.bd-header__inner)) {
         background-color: var(--pst-color-background);
     }
 }
-/* A filled navbar brings pydata’s own sidebar toggles, which its JS binds instead of ours. */
+/* A filled navbar has pydata’s own sidebar toggles. Its JS only binds the first .primary-toggle/.secondary-toggle,
+ * so the ones from our toggle-*-sidebar.html components further down would do nothing. */
 html:has(.bd-header__inner) .bd-header-article button.sidebar-toggle {
     display: none;
 }
