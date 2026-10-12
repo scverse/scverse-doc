@@ -92,6 +92,7 @@ def _configure(app: Sphinx) -> None:
     )
     config.html_static_path = [*config.html_static_path, str(static_dir)]
     app.add_css_file("scverse-accent.css")
+    app.add_js_file("scripts/rtd-sphinx-search.js", type="module")
 
 
 def _add_ecosystem_context(
