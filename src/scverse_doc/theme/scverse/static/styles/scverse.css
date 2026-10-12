@@ -115,7 +115,8 @@ html {
         display: flex;
     }
 }
-.sidebar-primary-item:has(> :only-child:empty) {
+/* custom elements render into shadow DOM, so they always match :empty */
+.sidebar-primary-item:has(> :only-child:empty:not(readthedocs-flyout)) {
     display: none;
 }
 .sidebar-primary-item readthedocs-flyout {
