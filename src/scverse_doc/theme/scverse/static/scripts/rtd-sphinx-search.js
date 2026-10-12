@@ -28,7 +28,7 @@ document.addEventListener("readthedocs-addons-data-ready", (event) => {
 
     function overrideSearch() {
         /** @type {HTMLDialogElement} */
-        const theme_dialog = document.querySelector(".pst-search-dialog")
+        const theme_dialog = document.querySelector("dialog#pst-search-dialog")
         /** @type {HTMLButtonElement} */
         const search_button = document.querySelector(
             "button[aria-label='Search']",
