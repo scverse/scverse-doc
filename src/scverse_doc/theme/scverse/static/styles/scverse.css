@@ -61,21 +61,39 @@ html {
 
 /* --- Header ------------------------------------------------------------- */
 
-/* The navbar is empty (see theme.toml), so drop it and let the sidebars stick to the top of the viewport. */
 html {
-    --pst-header-height: 0px;
-    /* pydata derives these from the header height */
+    /* pydata derives this from the header height */
     --pst-header-article-height: calc(4rem * 2 / 3);
-    scroll-padding-top: calc(var(--pst-header-article-height) + 1rem);
+    scroll-padding-top: calc(
+        var(--pst-header-height) +
+        var(--pst-header-article-height) +
+        1rem
+    );
 }
-.bd-header {
+/* The navbar is empty unless a `navbar_*` option fills it (see theme.toml).
+ * Then drop it and let the sidebars stick to the top of the viewport. */
+html:not(:has(.bd-header__inner)) {
+    --pst-header-height: 0px;
+}
+.bd-header:not(:has(.bd-header__inner)) {
     display: none;
+}
+/* A filled navbar brings pydata’s own sidebar toggles, which its JS binds instead of ours. */
+html:has(.bd-header__inner) .bd-header-article button.sidebar-toggle {
+    display: none;
+}
+
+/* Like sphinx-book-theme: pydata’s overflow-x would make this the sticky header’s scroll container,
+ * and min-width keeps wide content from pushing off the secondary sidebar instead. */
+.bd-main .bd-content .bd-article-container {
+    overflow-x: unset;
+    min-width: 0;
 }
 
 /* Sticky like sphinx-book-theme’s, since it now holds the controls the navbar had. */
 .bd-header-article {
     position: sticky;
-    top: 0;
+    top: var(--pst-header-height);
     z-index: 1020; /* Bootstrap’s $zindex-sticky */
     background-color: var(--pst-color-background);
 
