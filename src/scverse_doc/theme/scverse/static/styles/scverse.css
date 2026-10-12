@@ -123,11 +123,59 @@ html {
     --readthedocs-flyout-font-family: inherit;
     --readthedocs-flyout-divider-color: var(--scverse-color-border);
     --readthedocs-flyout-color: var(--scverse-color-text-muted);
+    --readthedocs-flyout-current-version-color: var(
+        --scverse-color-accent-text
+    );
     --readthedocs-flyout-section-heading-color: var(--scverse-color-text-muted);
     --readthedocs-flyout-link-color: var(--pst-color-link-higher-contrast);
     --readthedocs-flyout-item-link-color: var(--pst-color-link);
 
     padding: 0;
+}
+
+/* --- Search ------------------------------------------------------------- */
+
+readthedocs-search {
+    --readthedocs-search-font-family: var(--scverse-font-body);
+    --readthedocs-search-code-font-family: var(--scverse-font-mono);
+    --readthedocs-search-color: var(--scverse-color-text);
+    --readthedocs-search-link-color: var(--pst-color-link);
+    --readthedocs-search-content-background-color: var(
+        --scverse-color-background
+    );
+    --readthedocs-search-content-border-color: var(--scverse-color-border);
+    --readthedocs-search-filters-border-color: var(--scverse-color-border);
+    --readthedocs-search-input-background-color: var(
+        --scverse-color-surface-alt
+    );
+    --readthedocs-search-footer-background-color: var(
+        --scverse-color-footer-bg
+    );
+    --readthedocs-search-footer-color: var(--scverse-color-text-muted);
+    --readthedocs-search-footer-code-background-color: var(
+        --scverse-color-code-bg
+    );
+    --readthedocs-search-footer-code-border-color: var(
+        --scverse-color-border-muted
+    );
+    --readthedocs-search-result-background-color: var(
+        --scverse-color-background
+    );
+    --readthedocs-search-result-active-background-color: var(
+        --pst-color-primary-bg
+    );
+    --readthedocs-search-result-border-color: var(--scverse-color-border-muted);
+    --readthedocs-search-result-color: var(--scverse-color-text);
+    --readthedocs-search-result-heading-color: var(--scverse-color-heading);
+    --readthedocs-search-result-subheading-color: var(
+        --scverse-color-text-secondary
+    );
+    --readthedocs-search-result-highlight-color: var(
+        --scverse-color-accent-text
+    );
+    --readthedocs-search-result-icon-color: var(--scverse-color-text-muted);
+    --readthedocs-search-badge-background-color: var(--pst-color-primary-bg);
+    --readthedocs-search-badge-color: var(--scverse-color-text);
 }
 
 /* --- Cards -------------------------------------------------------------- */
