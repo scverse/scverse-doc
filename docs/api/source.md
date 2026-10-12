@@ -47,7 +47,7 @@ Which forge’s URL layout the repository follows:
 `"github"`, `"gitlab"` or `"bitbucket"`.
 Inferring it works for the hosted instances and for self-hosted ones whose host
 name contains the forge’s (`gitlab.example.org`); name it for anything else.
-An unknown forge still gets the navbar icon, just no per-page links.
+An unknown forge still gets the icon link, just no per-page links.
 ```
 
 ## What each theme gets

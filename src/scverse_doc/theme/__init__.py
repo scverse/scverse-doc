@@ -37,11 +37,8 @@ _ACCENT_CSS = """\
 }}
 """
 
-#: ``fa-scverse`` is not a real Font Awesome glyph – the theme stylesheet masks the synced logo into it.
-_ICON_LINKS = (
-    {"name": "Discourse", "url": "https://discourse.scverse.org/", "icon": "fa-brands fa-discourse"},
-    {"name": "scverse", "url": "https://scverse.org/", "icon": "fa-scverse"},
-)
+#: scverse.org itself is linked from the scverse menu beside them.
+_ICON_LINKS = ({"name": "Discourse", "url": "https://discourse.scverse.org/", "icon": "fa-brands fa-discourse"},)
 
 
 def _package_name(config: Config) -> str:
@@ -102,7 +99,7 @@ def _add_ecosystem_context(
     context: dict[str, Any],
     doctree: object,
 ) -> None:
-    """Expose the registry to the navbar dropdown template."""
+    """Expose the registry to the scverse menu template."""
     if app.config.html_theme != "scverse":
         return
     current = _package_name(app.config).lower()

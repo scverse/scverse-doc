@@ -4,16 +4,19 @@ stylesheets = [
     "styles/scverse.css",
 ]
 pygments_style = { default = "tango" }
+sidebars = ["navbar-logo", "scverse-sidebar-nav"]
 
 [options]
 package = ""
 accent = ""
 show_ecosystem_dropdown = "True"
-navbar_align = "left"
-navbar_start = "navbar-logo"
-navbar_center = "navbar-nav"
-navbar_end = "scverse-ecosystem, theme-switcher, navbar-icon-links"
-navbar_persistent = "search-button"
+# No navbar: its parts live in the primary sidebar and the article header.
+navbar_start = ""
+navbar_center = ""
+navbar_end = ""
+navbar_persistent = ""
+article_header_start = ["toggle-primary-sidebar", "breadcrumbs"]
+article_header_end = ["navbar-icon-links", "scverse-ecosystem", "theme-switcher", "search-button", "toggle-secondary-sidebar"]
 primary_sidebar_end = ["sidebar-ethical-ads", "sidebar-versions"]
 secondary_sidebar_items = ["page-toc", "edit-this-page", "sourcelink"]
 footer_start = "scverse-footer"

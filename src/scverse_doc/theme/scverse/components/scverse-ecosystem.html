@@ -1,19 +1,27 @@
-{#- The “scverse packages” dropdown.
+{#- The scverse menu: scverse.org and the “scverse packages”, styled like pydata’s theme switcher.
 
-    Generated from the registry,
+    The packages are generated from the registry,
     so adding a package to scverse/ecosystem-packages makes it reachable from every scverse docs site
     without any package touching its own conf.py.
 -#}
 {%- if theme_show_ecosystem_dropdown | tobool and scverse_ecosystem -%}
-  <div class="dropdown scverse-ecosystem-dropdown">
+  <div
+    class="dropdown scverse-ecosystem-dropdown"
+    data-bs-toggle="tooltip"
+    data-bs-placement="bottom"
+    title="scverse"
+  >
     <button
-      class="btn dropdown-toggle nav-link"
       type="button"
+      class="btn btn-sm nav-link pst-navbar-icon dropdown-toggle"
       data-bs-toggle="dropdown"
       aria-expanded="false"
       aria-label="{{ _("scverse packages") }}"
-    >{{ _("scverse packages") }}</button>
+    >
+      <i class="fa-scverse fa-lg fa-fw" aria-hidden="true"></i>
+    </button>
     <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item" href="https://scverse.org/">scverse.org</a></li>
       {%- for group, label in [("core", _("Core")), ("ecosystem", _("Ecosystem"))] %}
         {%- if scverse_ecosystem[group] %}
           <li>
@@ -32,4 +40,15 @@
       {%- endfor %}
     </ul>
   </div>
+{%- else -%}
+  <a
+    class="nav-link pst-navbar-icon"
+    href="https://scverse.org/"
+    title="scverse"
+    data-bs-toggle="tooltip"
+    data-bs-placement="bottom"
+  >
+    <i class="fa-scverse fa-lg fa-fw" aria-hidden="true"></i>
+    <span class="visually-hidden">scverse</span>
+  </a>
 {%- endif -%}

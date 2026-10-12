@@ -1,0 +1,12 @@
+{#- Opens the secondary sidebar drawer on narrow screens; pydata only renders its own in the (empty) navbar.
+
+    Unconditional: pydata decides whether a page has a secondary sidebar only after it has dropped
+    the header templates that render empty. scverse.css hides the button on pages without one.
+-#}
+<button
+  type="button"
+  class="pst-navbar-icon sidebar-toggle secondary-toggle"
+  aria-label="{{ _("On this page") }}"
+>
+  <span class="fa-solid fa-outdent"></span>
+</button>

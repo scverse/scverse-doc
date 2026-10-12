@@ -2,8 +2,8 @@
 
 Every component the theme styles, on one page, so a change to
 [`scverse.css`](https://github.com/scverse/scverse-doc/blob/main/src/scverse_doc/theme/scverse/static/styles/scverse.css)
-can be eyeballed in both colour schemes. The navbar, ecosystem dropdown and footer are on this page
-like on any other – switch the theme with the toggle in the navbar.
+can be eyeballed in both colour schemes. The sidebar, page header with the scverse menu, and footer are on this page
+like on any other – switch the theme with the toggle in the page header.
 
 ## Text
 
