@@ -16,7 +16,7 @@ each of which also works on its own:
 :mod:`scverse_doc.registry`
     The package registry, usable as an :func:`~scverse_doc.registry.intersphinx` mapping.
 :mod:`scverse_doc.source`
-    The repository links: the navbar icon, “edit this page”, and ``[source]``.
+    The repository links: the header icon, “edit this page”, and ``[source]``.
 :mod:`scverse_doc.theme`
     The theme, its chrome, and the per-package accent.
 
