@@ -131,3 +131,38 @@ def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
     assert app.config.napoleon_numpy_docstring is DEFAULTS["napoleon_numpy_docstring"]
     # "not-an-scverse-package" is not in the registry, which must not break the theme.
     assert "scverse-ecosystem-dropdown" in html
+
+
+@pytest.fixture(scope="module")
+def autodoc(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    out = tmp_path_factory.mktemp("autodoc")
+    build(ROOTS / "autodoc", out)
+    return out / "html"
+
+
+def test_autodoc_works_without_the_theme(autodoc: Path) -> None:
+    assert "scverse" not in (autodoc / "index.html").read_text()
+
+
+def test_class_template_documents_members_by_kind(autodoc: Path) -> None:
+    html = (autodoc / "generated" / "apimod.Thing.html").read_text()
+    assert "Attributes table" in html
+    assert "Methods table" in html
+    assert 'class="py property"' in html
+    assert 'class="py method"' in html
+    assert 'class="py attribute"' in html
+
+
+def test_private_bases_are_hidden(autodoc: Path) -> None:
+    html = (autodoc / "generated" / "apimod.Thing.html").read_text()
+    assert "Bases:" in html
+    assert "Public" in html
+    assert "_Private" not in html
+    assert "Generic" not in html
+
+
+def test_prose_returns(autodoc: Path) -> None:
+    html = (autodoc / "generated" / "apimod.fit.html").read_text()
+    assert "<p>The fitted model, or <cite>None</cite>" in html
+    # Unpatched napoleon would read the sentence as a type.
+    assert "Return type" not in html

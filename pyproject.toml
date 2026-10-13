@@ -151,6 +151,8 @@ addopts = [
 filterwarnings = [
   "error",
   "ignore::PendingDeprecationWarning:sphinx_book_theme",
+  # Sphinx 9.1’s napoleon uses autodoc’s deprecated options mapping itself.
+  "ignore:The mapping interface for autodoc options:sphinx.deprecation.RemovedInSphinx11Warning",
 ]
 strict = true
 testpaths = [ "tests", "src" ]

@@ -13,6 +13,8 @@ api/config.md
 api/theme.md
 api/source.md
 api/registry.md
+api/autodoc.md
+api/napoleon.md
 ```
 
 ## {doc}`api/config`
@@ -46,3 +48,12 @@ from the {ref}`source_* config values <source-options>`, for whichever theme is 
     registry.intersphinx
     registry.Package
 ```
+
+## {doc}`api/autodoc`
+
+Autosummary templates for module and class pages,
+and private bases left out of `:show-inheritance:`.
+
+## {doc}`api/napoleon`
+
+Prose `Returns` sections in NumPy-style docstrings.
