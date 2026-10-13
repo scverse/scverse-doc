@@ -74,6 +74,11 @@ html:not(:has(.bd-header__inner)) {
         display: none;
     }
 
+    /* pydata sizes the logo by the header height; 4rem is pydata’s default */
+    .navbar-brand {
+        --pst-header-height: 4rem;
+    }
+
     /* pydata’s overflow-x would make this the sticky header’s scroll container;
      * min-width keeps wide content from pushing off the secondary sidebar instead. */
     .bd-main .bd-content .bd-article-container {
@@ -162,10 +167,6 @@ html:has(.bd-header__inner) .bd-header-article button.sidebar-toggle {
 }
 .bd-main:not(:has(#pst-secondary-sidebar)) button.secondary-toggle {
     display: none;
-}
-
-.navbar-brand img {
-    max-height: 2.2rem;
 }
 
 /* ``fa-scverse`` is not a real Font Awesome glyph – the synced logo is masked into it. */

@@ -2,6 +2,7 @@
 
 project = "scverse-doc"
 extensions = ["scverse_doc", "sphinxcontrib.bibtex", "sphinx.ext.linkcode"]
+html_logo = "_static/scverse.svg"
 html_theme_options = {"announcement": ""}
 source_repository = "https://github.com/scverse/scverse-doc"
 
