@@ -86,6 +86,23 @@ html:not(:has(.bd-header__inner)) {
         top: 0;
         z-index: 1020; /* Bootstrap’s $zindex-sticky */
         background-color: var(--pst-color-background);
+        /* Span the article container’s padding, so content doesn’t peek out beside it */
+        margin: -1rem -1rem 0;
+        padding-inline: 1rem;
+        box-shadow: 0 0.125rem 0.25rem 0 var(--pst-color-shadow); /* pydata’s navbar shadow */
+    }
+    /* Where supported, only once the page is scrolled */
+    @supports (animation-timeline: scroll()) {
+        .bd-header-article {
+            animation: scverse-header-shadow linear both;
+            animation-timeline: scroll();
+            animation-range: 0 1rem;
+        }
+    }
+}
+@keyframes scverse-header-shadow {
+    from {
+        box-shadow: none;
     }
 }
 /* A filled navbar has pydata’s own sidebar toggles. Its JS only binds the first .primary-toggle/.secondary-toggle,
@@ -98,10 +115,16 @@ html:has(.bd-header__inner) .bd-header-article button.sidebar-toggle {
     /* pydata pushes __end right with margin-left: auto, but never makes this a flex container */
     .header-article-items,
     .header-article-items__start,
-    .header-article-items__end {
+    .header-article-items__end,
+    .header-article-item {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+    }
+
+    /* Bootstrap’s list margin would push them off-centre */
+    ul.bd-breadcrumbs {
+        margin: 0;
     }
 
     /* Space the icon links like the buttons beside them */
