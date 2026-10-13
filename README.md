@@ -43,7 +43,6 @@ We recommend managing dependencies in project-specific virtual environments to a
 This is most convenient using package managers such as [uv][].
 Choose from the options below to install scverse-doc:
 
-<!--
 1. Add the latest release of `scverse-doc` from [PyPI][] to your `uv` project:
 
    ```bash
@@ -56,8 +55,6 @@ Choose from the options below to install scverse-doc:
    (after activating your venv)
    pip install 'scverse-doc[full]'
    ```
-
--->
 
 1. Install the latest development version:
 
