@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from importlib.util import find_spec
 from io import StringIO
 from pathlib import Path
@@ -152,7 +153,9 @@ def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
 @pytest.fixture(scope="module")
 def autodoc_build(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, str]:
     out = tmp_path_factory.mktemp("autodoc")
-    _, warnings = build_capturing_warnings(ROOTS / "autodoc", out)
+    # Autosummary writes its stubs into the source tree, which parallel test workers must not share.
+    src = shutil.copytree(ROOTS / "autodoc", out / "src", ignore=shutil.ignore_patterns("__pycache__", "generated"))
+    _, warnings = build_capturing_warnings(src, out)
     return out / "html", warnings
 
 
