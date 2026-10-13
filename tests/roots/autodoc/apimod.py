@@ -19,6 +19,9 @@ class Thing(_Private, Public, Generic[T]):  # noqa: UP046
     attr: int = 1
     """An attribute."""
 
+    ivar: str
+    """An instance attribute, which only autosummary’s fallback for dotted names finds."""
+
     @property
     def prop(self) -> int:
         """A property."""

@@ -1,6 +1,12 @@
 API
 ===
 
+.. autosummary::
+   :toctree: generated
+   :recursive:
+
+   apipkg
+
 .. currentmodule:: apimod
 
 .. autosummary::
