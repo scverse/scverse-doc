@@ -1,10 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
-requires = [ "hatch-fancy-pypi-readme", "hatchling" ]
+requires = [ "hatch-fancy-pypi-readme", "hatch-vcs", "hatchling" ]
 
 [project]
 name = "scverse-doc"
-version = "0.0.1"
 description = "Scverse documentation theme and utilities."
 license = "MPL-2.0"
 maintainers = [
@@ -25,7 +24,7 @@ classifiers = [
   "Programming Language :: Python :: 3.15",
   "Typing :: Typed",
 ]
-dynamic = [ "readme" ]
+dynamic = [ "readme", "version" ]
 # The subextensions `autodoc`, `napoleon`, `registry` and `source` need only Sphinx.
 dependencies = [ "sphinx>=8.1" ]
 # The extension stack of `scverse_doc.config`.
@@ -67,6 +66,7 @@ doc = [
 typecheck = [ "mypy" ]
 
 [tool.hatch]
+version.source = "vcs"
 metadata.hooks.fancy-pypi-readme.content-type = "text/markdown"
 metadata.hooks.fancy-pypi-readme.fragments = [
   { path = "README.md", start-after = "<!-- badges-end -->\n" },
