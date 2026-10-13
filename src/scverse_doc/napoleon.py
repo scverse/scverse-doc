@@ -49,6 +49,6 @@ def _parse_returns_section(self: NumpyDocstring, section: str) -> list[str]:
 def setup(app: Sphinx) -> ExtensionMetadata:
     """Set up napoleon and make it read ``Returns`` sections as prose."""
     app.setup_extension("sphinx.ext.napoleon")
-    # ponytail: patches private napoleon API; replace once napoleon has a hook for this.
+    # TODO: patches private napoleon API; replace once napoleon has a hook for this.
     NumpyDocstring._parse_returns_section = _parse_returns_section  # type: ignore[method-assign,assignment]
     return ExtensionMetadata(parallel_read_safe=True)

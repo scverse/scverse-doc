@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from importlib.util import find_spec
 from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -16,6 +17,11 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 ROOTS = Path(__file__).parent / "roots"
+
+#: Roots listing ``scverse_doc`` need both extras; one module stands in for each.
+needs_full = pytest.mark.skipif(
+    find_spec("myst_nb") is None or find_spec("pydata_sphinx_theme") is None, reason="needs scverse-doc[full]"
+)
 
 
 def build(root: Path, out: Path, *, freshenv: bool = True, **overrides: object) -> tuple[Sphinx, str]:
@@ -48,6 +54,7 @@ def minimal(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[Sphinx, 
     yield build(ROOTS / "minimal", tmp_path_factory.mktemp("minimal"))
 
 
+@needs_full
 def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
     app, html = minimal
     assert app.config.html_theme == "scverse"
@@ -58,6 +65,7 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
     assert 'href="https://github.com/scverse/pertpy"' in html
 
 
+@needs_full
 def test_linkcode_is_resolved_when_requested(minimal: tuple[Sphinx, str]) -> None:
     app, _ = minimal
     assert callable(app.config.linkcode_resolve)
@@ -66,6 +74,7 @@ def test_linkcode_is_resolved_when_requested(minimal: tuple[Sphinx, str]) -> Non
     )
 
 
+@needs_full
 def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[Sphinx, str]) -> None:
     _, html = minimal
     # Display names are the upstream ``name`` verbatim, inconsistent casing and all.
@@ -74,6 +83,7 @@ def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[Sphinx, st
     assert 'class="dropdown-item active"' in html
 
 
+@needs_full
 def test_accent_is_derived_for_both_modes(minimal: tuple[Sphinx, str]) -> None:
     app, _ = minimal
     css = (Path(app.outdir) / "_static" / "scverse-accent.css").read_text()
@@ -81,6 +91,7 @@ def test_accent_is_derived_for_both_modes(minimal: tuple[Sphinx, str]) -> None:
     assert "--scverse-color-accent-text: light-dark(#" in css
 
 
+@needs_full
 def test_build_is_warning_free(tmp_path: Path) -> None:
     _, warnings = build_capturing_warnings(ROOTS / "minimal", tmp_path)
     # Building several Sphinx apps in one process re-registers nodes and directives; that noise is the harness.
@@ -88,6 +99,7 @@ def test_build_is_warning_free(tmp_path: Path) -> None:
     assert real == []
 
 
+@needs_full
 def test_rebuilding_reuses_everything(tmp_path: Path) -> None:
     """The config we inject must hash the same next build, or every page is written again."""
     build(ROOTS / "minimal", tmp_path)
@@ -99,6 +111,7 @@ def test_rebuilding_reuses_everything(tmp_path: Path) -> None:
     assert list(app.builder.get_outdated_docs()) == []
 
 
+@needs_full
 def test_theme_works_without_being_listed_as_an_extension(tmp_path: Path) -> None:
     """Selecting the theme loads it from the entry point, which happens after ``config-inited``."""
     app, html = build(ROOTS / "entry-point", tmp_path)
@@ -110,6 +123,7 @@ def test_theme_works_without_being_listed_as_an_extension(tmp_path: Path) -> Non
     assert callable(app.config.linkcode_resolve)
 
 
+@needs_full
 @pytest.mark.parametrize("theme", ["furo", "sphinx_book_theme"])
 def test_source_links_reach_other_themes(tmp_path: Path, theme: str) -> None:
     """The names `scverse_doc.source` fills in are the ones these themes really read."""
@@ -117,6 +131,7 @@ def test_source_links_reach_other_themes(tmp_path: Path, theme: str) -> None:
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
 
 
+@needs_full
 def test_conf_py_can_pick_another_theme(tmp_path: Path) -> None:
     """A theme that declares none of the source options must not be given any."""
     app, _ = build(ROOTS / "minimal", tmp_path, html_theme="alabaster")
@@ -124,6 +139,7 @@ def test_conf_py_can_pick_another_theme(tmp_path: Path) -> None:
     assert app.config.html_theme_options.keys() == {"announcement"}
 
 
+@needs_full
 def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
     app, html = build(ROOTS / "override", tmp_path)
     assert app.config.nb_execution_mode == "force"

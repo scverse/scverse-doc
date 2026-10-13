@@ -63,7 +63,7 @@ def setup(app: Sphinx) -> ExtensionMetadata:
     """Register the templates, their filter, and the bases hook."""
     app.setup_extension("sphinx.ext.autodoc")
     app.setup_extension("sphinx.ext.autosummary")
-    # ponytail: autosummary builds its own jinja environment with no hook for filters, so this is global.
+    # TODO: autosummary builds its own jinja environment with no hook for filters, so this is global.
     DEFAULT_FILTERS["member_type"] = _member_type
     app.connect("config-inited", _add_templates)
     app.connect("autodoc-process-bases", _skip_private_bases)

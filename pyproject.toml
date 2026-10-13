@@ -26,14 +26,19 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = [ "readme" ]
-dependencies = [
+# The subextensions `autodoc`, `napoleon`, `registry` and `source` need only Sphinx.
+dependencies = [ "sphinx>=8.1" ]
+# The extension stack of `scverse_doc.config`.
+optional-dependencies.config = [
   "myst-nb>=1.1",
-  "pydata-sphinx-theme>=0.23",
-  "sphinx>=8.1",
   "sphinx-copybutton",
   "sphinx-design",
   "sphinxext-opengraph",
 ]
+# Everything, as the `scverse_doc` extension needs.
+optional-dependencies.full = [ "scverse-doc[config,theme]" ]
+# `html_theme = "scverse"`, i.e. `scverse_doc.theme`.
+optional-dependencies.theme = [ "pydata-sphinx-theme>=0.23" ]
 # https://docs.pypi.org/project_metadata/#project-urls
 urls.Documentation = "https://scverse-doc.readthedocs.io/"
 urls.Homepage = "https://github.com/scverse/scverse-doc"
@@ -48,11 +53,9 @@ dev = [
 ]
 test = [
   "coverage>=7.10",
-  "defusedxml",        # for sphinx.testing’s HTML assertions
-  "furo",              # to check `scverse_doc.source` against a non-pydata theme
+  "defusedxml",     # for sphinx.testing’s HTML assertions
   "pytest",
-  "pytest-cov",        # For VS Code’s coverage functionality
-  "sphinx-book-theme",
+  "pytest-cov",     # For VS Code’s coverage functionality
 ]
 doc = [
   "ipykernel",
@@ -71,6 +74,7 @@ metadata.hooks.fancy-pypi-readme.fragments = [
 build.targets.sdist.exclude = [ "/docs", "/tests" ]
 envs.default.installer = "uv"
 envs.default.dependency-groups = [ "dev" ]
+envs.docs.features = [ "full" ]
 envs.docs.scripts.build = "sphinx-build -M html docs docs/_build -W {args}"
 envs.docs.scripts.clean = "git clean -fdX -- {args:docs}"
 envs.docs.scripts.open = "python -m webbrowser -t docs/_build/html/index.html"
@@ -81,18 +85,29 @@ envs.hatch-check-code.scripts.lint-fix = "prek run -a --no-group=format --no-gro
 envs.hatch-check-fmt.dependencies = [ "prek" ]
 envs.hatch-check-fmt.scripts.format-check = "echo 'try `hatch check fmt --fix`'; false"
 envs.hatch-check-fmt.scripts.format-fix = "prek run -a --group=format --no-group=typecheck"
+envs.hatch-check-types.features = [ "full" ]
 envs.hatch-check-types.scripts.check = [ "mypy" ]
 envs.hatch-check-types.dependency-groups = [ "typecheck", "doc", "test" ]
 envs.hatch-test.matrix = [
   # Test the lowest and highest supported Python versions with normal deps
-  { deps = [ "stable" ], python = [ "3.12", "3.14" ] },
+  { deps = [ "stable" ], python = [ "3.12", "3.14" ], extras = [ "full" ] },
+  # Test the newest supported Python version with only the subextensions that need nothing but Sphinx
+  { deps = [ "stable" ], python = [ "3.14" ], extras = [ "min" ] },
   # Test the newest supported Python version also with pre-release deps
-  { deps = [ "pre" ], python = [ "3.14" ] },
+  { deps = [ "pre" ], python = [ "3.14" ], extras = [ "full" ] },
 ]
 # If the matrix variable `deps` is set to "pre",
 # set the environment variable `UV_PRERELEASE` to "allow".
 envs.hatch-test.overrides.matrix.deps.env-vars = [
   { value = "allow", key = "UV_PRERELEASE", if = [ "pre" ] },
+]
+envs.hatch-test.overrides.matrix.extras.features = [
+  { value = "full", if = [ "full" ] },
+]
+envs.hatch-test.overrides.matrix.extras.extra-dependencies = [
+  # to check `scverse_doc.source` against other themes
+  { value = "furo", if = [ "full" ] },
+  { value = "sphinx-book-theme", if = [ "full" ] },
 ]
 envs.hatch-test.default-args = []
 envs.hatch-test.dependency-groups = [ "dev", "test" ]
