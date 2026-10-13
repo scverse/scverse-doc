@@ -1,8 +1,10 @@
 [![Tests][badge-tests]][tests]
 [![Documentation][badge-docs]][documentation]
+[![PyPI Version][badge-pypi]][pypi]
 
 [badge-tests]: https://img.shields.io/github/actions/workflow/status/scverse/scverse-doc/test.yaml?branch=main
 [badge-docs]: https://app.readthedocs.org/projects/scverse-doc/badge/
+[badge-pypi]: https://img.shields.io/pypi/v/scverse-doc
 
 <!-- badges-end -->
 
