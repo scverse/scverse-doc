@@ -342,10 +342,10 @@ sphinx-build -M html . _build -W
 ### Changing the theme
 
 The theme lives in `src/scverse_doc/theme/scverse`: brand tokens in `static/_tokens.css`,
-component styling in `static/styles/scverse.css`, and the navbar and footer parts in `components/`.
+component styling in `static/styles/scverse.css`, and the sidebar, header and footer parts in `components/`.
 
 After a change, build the docs and check {doc}`kitchen-sink` – it renders every construct the theme
-styles – in both colour schemes, using the theme switcher in the navbar.
+styles – in both colour schemes, using the theme switcher in the page header.
 This package sets no `accent`, so it inherits the scverse brand colour as its default;
 to see the accent-driven parts, build with one:
 

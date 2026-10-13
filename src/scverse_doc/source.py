@@ -2,7 +2,7 @@
 
 Declare the repository with :confval:`source_repository`.
 Whatever the selected theme understands is filled in: `pydata-sphinx-theme`’s
-`html_context` entries, `furo`’s and `sphinx-book-theme`’s theme options, and the navbar icon.
+`html_context` entries, `furo`’s and `sphinx-book-theme`’s theme options, and the icon link.
 
 If `conf.py` lists :mod:`sphinx.ext.linkcode`, this also resolves that extension’s
 ``[source]`` links.
@@ -101,7 +101,7 @@ class _Source:
 
     @property
     def icon_link(self) -> dict[str, str]:
-        """The navbar icon link pointing at the repository."""
+        """The icon link pointing at the repository."""
         return {"name": self.provider.label, "url": self.url, "icon": self.provider.icon}
 
     def view(self, path: PurePosixPath | str, lines: tuple[int, int] | None = None) -> str | None:

@@ -12,6 +12,12 @@
 [pydata-sphinx-theme’s](https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/layout.html).
 The repository links have their own {ref}`config values <source-options>`.
 
+The theme has no navbar: the logo and the whole site’s navigation are in the primary sidebar,
+and the remaining controls in the article header (`article_header_start`/`article_header_end`).
+Filling any of the `navbar_start`/`_center`/`_end`/`_persistent` lists brings back a top bar,
+and setting `html_sidebars` replaces the site navigation – include `scverse-sidebar-nav` to keep it.
+`show_nav_level` sets how many levels of that navigation start expanded.
+
 ```{confval} package
 :type: str
 :default: `project`
@@ -30,5 +36,6 @@ CSS colour for decorative surfaces; link and text shades are derived from it.
 :type: bool
 :default: `True`
 
-Whether the navbar carries the “scverse packages” dropdown.
+Whether the scverse menu in the page header lists the “scverse packages”.
+Without them, it is a plain link to scverse.org.
 ```

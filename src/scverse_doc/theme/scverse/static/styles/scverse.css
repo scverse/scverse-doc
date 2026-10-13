@@ -59,33 +59,122 @@ html {
     --pst-font-family-monospace: var(--scverse-font-mono);
 }
 
-/* --- Navbar ------------------------------------------------------------- */
+/* --- Header ------------------------------------------------------------- */
 
-.bd-header ul.navbar-nav > li.nav-item {
-    /* Like the website: the current link is plain text, marked only by its accent underline. */
-    &.current > .nav-link {
-        color: var(--scverse-color-text);
+/* The navbar is empty unless a `navbar_*` option fills it (see theme.toml).
+ * Then drop it, let the sidebars stick to the top of the viewport,
+ * and make the article header sticky like sphinx-book-theme’s, since it holds the controls instead. */
+html:not(:has(.bd-header__inner)) {
+    --pst-header-height: 0px;
+    /* pydata derives these from the header height */
+    --pst-header-article-height: calc(4rem * 2 / 3);
+    scroll-padding-top: calc(var(--pst-header-article-height) + 1rem);
+
+    .bd-header {
+        display: none;
     }
 
-    &.current > .nav-link::before,
-    & > .nav-link:hover::before {
-        border-bottom-color: var(--scverse-color-accent-decorative);
+    /* pydata sizes the logo by the header height; 4rem is pydata’s default */
+    .navbar-brand {
+        --pst-header-height: 4rem;
+    }
+
+    /* pydata’s overflow-x would make this the sticky header’s scroll container;
+     * min-width keeps wide content from pushing off the secondary sidebar instead. */
+    .bd-main .bd-content .bd-article-container {
+        overflow-x: unset;
+        min-width: 0;
+    }
+
+    .bd-header-article {
+        position: sticky;
+        top: 0;
+        z-index: 1020; /* Bootstrap’s $zindex-sticky */
+        background-color: var(--pst-color-background);
+        /* Span the article container’s padding, so content doesn’t peek out beside it */
+        margin: -1rem -1rem 0;
+        padding-inline: 1rem;
+        box-shadow: 0 0.125rem 0.25rem 0 var(--pst-color-shadow); /* pydata’s navbar shadow */
+    }
+    /* Where supported, only once the page is scrolled */
+    @supports (animation-timeline: scroll()) {
+        .bd-header-article {
+            animation: scverse-header-shadow linear both;
+            animation-timeline: scroll();
+            animation-range: 0 1rem;
+        }
     }
 }
-
-.navbar-brand img {
-    max-height: 2.2rem;
+@keyframes scverse-header-shadow {
+    from {
+        box-shadow: none;
+    }
+}
+/* A filled navbar has pydata’s own sidebar toggles. Its JS only binds the first .primary-toggle/.secondary-toggle,
+ * so the ones from our toggle-*-sidebar.html components further down would do nothing. */
+html:has(.bd-header__inner) .bd-header-article button.sidebar-toggle {
+    display: none;
 }
 
-/* Sized like the real glyphs beside it:
- * https://github.com/pydata/pydata-sphinx-theme/blob/main/src/pydata_sphinx_theme/assets/styles/components/_icon-links.scss
- */
-.navbar-icon-links .fa-scverse {
+.bd-header-article {
+    /* pydata pushes __end right with margin-left: auto, but never makes this a flex container */
+    .header-article-items,
+    .header-article-items__start,
+    .header-article-items__end,
+    .header-article-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Bootstrap’s list margin would push them off-centre */
+    ul.bd-breadcrumbs {
+        margin: 0;
+    }
+
+    /* Space the icon links like the buttons beside them */
+    ul.navbar-icon-links {
+        column-gap: 0.5rem;
+    }
+
+    /* On narrow screens, wrap the breadcrumbs instead of the buttons */
+    .header-article-items__start {
+        min-width: 0;
+    }
+    .header-article-items__end {
+        flex-shrink: 0;
+    }
+
+    /* pydata only styles these inside .bd-header */
+    button.sidebar-toggle {
+        font-size: var(--pst-font-size-icon);
+        color: var(--pst-color-text-muted);
+        background-color: inherit;
+        border: none;
+        padding: 0.5rem;
+    }
+    /* pydata’s $breakpoint-sidebar-primary (lg) and $breakpoint-sidebar-secondary (xl) */
+    @media (min-width: 960px) {
+        button.primary-toggle {
+            display: none;
+        }
+    }
+    @media (min-width: 1200px) {
+        button.secondary-toggle {
+            display: none;
+        }
+    }
+}
+.bd-main:not(:has(#pst-secondary-sidebar)) button.secondary-toggle {
+    display: none;
+}
+
+/* ``fa-scverse`` is not a real Font Awesome glyph – the synced logo is masked into it. */
+.fa-scverse {
     display: inline-block;
-    font-size: var(--pst-font-size-icon);
     width: 1em;
     height: 1em;
-    vertical-align: middle;
+    vertical-align: -0.125em; /* like Font Awesome’s .svg-inline--fa */
     background-color: currentColor;
     mask: url("../scverse-fa.svg") center / contain no-repeat;
 }
@@ -98,7 +187,8 @@ html {
         box-shadow: var(--scverse-shadow);
     }
 
-    .dropdown-header {
+    :is(h1, h2, h3, h4, h5, h6).dropdown-header {
+        margin: 0; /* pydata’s heading margins */
         font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -107,14 +197,20 @@ html {
     }
 }
 
-/* --- Sidebar ------------------------------------------------------------ */
+/* Bootstrap’s dropdown link colours, as specific as pydata’s a:visited(:hover), so they win by coming later */
+a.dropdown-item {
+    color: var(--bs-dropdown-link-color);
 
-/* pydata hides the sidebar when it has no toctree (e.g. the root page), but the version selector should stay */
-@media (min-width: 960px) {
-    .bd-sidebar-primary.hide-on-wide:has(readthedocs-flyout) {
-        display: flex;
+    &:hover {
+        color: var(--bs-dropdown-link-hover-color);
+    }
+    &:is(.active, :active) {
+        color: var(--bs-dropdown-link-active-color);
     }
 }
+
+/* --- Sidebar ------------------------------------------------------------ */
+
 /* custom elements render into shadow DOM, so they always match :empty */
 .sidebar-primary-item:has(> :only-child:empty:not(readthedocs-flyout)) {
     display: none;

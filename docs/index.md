@@ -5,12 +5,19 @@
 ```{toctree}
 :hidden: true
 :maxdepth: 1
+:caption: User Guide
 
 api.md
 changelog.md
 contributing.md
-kitchen-sink.md
 references.md
+```
 
+```{toctree}
+:hidden: true
+:maxdepth: 1
+:caption: Examples
+
+kitchen-sink.md
 notebooks/example
 ```
