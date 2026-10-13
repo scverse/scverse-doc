@@ -11,8 +11,12 @@ A package’s `conf.py` needs few lines:
 This extension sets up the subextensions,
 each of which also works on its own:
 
+:mod:`scverse_doc.autodoc`
+    The layout of the API pages.
 :mod:`scverse_doc.config`
     The extension stack and the shared defaults.
+:mod:`scverse_doc.napoleon`
+    Prose return sections in NumPy-style docstrings.
 :mod:`scverse_doc.registry`
     The package registry, usable as an :func:`~scverse_doc.registry.intersphinx` mapping.
 :mod:`scverse_doc.source`
@@ -29,14 +33,14 @@ from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
-from . import config, registry, source, theme
+from . import autodoc, config, napoleon, registry, source, theme
 from .config import _is_set_by_user
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-__all__ = ["config", "registry", "source", "theme", "setup"]
+__all__ = ["autodoc", "config", "napoleon", "registry", "source", "theme", "setup"]
 
 
 def _default_theme(app: Sphinx, config: Config) -> None:

@@ -47,14 +47,14 @@ Choose from the options below to install scverse-doc:
 1. Add the latest release of `scverse-doc` from [PyPI][] to your `uv` project:
 
    ```bash
-   uv add scverse-doc
+   uv add 'scverse-doc[full]'
    ```
 
 1. Install the latest release into a [standard virtual environment][venv]:
 
    ```bash
    (after activating your venv)
-   pip install scverse-doc
+   pip install 'scverse-doc[full]'
    ```
 
 -->
@@ -62,8 +62,12 @@ Choose from the options below to install scverse-doc:
 1. Install the latest development version:
 
    ```bash
-   pip install git+https://github.com/scverse/scverse-doc.git  # (or `uv add`)
+   pip install 'scverse-doc[full] @ git+https://github.com/scverse/scverse-doc.git'  # (or `uv add`)
    ```
+
+The `full` extra is what `extensions = ["scverse_doc"]` needs.
+For less, pick from the `theme` extra (for `html_theme = "scverse"`) and the `config` extra (for `scverse_doc.config`’s extension stack).
+`scverse_doc.autodoc`, `scverse_doc.napoleon`, `scverse_doc.registry` and `scverse_doc.source` need no extra.
 
 ## Release notes
 
