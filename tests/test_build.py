@@ -150,10 +150,23 @@ def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
 
 
 @pytest.fixture(scope="module")
-def autodoc(tmp_path_factory: pytest.TempPathFactory) -> Path:
+def autodoc_build(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, str]:
     out = tmp_path_factory.mktemp("autodoc")
-    build(ROOTS / "autodoc", out)
-    return out / "html"
+    _, warnings = build_capturing_warnings(ROOTS / "autodoc", out)
+    return out / "html", warnings
+
+
+@pytest.fixture
+def autodoc(autodoc_build: tuple[Path, str]) -> Path:
+    return autodoc_build[0]
+
+
+def test_autodoc_build_is_warning_free(autodoc_build: tuple[Path, str]) -> None:
+    _, warnings = autodoc_build
+    # This root has no intersphinx, so the harness’s `intersphinx_mapping` override is unknown to it.
+    noise = ("is already registered", "'intersphinx_mapping' in override")
+    real = [line for line in warnings.splitlines() if line.strip() and not any(n in line for n in noise)]
+    assert real == []
 
 
 def test_autodoc_works_without_the_theme(autodoc: Path) -> None:
@@ -167,6 +180,11 @@ def test_class_template_documents_members_by_kind(autodoc: Path) -> None:
     assert 'class="py property"' in html
     assert 'class="py method"' in html
     assert 'class="py attribute"' in html
+    assert 'href="#apimod.Thing.ivar"' in html
+
+
+def test_module_template_recurses(autodoc: Path) -> None:
+    assert (autodoc / "generated" / "apipkg.sub.deep.html").is_file()
 
 
 def test_private_bases_are_hidden(autodoc: Path) -> None:
