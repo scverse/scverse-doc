@@ -306,6 +306,28 @@ code.literal {
     border-radius: calc(var(--scverse-radius) / 2);
 }
 
+/* --- Config values ------------------------------------------------------ */
+
+/* Type and default on one line, instead of a grid row each */
+dl.confval > dd > dl.field-list:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 1.5rem;
+    margin-block-end: 0.5rem;
+    color: var(--pst-color-text-muted);
+
+    > dt {
+        padding: 0;
+        background: none;
+        margin-inline-end: -1rem; /* pull the value up to its label */
+    }
+    > dd,
+    > dd > p {
+        margin: 0;
+    }
+}
+
 /* --- Footer ------------------------------------------------------------- */
 
 .bd-footer {
