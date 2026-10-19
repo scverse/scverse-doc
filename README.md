@@ -1,10 +1,16 @@
 [![Tests][badge-tests]][tests]
+[![codecov][badge-codecov]][codecov]
 [![Documentation][badge-docs]][documentation]
 [![PyPI Version][badge-pypi]][pypi]
+[![Python Versions][badge-python]][pypi]
+[![License][badge-license]][license]
 
 [badge-tests]: https://img.shields.io/github/actions/workflow/status/scverse/scverse-doc/test.yaml?branch=main
+[badge-codecov]: https://codecov.io/gh/scverse/scverse-doc/graph/badge.svg
 [badge-docs]: https://app.readthedocs.org/projects/scverse-doc/badge/
 [badge-pypi]: https://img.shields.io/pypi/v/scverse-doc
+[badge-python]: https://img.shields.io/pypi/pyversions/scverse-doc
+[badge-license]: https://img.shields.io/pypi/l/scverse-doc
 
 <!-- badges-end -->
 
@@ -85,9 +91,11 @@ If you found a bug, please use the [issue tracker][].
 [scverse discourse]: https://discourse.scverse.org/
 [issue tracker]: https://github.com/scverse/scverse-doc/issues
 [tests]: https://github.com/scverse/scverse-doc/actions/workflows/test.yaml
+[codecov]: https://codecov.io/gh/scverse/scverse-doc
 [documentation]: https://scverse-doc.readthedocs.io
 [changelog]: https://scverse-doc.readthedocs.io/page/changelog.html
 [api documentation]: https://scverse-doc.readthedocs.io/page/api.html
 [kitchen sink]: https://scverse-doc.readthedocs.io/page/kitchen-sink.html
 [pypi]: https://pypi.org/project/scverse-doc
+[license]: https://github.com/scverse/scverse-doc/blob/main/LICENSE
 [venv]: https://docs.python.org/3/tutorial/venv.html

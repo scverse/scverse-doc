@@ -89,9 +89,7 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
-          # Codecov answers "Repository not found" until scverse/scverse-doc is added there.
-          # Flip back to true once it is.
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           use_oidc: true
 
   # Check that all tests defined above pass. This makes it easy to set a single "required" test in branch

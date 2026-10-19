@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, cast
 import pytest
 from sphinx.errors import ConfigError
 
-from scverse_doc.source import _html_context, _linkcode_url, _Provider, _Source, _theme_options
+from scverse_doc.source import _configure_linkcode, _html_context, _linkcode_url, _Provider, _Source, _theme_options
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -184,3 +184,19 @@ def test_linkcode_finds_our_own_source(module: str, fullname: str, path: str) ->
 )
 def test_linkcode_gives_up_quietly(module: str, fullname: str) -> None:
     assert _linkcode_url(GITHUB, module, fullname) is None
+
+
+def test_linkcode_needs_a_repository() -> None:
+    app = SimpleNamespace(config=config(), extensions={"sphinx.ext.linkcode"})
+    app.config.linkcode_resolve = None
+    _configure_linkcode(app)  # type: ignore[arg-type]
+    assert app.config.linkcode_resolve is None
+
+
+def test_linkcode_only_resolves_python() -> None:
+    app = SimpleNamespace(
+        config=config(source_repository="https://github.com/scverse/pertpy"), extensions={"sphinx.ext.linkcode"}
+    )
+    app.config.linkcode_resolve = None
+    _configure_linkcode(app)  # type: ignore[arg-type]
+    assert app.config.linkcode_resolve("js", {"module": "", "fullname": "x"}) is None

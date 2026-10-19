@@ -5,13 +5,11 @@ from __future__ import annotations
 
 import re
 from importlib.util import find_spec
-from io import StringIO
 from textwrap import dedent
 from typing import TYPE_CHECKING, Literal
 
 import pytest
-from sphinx.application import Sphinx
-from sphinx.util.docutils import docutils_namespace
+from sphinx.testing.util import SphinxTestApp
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -65,31 +63,30 @@ def file_format(request: pytest.FixtureRequest) -> Format:
     return request.param  # type: ignore[no-any-return]
 
 
-def build(tmp_path: Path, file_format: Format, arg: str, files: dict[str, str]) -> tuple[Path, str]:
+def build(
+    tmp_path: Path, file_format: Format, arg: str, files: dict[str, str], **overrides: object
+) -> tuple[Path, str]:
     """Write `files` and an index calling the directive with `arg` to `tmp_path`, build it, and return the output dir and warnings."""
     index = f"```{{release-notes}} {arg}\n```" if file_format == "myst" else f".. release-notes:: {arg}"
     files = {f"index.{'md' if file_format == 'myst' else 'rst'}": index, **files}
     for name, content in files.items():
         (tmp_path / name).write_text(content)
     (tmp_path / "conf.py").write_text("")
-    out = tmp_path / "_build"
-    warnings = StringIO()
-    with docutils_namespace():  # every app registers its nodes globally
-        Sphinx(
-            srcdir=str(tmp_path),
-            confdir=str(tmp_path),
-            outdir=str(out),
-            doctreedir=str(out / ".doctrees"),
-            buildername="pseudoxml",
-            confoverrides={
-                "extensions": [*(["myst_parser"] if file_format == "myst" else []), "scverse_doc.release_notes"],
-                # the version files are only included
-                "exclude_patterns": ["_build", "[!i]*.md", "[!i]*.rst"],
-            },
-            status=None,
-            warning=warnings,
-        ).build()
-    return out, warnings.getvalue()
+    app = SphinxTestApp(
+        "pseudoxml",
+        srcdir=tmp_path,
+        confoverrides={
+            "extensions": [*(["myst_parser"] if file_format == "myst" else []), "scverse_doc.release_notes"],
+            # the version files are only included
+            "exclude_patterns": ["_build", "[!i]*.md", "[!i]*.rst"],
+            **overrides,
+        },
+    )
+    try:
+        app.build()
+    finally:
+        app.cleanup()
+    return app.outdir, app.warning.getvalue()
 
 
 def test_release_notes(tmp_path: Path, file_format: Format) -> None:
@@ -108,3 +105,9 @@ def test_release_notes(tmp_path: Path, file_format: Format) -> None:
 def test_error_not_a_dir(tmp_path: Path, file_format: Format, arg: str, files: dict[str, str]) -> None:
     _, warnings = build(tmp_path, file_format, arg, files)
     assert re.search(rf"Not a directory:.*{re.escape(arg)}", warnings)
+
+
+def test_error_no_source_file(tmp_path: Path) -> None:
+    """A relative path needs a file to be relative to, which the prolog is not."""
+    _, warnings = build(tmp_path, "rst", "/", {}, rst_prolog=".. release-notes:: .")
+    assert "Cannot find relative path to: <rst_prologue>" in warnings

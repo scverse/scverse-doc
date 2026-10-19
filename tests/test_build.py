@@ -5,13 +5,12 @@ from __future__ import annotations
 
 import shutil
 from importlib.util import find_spec
-from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from sphinx.application import Sphinx
 from sphinx.environment import CONFIG_OK
+from sphinx.testing.util import SphinxTestApp
 
 from scverse_doc.config import DEFAULTS
 
@@ -26,38 +25,28 @@ needs_full = pytest.mark.skipif(
 )
 
 
-def build(root: Path, out: Path, *, freshenv: bool = True, **overrides: object) -> tuple[Sphinx, str]:
+def build(root: Path, out: Path, *, freshenv: bool = True, **overrides: object) -> tuple[SphinxTestApp, str]:
     """Build `root` into `out` and return the app and the rendered index page."""
-    app, _ = build_capturing_warnings(root, out, freshenv=freshenv, **overrides)
+    app = SphinxTestApp(
+        srcdir=root,
+        builddir=out,
+        confoverrides={"intersphinx_mapping": {}, "nitpicky": False, **overrides},
+        freshenv=freshenv,
+    )
+    try:
+        app.build()
+    finally:
+        app.cleanup()
     return app, (out / "html" / "index.html").read_text()
 
 
-def build_capturing_warnings(
-    root: Path, out: Path, *, freshenv: bool = True, **overrides: object
-) -> tuple[Sphinx, str]:
-    """Build `root` into `out` and return the app and everything it wrote to the warning stream."""
-    warnings = StringIO()
-    app = Sphinx(
-        srcdir=str(root),
-        confdir=str(root),
-        outdir=str(out / "html"),
-        doctreedir=str(out / "doctrees"),
-        buildername="html",
-        confoverrides={"intersphinx_mapping": {}, "nitpicky": False, **overrides},
-        warning=warnings,
-        freshenv=freshenv,
-    )
-    app.build()
-    return app, warnings.getvalue()
-
-
 @pytest.fixture(scope="module")
-def minimal(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[Sphinx, str]]:
+def minimal(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[SphinxTestApp, str]]:
     yield build(ROOTS / "minimal", tmp_path_factory.mktemp("minimal"))
 
 
 @needs_full
-def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
+def test_theme_renders_the_shared_chrome(minimal: tuple[SphinxTestApp, str]) -> None:
     app, html = minimal
     assert app.config.html_theme == "scverse"
     for css in ("styles/scverse.css", "scverse-accent.css"):
@@ -68,7 +57,7 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[Sphinx, str]) -> None:
 
 
 @needs_full
-def test_linkcode_is_resolved_when_requested(minimal: tuple[Sphinx, str]) -> None:
+def test_linkcode_is_resolved_when_requested(minimal: tuple[SphinxTestApp, str]) -> None:
     app, _ = minimal
     assert callable(app.config.linkcode_resolve)
     assert app.config.linkcode_resolve("py", {"module": "scverse_doc.registry", "fullname": "Package"}).startswith(
@@ -77,7 +66,7 @@ def test_linkcode_is_resolved_when_requested(minimal: tuple[Sphinx, str]) -> Non
 
 
 @needs_full
-def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[Sphinx, str]) -> None:
+def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[SphinxTestApp, str]) -> None:
     _, html = minimal
     # Display names are the upstream ``name`` verbatim, inconsistent casing and all.
     assert ">AnnData</a>" in html
@@ -86,7 +75,7 @@ def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[Sphinx, st
 
 
 @needs_full
-def test_accent_is_derived_for_both_modes(minimal: tuple[Sphinx, str]) -> None:
+def test_accent_is_derived_for_both_modes(minimal: tuple[SphinxTestApp, str]) -> None:
     app, _ = minimal
     css = (Path(app.outdir) / "_static" / "scverse-accent.css").read_text()
     assert "--scverse-color-accent-decorative: #da347f;" in css
@@ -95,10 +84,8 @@ def test_accent_is_derived_for_both_modes(minimal: tuple[Sphinx, str]) -> None:
 
 @needs_full
 def test_build_is_warning_free(tmp_path: Path) -> None:
-    _, warnings = build_capturing_warnings(ROOTS / "minimal", tmp_path)
-    # Building several Sphinx apps in one process re-registers nodes and directives; that noise is the harness.
-    real = [line for line in warnings.splitlines() if line.strip() and "is already registered" not in line]
-    assert real == []
+    app, _ = build(ROOTS / "minimal", tmp_path)
+    assert app.warning.getvalue() == ""
 
 
 @needs_full
@@ -156,8 +143,8 @@ def autodoc_build(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, str]:
     out = tmp_path_factory.mktemp("autodoc")
     # Autosummary writes its stubs into the source tree, which parallel test workers must not share.
     src = shutil.copytree(ROOTS / "autodoc", out / "src", ignore=shutil.ignore_patterns("__pycache__", "generated"))
-    _, warnings = build_capturing_warnings(src, out)
-    return out / "html", warnings
+    app, _ = build(src, out)
+    return out / "html", app.warning.getvalue()
 
 
 @pytest.fixture
@@ -168,8 +155,7 @@ def autodoc(autodoc_build: tuple[Path, str]) -> Path:
 def test_autodoc_build_is_warning_free(autodoc_build: tuple[Path, str]) -> None:
     _, warnings = autodoc_build
     # This root has no intersphinx, so the harness’s `intersphinx_mapping` override is unknown to it.
-    noise = ("is already registered", "'intersphinx_mapping' in override")
-    real = [line for line in warnings.splitlines() if line.strip() and not any(n in line for n in noise)]
+    real = [line for line in warnings.splitlines() if line.strip() and "'intersphinx_mapping' in override" not in line]
     assert real == []
 
 
