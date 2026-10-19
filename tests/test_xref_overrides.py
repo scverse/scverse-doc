@@ -5,10 +5,13 @@ from __future__ import annotations
 
 import sys
 from textwrap import dedent
+from types import ModuleType
 from typing import TYPE_CHECKING
 
 import pytest
 from sphinx.testing.util import SphinxTestApp
+
+from scverse_doc.xref_overrides import _exec_guarded_imports
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -42,10 +45,25 @@ def build(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[str, str, st
         dedent("""\
         extensions = ["scverse_doc.xref_overrides"]
         nitpicky = True
-        xref_overrides = {"qo_mod._Private": "qo_mod.Public", "qo_mod.Unused": "qo_mod.Public"}
+        xref_overrides = {
+            "qo_mod._Private": "qo_mod.Public",
+            "qo_mod.Unused": "qo_mod.Public",
+            ("py:class", "qo_mod.Label"): ("std:ref", "label"),
+        }
         """)
     )
-    (tmp_path / "index.rst").write_text(".. autoclass:: qo_mod.Public\n\n.. autofunction:: qo_mod.f\n")
+    (tmp_path / "index.rst").write_text(
+        """\
+.. autoclass:: qo_mod.Public
+.. autofunction:: qo_mod.f
+
+.. _label:
+Section
+=======
+
+:class:`qo_mod.Label`
+"""
+    )
     monkeypatch.syspath_prepend(tmp_path)
     monkeypatch.delitem(sys.modules, "qo_mod", raising=False)
     app = SphinxTestApp("html", srcdir=tmp_path)
@@ -62,10 +80,20 @@ def test_override(build: tuple[str, str, str]) -> None:
     assert "_Private" not in warnings
 
 
+def test_override_role(build: tuple[str, str, str]) -> None:
+    html, _, warnings = build
+    assert 'href="#label"' in html
+    assert "Label" not in warnings
+
+
 def test_guarded_import(build: tuple[str, str, str]) -> None:
     _, _, warnings = build
     # resolved to the full name (there’s no inventory to link it to)
     assert "reference target not found: fractions.Fraction" in warnings
+
+
+def test_guarded_import_no_source() -> None:
+    _exec_guarded_imports(ModuleType("no_source"))  # doesn’t raise
 
 
 def test_deprecated_name(tmp_path: Path) -> None:

@@ -1,4 +1,3 @@
-# Based on pydata/xarray
 codecov:
   require_ci_to_pass: no
 
@@ -6,8 +5,7 @@ coverage:
   status:
     project:
       default:
-        # Require 1% coverage, i.e., always succeed
-        target: 1
+        target: 100
     patch: false
     changes: false
 
