@@ -20,6 +20,8 @@ each of which also works on its own:
     Prose return sections in NumPy-style docstrings.
 :mod:`scverse_doc.registry`
     The package registry, usable as an :func:`~scverse_doc.registry.intersphinx` mapping.
+:mod:`scverse_doc.release_notes`
+    A ``release-notes`` directive, rendering a directory of per-version files.
 :mod:`scverse_doc.source`
     The repository links: the header icon, “edit this page”, and ``[source]``.
 :mod:`scverse_doc.theme`
@@ -34,14 +36,14 @@ from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
-from . import autodoc, config, napoleon, registry, source, theme
+from . import autodoc, config, napoleon, registry, release_notes, source, theme
 from .config import _is_set_by_user
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-__all__ = ["autodoc", "config", "napoleon", "registry", "source", "theme", "setup"]
+__all__ = ["autodoc", "config", "napoleon", "registry", "release_notes", "source", "theme", "setup"]
 
 
 def _default_theme(app: Sphinx, config: Config) -> None:
