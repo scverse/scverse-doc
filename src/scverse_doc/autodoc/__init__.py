@@ -51,8 +51,15 @@ def _member_type(obj_path: str) -> Literal["method", "property", "attribute"]:
             return "attribute"
 
 
-def _skip_private_bases(app: Sphinx, name: str, obj: type, options: Any, bases: list[type]) -> None:
-    bases[:] = [b for b in bases if b is not object and get_origin(b) is not Generic and not b.__name__.startswith("_")]
+def _skip_private_bases(app: Sphinx, name: str, obj: type, options: Any, bases: list[type | str]) -> None:
+    # Other handlers may have added strings, and some typing constructs have no `__name__`.
+    bases[:] = [
+        b
+        for b in bases
+        if b is not object
+        and get_origin(b) is not Generic
+        and not (b if isinstance(b, str) else getattr(b, "__name__", "")).rpartition(".")[2].startswith("_")
+    ]
 
 
 def _add_templates(app: Sphinx, config: Config) -> None:

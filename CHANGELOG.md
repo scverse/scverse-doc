@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.2.1]
+
+### Fixed
+
+- Hiding private base classes no longer crashes when a base is a string or has no `__name__`
+
 ## [0.2.0]
 
 ### Added
@@ -35,7 +41,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.2.0...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.2.1...main
+[0.2.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.1
 [0.2.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.0
 [0.1.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.1.1
 [0.1.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.1.0
