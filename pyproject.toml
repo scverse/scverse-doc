@@ -25,8 +25,8 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = [ "readme", "version" ]
-# The subextensions `autodoc`, `napoleon`, `registry` and `source` need only Sphinx.
-dependencies = [ "sphinx>=8.1" ]
+# The subextensions `autodoc`, `napoleon`, `registry`, `release_notes` and `source` need only these.
+dependencies = [ "packaging", "sphinx>=8.1" ]
 # The extension stack of `scverse_doc.config`.
 optional-dependencies.config = [
   "myst-nb>=1.1",
@@ -63,7 +63,7 @@ doc = [
   "sphinx-autodoc-typehints",
   "sphinxcontrib-bibtex>=1",
 ]
-typecheck = [ "mypy" ]
+typecheck = [ "mypy", "types-docutils" ]
 
 [tool.hatch]
 version.source = "vcs"
@@ -171,6 +171,7 @@ filterwarnings = [
   "ignore::PendingDeprecationWarning:sphinx_book_theme",
   # Sphinx 9.1’s napoleon uses autodoc’s deprecated options mapping itself.
   "ignore:The mapping interface for autodoc options:sphinx.deprecation.RemovedInSphinx11Warning",
+  "ignore::sphinx.deprecation.RemovedInSphinx11Warning:myst_parser",
 ]
 strict = true
 testpaths = [ "tests", "src" ]

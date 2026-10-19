@@ -15,6 +15,7 @@ api/source.md
 api/registry.md
 api/autodoc.md
 api/napoleon.md
+api/release_notes.md
 ```
 
 ## {doc}`api/config`
@@ -57,3 +58,7 @@ and private bases left out of `:show-inheritance:`.
 ## {doc}`api/napoleon`
 
 Prose `Returns` sections in NumPy-style docstrings.
+
+## {doc}`api/release_notes`
+
+A `release-notes` directive, rendering a directory of per-version files grouped by minor version.
