@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/
 [semantic versioning]: https://semver.org/
 
-
 ## [Unreleased]
+
+## [0.2.0]
 
 ### Added
 
@@ -34,5 +35,7 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.2.0...main
+[0.2.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.0
 [0.1.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.1.1
 [0.1.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.1.0
