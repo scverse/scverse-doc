@@ -17,6 +17,7 @@ api/autodoc.md
 api/napoleon.md
 api/release_notes.md
 api/typed_fields.md
+api/xref_overrides.md
 ```
 
 ## {doc}`api/config`
@@ -67,3 +68,7 @@ A `release-notes` directive, rendering a directory of per-version files grouped 
 ## {doc}`api/typed_fields`
 
 Parameters and attributes rendered as definition lists, like numpydoc.
+
+## {doc}`api/xref_overrides`
+
+An `xref_overrides` config value, redirecting cross-references to objects documented under another name or role.
