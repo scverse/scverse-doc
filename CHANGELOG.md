@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Added
+
+- Annotate prose return sections’ items with the members of a returned tuple
+
 ## [0.1.1]
 
 ### Fixed

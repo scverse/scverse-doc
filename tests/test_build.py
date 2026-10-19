@@ -204,3 +204,9 @@ def test_prose_returns(autodoc: Path) -> None:
     assert "<p>The fitted model, or <cite>None</cite>" in html
     # Unpatched napoleon would read the sentence as a type.
     assert "Return type" not in html
+
+
+def test_returned_tuple_annotates_items(autodoc: Path) -> None:
+    html = (autodoc / "generated" / "apimod.split.html").read_text()
+    assert html.count('class="classifier"') == 2
+    assert ">Public</span>" in html

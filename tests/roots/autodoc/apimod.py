@@ -39,3 +39,15 @@ def fit() -> None:
     -------
     The fitted model, or `None` if `copy` is false.
     """
+
+
+def split() -> tuple[int, Public] | None:
+    """Split something.
+
+    Returns
+    -------
+    count
+        How many.
+    thing
+        Which one.
+    """
