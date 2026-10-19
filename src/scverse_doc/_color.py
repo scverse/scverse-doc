@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Colour maths for deriving accessible accent shades.
 
 Package accents are chosen for brand recognition, not for contrast.

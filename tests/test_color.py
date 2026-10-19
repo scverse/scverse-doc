@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Contrast guarantees for the derived accents."""
 
 from __future__ import annotations

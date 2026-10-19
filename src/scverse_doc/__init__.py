@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """The scverse Sphinx theme and shared documentation configuration.
 
 A package’s `conf.py` needs few lines:

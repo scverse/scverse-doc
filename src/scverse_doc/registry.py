@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """The scverse package registry.
 
 :data:`packages` and :func:`core_packages` give the `listed packages`_ as :class:`Package` objects;
