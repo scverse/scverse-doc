@@ -28,6 +28,8 @@ each of which also works on its own:
     The theme, its chrome, and the per-package accent.
 :mod:`scverse_doc.typed_fields`
     Parameters and attributes as definition lists.
+:mod:`scverse_doc.xref_overrides`
+    Cross-references to objects documented under another name or role.
 
 Anything set in `conf.py` wins.
 """
@@ -38,14 +40,25 @@ from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
-from . import autodoc, config, napoleon, registry, release_notes, source, theme, typed_fields
+from . import autodoc, config, napoleon, registry, release_notes, source, theme, typed_fields, xref_overrides
 from .config import _is_set_by_user
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-__all__ = ["autodoc", "config", "napoleon", "registry", "release_notes", "source", "theme", "typed_fields", "setup"]
+__all__ = [
+    "autodoc",
+    "config",
+    "napoleon",
+    "registry",
+    "release_notes",
+    "source",
+    "theme",
+    "typed_fields",
+    "xref_overrides",
+    "setup",
+]
 
 
 def _default_theme(app: Sphinx, config: Config) -> None:

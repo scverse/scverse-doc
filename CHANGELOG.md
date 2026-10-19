@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning][].
 - Annotate prose return sections’ items with the members of a returned tuple
 - `release-notes` directive, ported from `scanpydoc` (#51)
 - Parameters and attributes as definition lists, ported from `scanpydoc`’s `definition_list_typed_field` (#54)
+- `xref_overrides`, ported from `scanpydoc`’s `qualname_overrides`, also for Sphinx’ own annotations, and reporting unused entries (#53)
 
 ## [0.1.1]
 
