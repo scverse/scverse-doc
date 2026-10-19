@@ -25,7 +25,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = [ "readme", "version" ]
-# The subextensions `autodoc`, `napoleon`, `registry`, `release_notes` and `source` need only these.
+# The subextensions `autodoc`, `napoleon`, `registry`, `release_notes`, `source` and `typed_fields` need only these.
 dependencies = [ "packaging", "sphinx>=8.1" ]
 # The extension stack of `scverse_doc.config`.
 optional-dependencies.config = [

@@ -16,6 +16,7 @@ api/registry.md
 api/autodoc.md
 api/napoleon.md
 api/release_notes.md
+api/typed_fields.md
 ```
 
 ## {doc}`api/config`
@@ -62,3 +63,7 @@ Prose `Returns` sections in NumPy-style docstrings.
 ## {doc}`api/release_notes`
 
 A `release-notes` directive, rendering a directory of per-version files grouped by minor version.
+
+## {doc}`api/typed_fields`
+
+Parameters and attributes rendered as definition lists, like numpydoc.
