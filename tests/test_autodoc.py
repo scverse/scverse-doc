@@ -7,7 +7,7 @@ import pytest
 from sphinx.ext.napoleon import Config, NumpyDocstring
 
 from scverse_doc import napoleon
-from scverse_doc.autodoc import _member_type
+from scverse_doc.autodoc import _member_type, _skip_private_bases
 
 
 @pytest.mark.parametrize(
@@ -20,6 +20,14 @@ from scverse_doc.autodoc import _member_type
 )
 def test_member_type(path: str, expected: str) -> None:
     assert _member_type(path) == expected
+
+
+def test_skip_private_bases() -> None:
+    class _Private: ...
+
+    bases: list[type | str] = [object, _Private, dict, ":class:`~pkg._Hidden`", ":class:`pkg.Public`"]
+    _skip_private_bases(None, "x", object, None, bases)  # type: ignore[arg-type]
+    assert bases == [dict, ":class:`pkg.Public`"]
 
 
 @pytest.mark.parametrize(
