@@ -14,3 +14,4 @@ API
 
    Thing
    fit
+   split
