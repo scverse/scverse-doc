@@ -56,7 +56,8 @@ def _return_tuples(obj: object) -> Iterator[tuple[object, ...]]:
     """Yield the member types of each fixed-length tuple `obj` can return."""
     try:
         ret = get_type_hints(obj).get("return")
-    except Exception:  # noqa: BLE001  # shortcut: unresolvable hints (e.g. `TYPE_CHECKING` imports) get no types
+    # shortcut: unresolvable hints (e.g. `TYPE_CHECKING` imports) get no types
+    except (AttributeError, NameError, TypeError):
         return
     for option in get_args(ret) if get_origin(ret) in {Union, UnionType} else [ret]:
         if get_origin(option) is tuple and ... not in (members := get_args(option)):
