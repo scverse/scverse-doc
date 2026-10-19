@@ -5,13 +5,11 @@ from __future__ import annotations
 
 import re
 from importlib.util import find_spec
-from io import StringIO
 from textwrap import dedent
 from typing import TYPE_CHECKING, Literal
 
 import pytest
-from sphinx.application import Sphinx
-from sphinx.util.docutils import docutils_namespace
+from sphinx.testing.util import SphinxTestApp
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -72,24 +70,20 @@ def build(tmp_path: Path, file_format: Format, arg: str, files: dict[str, str]) 
     for name, content in files.items():
         (tmp_path / name).write_text(content)
     (tmp_path / "conf.py").write_text("")
-    out = tmp_path / "_build"
-    warnings = StringIO()
-    with docutils_namespace():  # every app registers its nodes globally
-        Sphinx(
-            srcdir=str(tmp_path),
-            confdir=str(tmp_path),
-            outdir=str(out),
-            doctreedir=str(out / ".doctrees"),
-            buildername="pseudoxml",
-            confoverrides={
-                "extensions": [*(["myst_parser"] if file_format == "myst" else []), "scverse_doc.release_notes"],
-                # the version files are only included
-                "exclude_patterns": ["_build", "[!i]*.md", "[!i]*.rst"],
-            },
-            status=None,
-            warning=warnings,
-        ).build()
-    return out, warnings.getvalue()
+    app = SphinxTestApp(
+        "pseudoxml",
+        srcdir=tmp_path,
+        confoverrides={
+            "extensions": [*(["myst_parser"] if file_format == "myst" else []), "scverse_doc.release_notes"],
+            # the version files are only included
+            "exclude_patterns": ["_build", "[!i]*.md", "[!i]*.rst"],
+        },
+    )
+    try:
+        app.build()
+    finally:
+        app.cleanup()
+    return app.outdir, app.warning.getvalue()
 
 
 def test_release_notes(tmp_path: Path, file_format: Format) -> None:
