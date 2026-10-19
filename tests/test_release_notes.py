@@ -63,7 +63,9 @@ def file_format(request: pytest.FixtureRequest) -> Format:
     return request.param  # type: ignore[no-any-return]
 
 
-def build(tmp_path: Path, file_format: Format, arg: str, files: dict[str, str]) -> tuple[Path, str]:
+def build(
+    tmp_path: Path, file_format: Format, arg: str, files: dict[str, str], **overrides: object
+) -> tuple[Path, str]:
     """Write `files` and an index calling the directive with `arg` to `tmp_path`, build it, and return the output dir and warnings."""
     index = f"```{{release-notes}} {arg}\n```" if file_format == "myst" else f".. release-notes:: {arg}"
     files = {f"index.{'md' if file_format == 'myst' else 'rst'}": index, **files}
@@ -77,6 +79,7 @@ def build(tmp_path: Path, file_format: Format, arg: str, files: dict[str, str]) 
             "extensions": [*(["myst_parser"] if file_format == "myst" else []), "scverse_doc.release_notes"],
             # the version files are only included
             "exclude_patterns": ["_build", "[!i]*.md", "[!i]*.rst"],
+            **overrides,
         },
     )
     try:
@@ -102,3 +105,9 @@ def test_release_notes(tmp_path: Path, file_format: Format) -> None:
 def test_error_not_a_dir(tmp_path: Path, file_format: Format, arg: str, files: dict[str, str]) -> None:
     _, warnings = build(tmp_path, file_format, arg, files)
     assert re.search(rf"Not a directory:.*{re.escape(arg)}", warnings)
+
+
+def test_error_no_source_file(tmp_path: Path) -> None:
+    """A relative path needs a file to be relative to, which the prolog is not."""
+    _, warnings = build(tmp_path, "rst", "/", {}, rst_prolog=".. release-notes:: .")
+    assert "Cannot find relative path to: <rst_prologue>" in warnings
