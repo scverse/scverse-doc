@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Sphinx docs configuration."""
 
 project = "scverse-doc"

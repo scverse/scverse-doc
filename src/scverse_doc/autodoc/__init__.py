@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """The layout of the API pages.
 
 Ships :mod:`~sphinx.ext.autosummary` templates for modules and classes.

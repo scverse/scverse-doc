@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """The fetched registry and the intersphinx mapping built from it."""
 
 from __future__ import annotations

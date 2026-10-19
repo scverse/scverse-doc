@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """A module to document."""
 
 from typing import Generic, TypeVar

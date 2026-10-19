@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Links into the source repository: the repository icon, “edit this page”, and ``[source]``.
 
 Declare the repository with :confval:`source_repository`.

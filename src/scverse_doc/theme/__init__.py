@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """The scverse theme: brand chrome, the per-package accent, and the ecosystem dropdown.
 
 :mod:`scverse_doc` selects this theme; on its own, set ``html_theme = "scverse"``.

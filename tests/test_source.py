@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """The repository description derived from the ``source_*`` config values."""
 
 from __future__ import annotations

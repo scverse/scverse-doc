@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """The extension stack and the shared defaults.
 
 Sets up the extensions in :data:`EXTENSIONS`, so `conf.py` lists only ``scverse_doc``,

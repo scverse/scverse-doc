@@ -125,6 +125,7 @@ lint.select = [
   "B",      # flake8-bugbear
   "BLE",    # flake8-blind-except
   "C4",     # flake8-comprehensions
+  "CPY",    # flake8-copyright
   "D",      # pydocstyle
   "E",      # Error detected by Pycodestyle
   "F",      # Errors detected by Pyflakes
@@ -149,8 +150,10 @@ lint.ignore = [
   "E741",   # allow I, O, l as variable names -> I is the identity matrix
   "TID252", # Allow relative imports
 ]
+lint.per-file-ignores."**/*.ipynb" = [ "CPY001" ]  # Missing copyright notice in notebook is fine
 lint.per-file-ignores."docs/*" = [ "I" ]
 lint.per-file-ignores."tests/*" = [ "D" ]
+lint.flake8-copyright.notice-rgx = "SPDX-License-Identifier: MPL-2\\.0"
 lint.pydocstyle.convention = "numpy"
 
 [tool.mypy]

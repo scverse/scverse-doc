@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """End-to-end builds of the fixture documentation trees."""
 
 from __future__ import annotations

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MPL-2.0
 """Prose return sections in NumPy-style docstrings.
 
 :mod:`sphinx.ext.napoleon` reads a NumPy-style ``Returns`` section as a list of ``name : type`` entries.
