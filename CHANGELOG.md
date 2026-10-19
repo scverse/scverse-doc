@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning][].
 
 - Annotate prose return sections’ items with the members of a returned tuple
 - `release-notes` directive, ported from `scanpydoc` (#51)
+- Parameters and attributes as definition lists, ported from `scanpydoc`’s `definition_list_typed_field` (#54)
 
 ## [0.1.1]
 

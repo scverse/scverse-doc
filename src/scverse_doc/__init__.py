@@ -26,6 +26,8 @@ each of which also works on its own:
     The repository links: the header icon, “edit this page”, and ``[source]``.
 :mod:`scverse_doc.theme`
     The theme, its chrome, and the per-package accent.
+:mod:`scverse_doc.typed_fields`
+    Parameters and attributes as definition lists.
 
 Anything set in `conf.py` wins.
 """
@@ -36,14 +38,14 @@ from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
-from . import autodoc, config, napoleon, registry, release_notes, source, theme
+from . import autodoc, config, napoleon, registry, release_notes, source, theme, typed_fields
 from .config import _is_set_by_user
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-__all__ = ["autodoc", "config", "napoleon", "registry", "release_notes", "source", "theme", "setup"]
+__all__ = ["autodoc", "config", "napoleon", "registry", "release_notes", "source", "theme", "typed_fields", "setup"]
 
 
 def _default_theme(app: Sphinx, config: Config) -> None:
