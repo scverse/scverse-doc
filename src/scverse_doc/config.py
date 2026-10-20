@@ -72,6 +72,14 @@ class Defaults:
 
 
 #: Sphinx config values applied unless `conf.py` sets them.
+#:
+#: Access them by name to create variations of their values, e.g.
+#:
+#: ```python
+#: from scverse_doc.config import DEFAULTS
+#:
+#: exclude_patterns = [*DEFAULTS.exclude_patterns, ...]
+#: ```
 DEFAULTS: Final = Defaults()
 
 
