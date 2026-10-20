@@ -62,7 +62,7 @@ doc = [
   "sphinx-autodoc-typehints",
   "sphinxcontrib-bibtex>=1",
 ]
-typecheck = [ "mypy", "types-docutils" ]
+typecheck = [ "mypy", "types-docutils", "wenmode" ]  # wenmode for scripts/check_changelog.py
 
 [tool.hatch]
 version.source = "vcs"
@@ -159,6 +159,8 @@ lint.pydocstyle.convention = "numpy"
 files = [ "docs", "scripts", "src", "tests" ]
 # Fixture conf.py files all share the module name "conf".
 exclude = [ "tests/roots/" ]
+disallow_any_explicit = true
+disallow_any_generics = true
 
 [tool.pytest]
 addopts = [
