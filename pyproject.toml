@@ -54,6 +54,7 @@ test = [
   "defusedxml",     # for sphinx.testing’s HTML assertions
   "pytest",
   "pytest-cov",     # For VS Code’s coverage functionality
+  "wenmode",        # for scripts/check_changelog.py
 ]
 doc = [
   "ipykernel",
@@ -174,6 +175,7 @@ filterwarnings = [
   "ignore:The mapping interface for autodoc options:sphinx.deprecation.RemovedInSphinx11Warning",
   "ignore::sphinx.deprecation.RemovedInSphinx11Warning:myst_parser",
 ]
+pythonpath = [ "scripts" ]
 strict = true
 testpaths = [ "tests", "src" ]
 
