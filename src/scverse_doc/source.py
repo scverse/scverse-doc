@@ -201,8 +201,7 @@ def _linkcode_url(source: _Source, module: str, fullname: str) -> str | None:
         obj = import_module(module)
         for part in filter(None, fullname.split(".")):
             obj = getattr(obj, part)
-        assert callable(obj)
-        obj = inspect.unwrap(obj)
+        obj = inspect.unwrap(obj) if callable(obj) else obj
         lines, start = inspect.getsourcelines(obj)
         file = Path(inspect.getsourcefile(obj) or "")
     except (ImportError, AttributeError, TypeError, OSError):
