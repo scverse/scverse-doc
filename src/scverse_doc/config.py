@@ -7,7 +7,8 @@ and fills in :data:`DEFAULTS`. Anything set in `conf.py` always wins.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from dataclasses import dataclass, field, fields
+from typing import TYPE_CHECKING, Final
 
 from sphinx.util.typing import ExtensionMetadata
 
@@ -15,11 +16,11 @@ if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-__all__ = ["DEFAULTS", "EXTENSIONS", "MYST_ENABLE_EXTENSIONS", "setup"]
+__all__ = ["DEFAULTS", "EXTENSIONS", "Defaults", "MYST_ENABLE_EXTENSIONS", "setup"]
 
 #: Extensions set up alongside this one,
 #: so packages list only ``scverse_doc``.
-EXTENSIONS = (
+EXTENSIONS: Final = (
     "myst_nb",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
@@ -31,7 +32,7 @@ EXTENSIONS = (
 )
 
 #: The MyST syntax extensions, i.e. the ``myst_enable_extensions`` entry of :data:`~scverse_doc.config.DEFAULTS`.
-MYST_ENABLE_EXTENSIONS = (
+MYST_ENABLE_EXTENSIONS: Final = (
     "amsmath",
     "colon_fence",
     "deflist",
@@ -40,28 +41,38 @@ MYST_ENABLE_EXTENSIONS = (
     "html_admonition",
 )
 
-#: Sphinx config values applied unless `conf.py` sets them.
-DEFAULTS: dict[str, object] = {
-    "autosummary_generate": True,
-    "autodoc_member_order": "groupwise",
-    "napoleon_google_docstring": False,
-    "napoleon_numpy_docstring": True,
-    "napoleon_include_init_with_doc": False,
-    "napoleon_use_param": True,
-    "napoleon_use_rtype": True,
-    "default_role": "literal",
-    "myst_enable_extensions": list(MYST_ENABLE_EXTENSIONS),
-    "myst_heading_anchors": 6,
-    "source_suffix": {".rst": "restructuredtext", ".md": "myst-nb", ".ipynb": "myst-nb"},
+
+@dataclass(frozen=True)
+class Defaults:
+    """Sphinx config values applied unless `conf.py` sets them."""
+
+    autosummary_generate: bool = True
+    autodoc_member_order: str = "groupwise"
+    napoleon_google_docstring: bool = False
+    napoleon_numpy_docstring: bool = True
+    napoleon_include_init_with_doc: bool = False
+    napoleon_use_param: bool = True
+    napoleon_use_rtype: bool = True
+    default_role: str = "literal"
+    myst_enable_extensions: list[str] = field(default_factory=lambda: list(MYST_ENABLE_EXTENSIONS))
+    myst_heading_anchors: int = 6
+    source_suffix: dict[str, str] = field(
+        default_factory=lambda: {".rst": "restructuredtext", ".md": "myst-nb", ".ipynb": "myst-nb"}
+    )
     # Off: tutorials needing a GPU or a large download must not gate a docs build.
-    "nb_execution_mode": "off",
-    "nb_output_stderr": "remove",
-    "nb_merge_streams": True,
+    nb_execution_mode: str = "off"
+    nb_output_stderr: str = "remove"
+    nb_merge_streams: bool = True
     # One unreachable host must not stall the build.
-    "intersphinx_timeout": 10,
-    "exclude_patterns": ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"],
-    "nitpicky": True,
-}
+    intersphinx_timeout: int = 10
+    exclude_patterns: list[str] = field(
+        default_factory=lambda: ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
+    )
+    nitpicky: bool = True
+
+
+#: Sphinx config values applied unless `conf.py` sets them.
+DEFAULTS: Final = Defaults()
 
 
 def _is_set_by_user(config: Config, name: str) -> bool:
@@ -71,10 +82,12 @@ def _is_set_by_user(config: Config, name: str) -> bool:
 
 def _apply_defaults(config: Config) -> None:
     """Fill in the values `conf.py` did not set."""
-    for name, value in DEFAULTS.items():
-        if _is_set_by_user(config, name):
+    # A fresh instance, so builds don't share (and mutate) the same lists and dicts.
+    defaults = Defaults()
+    for f in fields(defaults):
+        if _is_set_by_user(config, f.name):
             continue
-        setattr(config, name, value)
+        setattr(config, f.name, getattr(defaults, f.name))
 
 
 def _configure(app: Sphinx, config: Config) -> None:
