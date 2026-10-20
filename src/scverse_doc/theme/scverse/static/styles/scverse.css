@@ -212,11 +212,12 @@ a.dropdown-item {
 /* --- Sidebar ------------------------------------------------------------ */
 
 .sidebar-primary-item {
-    /* custom elements render into shadow DOM, so they always match :empty;
-    * the flyout only renders once Read the Docs’ addons define it */
+    /* Hide empty sidebar items; this:
+     * excludes defined custom elements (which only contain Shadow DOM)
+     * includes an empty ad container
+     */
     &:has(> :only-child:empty:not(readthedocs-flyout:defined)),
-    /* the ad placement holds whitespace, so it never matches :empty before an ad is injected */
-        &:has(> #ethical-ad-placement):not(:has(> #ethical-ad-placement > *)) {
+    &:has(> #ethical-ad-placement):not(:has(> #ethical-ad-placement > *)) {
         display: none;
     }
 
