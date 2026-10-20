@@ -17,7 +17,7 @@ renders the term ``a`` classified as :class:`str`, with the description indented
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, TypedDict, Unpack
 
 from docutils import nodes
 from sphinx import addnodes
@@ -26,14 +26,20 @@ from sphinx.util.typing import ExtensionMetadata
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from typing import Any
 
+    from docutils.parsers.rst.states import Inliner
     from sphinx.application import Sphinx
     from sphinx.environment import BuildEnvironment
 
     type TextLikeNode = nodes.Text | nodes.TextElement
 
 __all__ = ["setup"]
+
+
+class _XRefKw(TypedDict):
+    contnode: nodes.Node | None
+    inliner: Inliner | None
+    location: nodes.Node | None
 
 
 class _DLTypedField(PyTypedField):
@@ -47,7 +53,7 @@ class _DLTypedField(PyTypedField):
         domain: str,
         items: Iterable[tuple[str, list[nodes.inline]]],
         env: BuildEnvironment | None = None,
-        **kw: Any,
+        **kw: Unpack[_XRefKw],
     ) -> nodes.field:
         """Render a field to a node holding a definition list."""
 

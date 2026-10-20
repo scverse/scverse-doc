@@ -37,7 +37,6 @@ from sphinx.util.typing import ExtensionMetadata
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from types import ModuleType
-    from typing import Any
 
     from docutils import nodes
     from sphinx.addnodes import pending_xref
@@ -60,7 +59,7 @@ DEFAULT_OVERRIDES: dict[str, str] = {
 }
 
 
-def _normalize(mapping: Mapping[Any, str | _Key]) -> dict[_Key, _Key]:
+def _normalize[K: str | _Key](mapping: Mapping[K, str | _Key]) -> dict[_Key, _Key]:
     """Make keys and values ``(role, name)`` tuples, with role :data:`None` for any role."""
     return {
         (k if isinstance(k, tuple) else (None, k)): (v if isinstance(v, tuple) else (None, v))
@@ -88,7 +87,7 @@ def _exec_guarded_imports(module: ModuleType) -> None:
                 _logger.debug(f"Failed to execute guarded import {ast.unparse(stmt)!r} in {module.__name__}")
 
 
-def _resolve_guarded_imports(app: Sphinx, obj: Any, bound_method: bool) -> None:
+def _resolve_guarded_imports(app: Sphinx, obj: object, bound_method: bool) -> None:
     if isinstance(module_name := getattr(obj, "__module__", None), str) and module_name in sys.modules:
         _exec_guarded_imports(sys.modules[module_name])
 

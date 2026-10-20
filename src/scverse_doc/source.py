@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from enum import Enum
 from importlib import import_module
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING, Any, NamedTuple, Self
+from typing import TYPE_CHECKING, NamedTuple, Self
 from urllib.parse import urlsplit
 
 from sphinx.errors import ConfigError
@@ -128,13 +128,13 @@ def _ref(config: Config) -> str:
     return "main"
 
 
-def _theme_options(source: _Source) -> dict[str, Any]:
+def _theme_options(source: _Source) -> dict[str, object]:
     """Every theme option some theme reads this from; only the declared ones are applied."""
     if not source.provider:
         # Every one of these makes a theme build per-page URLs we have no layout for:
         # `sphinx-basic-ng` warns, `sphinx-book-theme` guesses the forge and errors out if it can’t.
         return {}
-    options: dict[str, Any] = {
+    options: dict[str, object] = {
         # sphinx-basic-ng, and so furo
         "source_repository": source.url,
         "source_branch": source.ref,
@@ -155,7 +155,7 @@ def _theme_options(source: _Source) -> dict[str, Any]:
     return options
 
 
-def _html_context(source: _Source) -> dict[str, Any]:
+def _html_context(source: _Source) -> dict[str, object]:
     """The `html_context` entries `pydata-sphinx-theme`, `sphinx_rtd_theme` and `furo` read."""
     parts = urlsplit(source.url)
     owner, _, name = parts.path.strip("/").rpartition("/")
@@ -198,10 +198,10 @@ def _configure_theme(app: Sphinx) -> None:
 def _linkcode_url(source: _Source, module: str, fullname: str) -> str | None:
     """Link to a Python object’s definition, or :data:`None` if it has no findable source."""
     try:
-        obj: Any = import_module(module)
+        obj = import_module(module)
         for part in filter(None, fullname.split(".")):
             obj = getattr(obj, part)
-        obj = inspect.unwrap(obj)
+        obj = inspect.unwrap(obj) if callable(obj) else obj
         lines, start = inspect.getsourcelines(obj)
         file = Path(inspect.getsourcefile(obj) or "")
     except (ImportError, AttributeError, TypeError, OSError):

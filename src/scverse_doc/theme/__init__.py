@@ -12,7 +12,7 @@ The accent colour and the “scverse packages” dropdown come from the
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
@@ -97,14 +97,14 @@ def _add_ecosystem_context(
     app: Sphinx,
     pagename: str,
     templatename: str,
-    context: dict[str, Any],
+    context: dict[str, object],
     doctree: object,
 ) -> None:
     """Expose the registry to the scverse menu template."""
     if app.config.html_theme != "scverse":
         return
     current = _package_name(app.config).lower()
-    groups: dict[str, list[dict[str, Any]]] = {"core": [], "ecosystem": []}
+    groups: dict[str, list[dict[str, object]]] = {"core": [], "ecosystem": []}
     for pkg in packages.values():
         groups[pkg.kind].append({"name": pkg.name, "docs": pkg.docs, "current": pkg.name.lower() == current})
     context["scverse_ecosystem"] = groups
