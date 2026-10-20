@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Fixed
+
+- header shadow now only extends downward (#70)
+
 ## [0.2.3]
 
 ### Added
