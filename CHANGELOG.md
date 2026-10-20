@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.2.2]
+
 ### Fixed
 
 - run the private-base-skipping code on the real class names in more cases (#66)
@@ -46,7 +48,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.2.1...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.2.2...main
+[0.2.2]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.2
 [0.2.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.1
 [0.2.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.0
 [0.1.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.1.1
