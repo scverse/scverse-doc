@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Added
+
+- `scverse_doc.config.DEFAULTS` is now a class (#69)
+
 ## [0.2.2]
 
 ### Fixed

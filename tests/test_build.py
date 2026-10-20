@@ -133,7 +133,7 @@ def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
     app, html = build(ROOTS / "override", tmp_path)
     assert app.config.nb_execution_mode == "force"
     assert app.config.html_theme_options["show_toc_level"] == 4
-    assert app.config.napoleon_numpy_docstring is DEFAULTS["napoleon_numpy_docstring"]
+    assert app.config.napoleon_numpy_docstring is DEFAULTS.napoleon_numpy_docstring
     # "not-an-scverse-package" is not in the registry, which must not break the theme.
     assert "scverse-ecosystem-dropdown" in html
 
