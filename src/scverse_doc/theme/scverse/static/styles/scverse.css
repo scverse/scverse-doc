@@ -74,9 +74,9 @@ html:not(:has(.bd-header__inner)) {
         display: none;
     }
 
-    /* pydata sizes the logo by the header height; 4rem is pydata’s default */
+    /* pydata sizes the logo by the header height */
     .navbar-brand {
-        --pst-header-height: 4rem;
+        --pst-header-height: auto;
     }
 
     /* pydata’s overflow-x would make this the sticky header’s scroll container;
@@ -211,11 +211,23 @@ a.dropdown-item {
 
 /* --- Sidebar ------------------------------------------------------------ */
 
-/* custom elements render into shadow DOM, so they always match :empty */
-.sidebar-primary-item:has(> :only-child:empty:not(readthedocs-flyout)) {
-    display: none;
+.sidebar-primary-item {
+    /* Hide empty sidebar items; this:
+     * excludes defined custom elements (which only contain Shadow DOM)
+     * includes an empty ad container
+     */
+    &:has(> :only-child:empty:not(readthedocs-flyout:defined)),
+    &:has(> #ethical-ad-placement):not(:has(> #ethical-ad-placement > *)) {
+        display: none;
+    }
+
+    /* for visual consistency, make the search field fill the sidebar */
+    .search-button-field {
+        width: 100%;
+    }
 }
-.sidebar-primary-item readthedocs-flyout {
+
+readthedocs-flyout {
     --readthedocs-flyout-background-color: transparent;
     --readthedocs-flyout-font-family: inherit;
     --readthedocs-flyout-divider-color: var(--scverse-color-border);

@@ -22,7 +22,7 @@ from functools import cache, cached_property
 from importlib.resources import files
 from operator import itemgetter
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Literal, NotRequired, TypedDict, cast
 
 from sphinx.application import Sphinx  # noqa: TC002  # `_build_cache`’s annotations must resolve at runtime
 from sphinx.util import requests
@@ -106,8 +106,19 @@ class Package:
     """The package’s brand accent, falling back to the scverse deep blue."""
 
 
+class _Entry(TypedDict):
+    """The fields of an upstream listing entry that the registry reads."""
+
+    name: str
+    documentation_home: str
+    inventory: NotRequired[str]
+    project_home: NotRequired[str]
+    description: NotRequired[str]
+    category: NotRequired[str]
+
+
 @cache
-def _fetch() -> list[dict[str, Any]]:
+def _fetch() -> list[_Entry]:
     """Fetch the upstream listing, going through `_cache_dir` if one is set."""
     cached = _cache_dir / "scverse-packages.json" if _cache_dir is not None else None
     if cached is not None and cached.is_file() and time.time() - cached.stat().st_mtime < _MAX_AGE_SECONDS:
@@ -122,7 +133,7 @@ def _fetch() -> list[dict[str, Any]]:
     if cached is not None:
         cached.parent.mkdir(parents=True, exist_ok=True)
         cached.write_bytes(response.content)
-    listing: list[dict[str, Any]] = response.json()
+    listing: list[_Entry] = response.json()
     return listing
 
 

@@ -22,8 +22,6 @@ from sphinx.util import logging
 from sphinx.util.typing import ExtensionMetadata
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
@@ -51,7 +49,7 @@ def _member_type(obj_path: str) -> Literal["method", "property", "attribute"]:
             return "attribute"
 
 
-def _skip_private_bases(app: Sphinx, name: str, obj: type, options: Any, bases: list[type | str]) -> None:
+def _skip_private_bases(app: Sphinx, name: str, obj: type, options: object, bases: list[type | str]) -> None:
     # Other handlers may have added strings, and some typing constructs have no `__name__`.
     bases[:] = [
         b

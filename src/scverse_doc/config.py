@@ -7,7 +7,7 @@ and fills in :data:`DEFAULTS`. Anything set in `conf.py` always wins.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
@@ -41,7 +41,7 @@ MYST_ENABLE_EXTENSIONS = (
 )
 
 #: Sphinx config values applied unless `conf.py` sets them.
-DEFAULTS: dict[str, Any] = {
+DEFAULTS: dict[str, object] = {
     "autosummary_generate": True,
     "autodoc_member_order": "groupwise",
     "napoleon_google_docstring": False,

@@ -54,6 +54,7 @@ test = [
   "defusedxml",     # for sphinx.testing’s HTML assertions
   "pytest",
   "pytest-cov",     # For VS Code’s coverage functionality
+  "wenmode",        # for scripts/check_changelog.py
 ]
 doc = [
   "ipykernel",
@@ -62,7 +63,7 @@ doc = [
   "sphinx-autodoc-typehints",
   "sphinxcontrib-bibtex>=1",
 ]
-typecheck = [ "mypy", "types-docutils" ]
+typecheck = [ "mypy", "types-docutils", "wenmode" ]  # wenmode for scripts/check_changelog.py
 
 [tool.hatch]
 version.source = "vcs"
@@ -159,6 +160,8 @@ lint.pydocstyle.convention = "numpy"
 files = [ "docs", "scripts", "src", "tests" ]
 # Fixture conf.py files all share the module name "conf".
 exclude = [ "tests/roots/" ]
+disallow_any_explicit = true
+disallow_any_generics = true
 
 [tool.pytest]
 addopts = [
@@ -172,6 +175,7 @@ filterwarnings = [
   "ignore:The mapping interface for autodoc options:sphinx.deprecation.RemovedInSphinx11Warning",
   "ignore::sphinx.deprecation.RemovedInSphinx11Warning:myst_parser",
 ]
+pythonpath = [ "scripts" ]
 strict = true
 testpaths = [ "tests", "src" ]
 
