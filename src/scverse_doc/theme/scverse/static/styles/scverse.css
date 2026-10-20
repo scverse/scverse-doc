@@ -94,7 +94,8 @@ html:not(:has(.bd-header__inner)) {
         /* Span the article container’s padding, so content doesn’t peek out beside it */
         margin: -1rem -1rem 0;
         padding-inline: 1rem;
-        box-shadow: 0 0.125rem 0.25rem 0 var(--pst-color-shadow); /* pydata’s navbar shadow */
+        /* pydata’s navbar shadow, horizontally shrunk so it only extends downwards */
+        box-shadow: -0.125rem 0.25rem 0.25rem -0.125rem var(--pst-color-shadow);
     }
     /* Where supported, only once the page is scrolled */
     @supports (animation-timeline: scroll()) {
