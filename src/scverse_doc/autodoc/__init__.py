@@ -72,7 +72,6 @@ def setup(app: Sphinx) -> ExtensionMetadata:
     # TODO: autosummary builds its own jinja environment with no hook for filters, so this is global.
     DEFAULT_FILTERS["member_type"] = _member_type
     app.connect("config-inited", _add_templates)
-    app.connect(
-        "autodoc-process-bases", _skip_private_bases, priority=100
-    )  # this needs to run before sphinx-autodoc-typehints
+    # when running before sphinx-autodoc-typehints, we run on the actual `__name__`
+    app.connect("autodoc-process-bases", _skip_private_bases, priority=100)
     return ExtensionMetadata(parallel_read_safe=True)
