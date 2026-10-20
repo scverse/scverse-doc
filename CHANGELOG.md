@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning][].
 
 ### Fixed
 
+- run the private-base-skipping code on the real class names in more cases (#66)
 - make logo and search button fill sidebar (#67)
 
 ## [0.2.1]
