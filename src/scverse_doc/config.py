@@ -54,10 +54,10 @@ class Defaults:
     napoleon_use_param: bool = True
     napoleon_use_rtype: bool = True
     default_role: str = "literal"
-    myst_enable_extensions: list[str] = field(default_factory=lambda: list(MYST_ENABLE_EXTENSIONS))
+    myst_enable_extensions: list[str] = field(default_factory=list(MYST_ENABLE_EXTENSIONS).copy)
     myst_heading_anchors: int = 6
     source_suffix: dict[str, str] = field(
-        default_factory=lambda: {".rst": "restructuredtext", ".md": "myst-nb", ".ipynb": "myst-nb"}
+        default_factory={".rst": "restructuredtext", ".md": "myst-nb", ".ipynb": "myst-nb"}.copy
     )
     # Off: tutorials needing a GPU or a large download must not gate a docs build.
     nb_execution_mode: str = "off"
@@ -66,7 +66,7 @@ class Defaults:
     # One unreachable host must not stall the build.
     intersphinx_timeout: int = 10
     exclude_patterns: list[str] = field(
-        default_factory=lambda: ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
+        default_factory=["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"].copy
     )
     nitpicky: bool = True
 
@@ -82,7 +82,7 @@ def _is_set_by_user(config: Config, name: str) -> bool:
 
 def _apply_defaults(config: Config) -> None:
     """Fill in the values `conf.py` did not set."""
-    # A fresh instance, so builds don't share (and mutate) the same lists and dicts.
+    # A fresh instance, so builds don’t share (and mutate) the same lists and dicts.
     defaults = Defaults()
     for f in fields(defaults):
         if _is_set_by_user(config, f.name):
