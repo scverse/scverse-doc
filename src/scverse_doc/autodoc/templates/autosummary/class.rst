@@ -7,6 +7,9 @@
 .. autoclass:: {{ fullname }}
 
 {% set methods = methods | select("ne", "__init__") | list %}
+{#- Inside autoclass, names resolve against the class’s real module, so prefix the class name:
+    `objname` can go through a module alias, and bare members break autosummary’s instance attribute fallback. #}
+{% set clsname = fullname.split(".") | last %}
 
 {% block attributes %}
 {% for item in attributes %}
@@ -16,7 +19,7 @@
 
     .. autosummary::
 {% endif %}
-       ~{{ [objname, item] | join(".") }}
+       ~{{ [clsname, item] | join(".") }}
 {%- endfor %}
 {% endblock %}
 
@@ -28,7 +31,7 @@
 
     .. autosummary::
 {% endif %}
-       ~{{ [objname, item] | join(".") }}
+       ~{{ [clsname, item] | join(".") }}
 {% endfor %}
 {% endblock %}
 

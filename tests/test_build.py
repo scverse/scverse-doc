@@ -173,6 +173,12 @@ def test_class_template_documents_members_by_kind(autodoc: Path) -> None:
     assert 'href="#apimod.Thing.ivar"' in html
 
 
+def test_class_template_handles_aliased_modules(autodoc: Path) -> None:
+    html = (autodoc / "generated" / "apipkg.aliased.Aliased.html").read_text()
+    assert 'href="#apipkg.aliased.Aliased.attr"' in html
+    assert 'href="#apipkg.aliased.Aliased.meth"' in html
+
+
 def test_module_template_recurses(autodoc: Path) -> None:
     assert (autodoc / "generated" / "apipkg.sub.deep.html").is_file()
 

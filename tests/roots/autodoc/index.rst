@@ -7,6 +7,14 @@ API
 
    apipkg
 
+.. currentmodule:: apipkg
+
+.. autosummary::
+   :toctree: generated
+   :recursive:
+
+   aliased
+
 .. currentmodule:: apimod
 
 .. autosummary::

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning][].
 ### Fixed
 
 - header shadow now only extends downward (#70)
+- the autosummary class template now correctly handles classes referenced through aliased modules (#71)
 
 ## [0.2.3]
 
