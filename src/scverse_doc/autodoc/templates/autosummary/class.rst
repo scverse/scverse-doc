@@ -16,7 +16,7 @@
 
     .. autosummary::
 {% endif %}
-       ~{{ [objname, item] | join(".") }}
+       ~{{ item }}
 {%- endfor %}
 {% endblock %}
 
@@ -28,7 +28,7 @@
 
     .. autosummary::
 {% endif %}
-       ~{{ [objname, item] | join(".") }}
+       ~{{ item }}
 {% endfor %}
 {% endblock %}
 
