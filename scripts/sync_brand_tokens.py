@@ -11,15 +11,14 @@ so transcribing its colours into this repository by hand
 would create exactly the kind of drift this package exists to remove.
 
 The website takes its neutral colours from Bootstrap’s tokens (``--bs-fg-*``, ``--bs-bg-*``, …),
-which already carry dark values via ``light-dark()``, and defines only the brand hues itself.
-This script looks up the tokens the theme needs in the website’s vendored Bootstrap and ``assets/main.scss``,
+which already carry dark values via ``light-dark()``, and defines only the brand hues itself,
+as OKLCH triples in ``assets/accents.json``.
+This script looks up the tokens the theme needs in the website’s vendored Bootstrap and ``accents.json``,
 resolves every ``var()`` down to literals, and writes them into ``_tokens.css`` as ``--scverse-color-x``.
-The per-package accents go to ``_accents.json``, because the registry needs their values in Python
-to derive readable shades from them.
-
 Only the region between the marker comments is touched; the rest of the file is hand-authored.
 
-The scverse logo used for the navbar link back to the website is copied verbatim for the same reason.
+The scverse logo used for the navbar link back to the website is copied verbatim for the same reason,
+as is ``accents.json``, which the registry reads the package accents from.
 
 Usage
 -----
@@ -37,16 +36,16 @@ from pathlib import Path
 HERE = Path(__file__).parent
 STATIC = HERE.parent / "src" / "scverse_doc" / "theme" / "scverse" / "static"
 TARGET = STATIC / "_tokens.css"
-ACCENTS_TARGET = HERE.parent / "src" / "scverse_doc" / "_accents.json"
 
-#: Website file -> theme static file, copied verbatim.
-ASSETS = {Path("static/img/logo/scverse-fa.svg"): STATIC / "scverse-fa.svg"}
+#: Website file -> package file, copied verbatim.
+ASSETS = {
+    Path("static/img/logo/scverse-fa.svg"): STATIC / "scverse-fa.svg",
+    Path("assets/accents.json"): HERE.parent / "src" / "scverse_doc" / "_accents.json",
+}
 
 #: CSS custom property emitted here -> website custom property it is resolved from.
 #: The pairing mirrors the one scverse/scverse.github.io#329 used when replacing its SCSS variables.
 TOKEN_MAP = {
-    "--scverse-color-gradient-start": "--scverse-deep-blue",
-    "--scverse-color-gradient-end": "--scverse-sky-blue",
     "--scverse-color-background": "--bs-bg-body",
     "--scverse-color-text": "--bs-fg-body",
     "--scverse-color-heading": "--bs-fg-1",
@@ -61,18 +60,10 @@ TOKEN_MAP = {
     "--scverse-color-footer-bg": "--bs-bg-2",
 }
 
-#: Package -> website custom property holding its accent; ``default`` is for packages without one.
-ACCENT_MAP = {
-    "default": "--scverse-deep-blue",
-    "anndata": "--anndata-orange",
-    "mudata": "--mudata-green",
-    "muon": "--muon-aquamarine",
-    "pertpy": "--pertpy-blue",
-    "scanpy": "--scanpy-cerise",
-    "scirpy": "--scirpy-purple",
-    "scvi-tools": "--scvi-yellow",
-    "spatialdata": "--spatialdata-blue",
-    "squidpy": "--squidpy-violet",
+#: CSS custom property emitted here -> (package, colour name) in the website’s ``accents.json``.
+ACCENT_TOKEN_MAP = {
+    "--scverse-color-gradient-start": ("scverse", "deep-blue"),
+    "--scverse-color-gradient-end": ("scverse", "sky-blue"),
 }
 
 BEGIN = "/* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */"
@@ -89,36 +80,34 @@ def parse_bootstrap(css: str) -> dict[str, str]:
     return dict(DECL_RE.findall(";".join(blocks) + ";"))
 
 
-def parse_scss(scss: str) -> dict[str, str]:
-    """Extract custom property declarations from the website’s SCSS."""
-    return dict(DECL_RE.findall(scss))
-
-
 def resolve(name: str, props: dict[str, str]) -> str:
     """Return the value of `name` with every ``var()`` in it recursively substituted."""
     return re.sub(r"var\((--[\w-]+)\)", lambda m: resolve(m[1], props), props[name])
 
 
-def render_region(props: dict[str, str], indent: str) -> str:
+def render_region(props: dict[str, str], accents: dict[str, list[tuple[str, list[float]]]], indent: str) -> str:
     """Render the generated region – marker comments included – indented by `indent`."""
     if missing := sorted(set(TOKEN_MAP.values()) - set(props)):
         msg = f"custom properties vanished from the website: {', '.join(missing)}"
         raise KeyError(msg)
-    lines = [BEGIN, *(f"{prop}: {resolve(src, props)};" for prop, src in TOKEN_MAP.items()), END]
+    lines = [
+        BEGIN,
+        *(
+            f"{prop}: oklch({' '.join(map(str, dict(accents[pkg])[name]))});"
+            for prop, (pkg, name) in ACCENT_TOKEN_MAP.items()
+        ),
+        *(f"{prop}: {resolve(src, props)};" for prop, src in TOKEN_MAP.items()),
+        END,
+    ]
     return "\n".join(indent + line for line in lines)
 
 
-def render_accents(props: dict[str, str]) -> str:
-    """Render the accent JSON read by ``scverse_doc.registry``."""
-    return json.dumps({pkg: resolve(src, props) for pkg, src in ACCENT_MAP.items()}, indent=4) + "\n"
-
-
-def render(props: dict[str, str], current: str) -> str:
-    """Return `current` with its generated region replaced by one rendered from `props`."""
+def render(props: dict[str, str], accents: dict[str, list[tuple[str, list[float]]]], current: str) -> str:
+    """Return `current` with its generated region replaced by one rendered from `props` and `accents`."""
     if (region := REGION_RE.search(current)) is None:
         msg = f"{TARGET} has no “{BEGIN}” … “{END}” region"
         raise LookupError(msg)
-    return current[: region.start()] + render_region(props, region[1]) + current[region.end() :]
+    return current[: region.start()] + render_region(props, accents, region[1]) + current[region.end() :]
 
 
 def main() -> int:
@@ -128,12 +117,10 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="fail instead of writing if the output would change")
     args = parser.parse_args()
 
-    props = parse_bootstrap(
-        (args.website / "static" / "bootstrap" / "css" / "bootstrap.min.css").read_text()
-    ) | parse_scss((args.website / "assets" / "main.scss").read_text())
+    props = parse_bootstrap((args.website / "static" / "bootstrap" / "css" / "bootstrap.min.css").read_text())
+    accents = json.loads((args.website / "assets" / "accents.json").read_text())
     updates = {
-        TARGET: render(props, TARGET.read_text()).encode(),
-        ACCENTS_TARGET: render_accents(props).encode(),
+        TARGET: render(props, accents, TARGET.read_text()).encode(),
         **{dst: (args.website / src).read_bytes() for src, dst in ASSETS.items()},
     }
     if args.check:

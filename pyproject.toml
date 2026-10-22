@@ -50,6 +50,7 @@ dev = [
   "twine>=4.0.2",
 ]
 test = [
+  "coloraide",      # to check the accent lightness bounds
   "coverage>=7.10",
   "defusedxml",     # for sphinx.testing’s HTML assertions
   "pytest",

@@ -43,7 +43,7 @@ def test_entries_are_well_formed() -> None:
         # ``docs`` is upstream’s link for humans, so it may well name a page.
         # An inventory root may not.
         assert pkg.docs.startswith("https://"), pkg
-        assert pkg.accent.startswith("#"), pkg
+        assert pkg.accent.startswith("oklch("), pkg
         if pkg.inventory is not None:
             assert pkg.inventory.startswith("https://"), pkg
             assert pkg.inventory.endswith("/"), pkg
