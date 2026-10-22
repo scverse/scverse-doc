@@ -9,8 +9,8 @@
 
 :root {
     /* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */
-    --scverse-color-gradient-start: #262fb5;
-    --scverse-color-gradient-end: #74c8fa;
+    --scverse-color-gradient-start: oklch(0.405 0.205 270);
+    --scverse-color-gradient-end: oklch(0.799 0.108 236);
     --scverse-color-background: light-dark(#fff,color-mix(in oklch, #000 76%, oklch(60% .02 245)));
     --scverse-color-text: light-dark(color-mix(in oklch, #000 64%, oklch(60% .02 245)),color-mix(in oklch, #fff 90%, oklch(60% .02 245)));
     --scverse-color-heading: light-dark(color-mix(in oklch, #000 48%, oklch(60% .02 245)),color-mix(in oklch, #fff 60%, oklch(60% .02 245)));

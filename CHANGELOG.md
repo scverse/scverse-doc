@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Changed
+
+- brand accents are synced from the website’s `accents.json`.
+
 ### Fixed
 
 - header shadow now only extends downward (#70)
