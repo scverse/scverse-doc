@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Added
+
+- `secondary_accent` theme option for the sidebar captions, defaulting to a package’s second brand colour from the website (#73)
+
 ### Fixed
 
 - header shadow now only extends downward (#70)
