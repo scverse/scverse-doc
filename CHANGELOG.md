@@ -10,13 +10,15 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.3.0]
+
 ### Added
 
 - `secondary_accent` theme option for the sidebar captions, which `True` sets to the package’s second brand colour from the website (#73)
 
 ### Changed
 
-- brand accents are synced from the website’s `accents.json`.
+- package accent colors are synced from the scverse website’s `accents.json` (#74)
 
 ### Fixed
 
@@ -68,7 +70,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.2.3...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.3.0...main
+[0.3.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.3.0
 [0.2.3]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.3
 [0.2.2]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.2
 [0.2.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.1
