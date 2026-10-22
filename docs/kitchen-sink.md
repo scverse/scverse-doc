@@ -183,7 +183,7 @@ third = "plain"
 ```pycon
 >>> from scverse_doc import registry
 >>> registry.packages["scanpy"].accent
-'#de367b'
+'oklch(0.608 0.209 1)'
 ```
 
 ## Table

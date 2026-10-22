@@ -6,6 +6,7 @@
         "includes": [
             "**",
             "!src/scverse_doc/registry.json",
+            "!src/scverse_doc/_accents.json",
             "!src/scverse_doc/theme/scverse/static/_tokens.css",
         ],
     },

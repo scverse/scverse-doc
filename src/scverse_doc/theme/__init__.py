@@ -16,7 +16,6 @@ from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
-from .._color import derive_readable
 from ..registry import DEFAULT_ACCENT, _build_cache, packages
 
 if TYPE_CHECKING:
@@ -31,17 +30,28 @@ _THEME_PATH = Path(__file__).parent / "scverse"
 _LIGHT_BACKGROUND = "#ffffff"
 _DARK_BACKGROUND = "#14181e"
 
-_ACCENT_CSS = """\
-:root {{
-  --scverse-color-accent-decorative: {accent};
-  --scverse-color-accent-text: light-dark({light}, {dark});
-}}
+#: OKLCH lightness bounds at which any hue and chroma meets WCAG AA on `_LIGHT_BACKGROUND` / `_DARK_BACKGROUND`;
+#: ``tests/test_color.py`` checks them.
+_MAX_LIGHTNESS_ON_LIGHT = 0.54
+_MIN_LIGHTNESS_ON_DARK = 0.66
+
+_ACCENT_CSS = f"""\
+:root {{{{
+  --scverse-color-accent-decorative: {{accent}};
+  --scverse-color-accent-text: light-dark(
+    oklch(from var(--scverse-color-accent-decorative) min(l, {_MAX_LIGHTNESS_ON_LIGHT}) c h),
+    oklch(from var(--scverse-color-accent-decorative) max(l, {_MIN_LIGHTNESS_ON_DARK}) c h)
+  );
+}}}}
 """
 
-_SECONDARY_ACCENT_CSS = """\
-:root {{
-  --scverse-color-secondary-accent-text: light-dark({light}, {dark});
-}}
+_SECONDARY_ACCENT_CSS = f"""\
+:root {{{{
+  --scverse-color-secondary-accent-text: light-dark(
+    oklch(from {{accent}} min(l, {_MAX_LIGHTNESS_ON_LIGHT}) c h),
+    oklch(from {{accent}} max(l, {_MIN_LIGHTNESS_ON_DARK}) c h)
+  );
+}}}}
 """
 
 #: scverse.org itself is linked from the scverse menu beside them.
@@ -92,17 +102,9 @@ def _configure(app: Sphinx) -> None:
 
     _add_chrome(config)
 
-    accent = _accent(config)
-    css = _ACCENT_CSS.format(
-        accent=accent,
-        light=derive_readable(accent, _LIGHT_BACKGROUND),
-        dark=derive_readable(accent, _DARK_BACKGROUND),
-    )
+    css = _ACCENT_CSS.format(accent=_accent(config))
     if secondary := _secondary_accent(config):
-        css += _SECONDARY_ACCENT_CSS.format(
-            light=derive_readable(secondary, _LIGHT_BACKGROUND),
-            dark=derive_readable(secondary, _DARK_BACKGROUND),
-        )
+        css += _SECONDARY_ACCENT_CSS.format(accent=secondary)
     static_dir = _build_cache(app) / "static"
     static_dir.mkdir(parents=True, exist_ok=True)
     (static_dir / "scverse-accent.css").write_text(css)

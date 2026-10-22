@@ -78,9 +78,9 @@ def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[SphinxTest
 def test_accent_is_derived_for_both_modes(minimal: tuple[SphinxTestApp, str]) -> None:
     app, _ = minimal
     css = (Path(app.outdir) / "_static" / "scverse-accent.css").read_text()
-    assert "--scverse-color-accent-decorative: #30679a;" in css
-    assert "--scverse-color-accent-text: light-dark(#" in css
-    assert "--scverse-color-secondary-accent-text: light-dark(#" in css
+    assert "--scverse-color-accent-decorative: oklch(0.5 0.1 249);" in css
+    assert "oklch(from var(--scverse-color-accent-decorative) min(l, 0.54) c h)" in css
+    assert "oklch(from oklch(0.595 0.177 14) min(l, 0.54) c h)" in css
 
 
 @needs_full
