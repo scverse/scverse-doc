@@ -12,10 +12,11 @@ would create exactly the kind of drift this package exists to remove.
 
 The website takes its neutral colours from Bootstrap’s tokens (``--bs-fg-*``, ``--bs-bg-*``, …),
 which already carry dark values via ``light-dark()``, and defines only the brand hues itself.
-This script looks up the tokens the theme needs in the website’s vendored Bootstrap and ``assets/main.scss``,
-resolves every ``var()`` down to literals, and writes them into ``_tokens.css`` as ``--scverse-color-x``.
-The per-package accents go to ``_accents.json`` and the second brand colours to ``_secondary_accents.json``,
-because the registry needs their values in Python
+This script looks up the tokens the theme needs in the website’s vendored Bootstrap, ``assets/main.scss``
+and ``assets/accents.json``, which lists each package’s brand colours in OKLCH, primary first.
+It resolves every ``var()`` down to literals and writes them into ``_tokens.css`` as ``--scverse-color-x``.
+The per-package accents go to ``_accents.json`` and the opted-in second brand colours to ``_secondary_accents.json``
+as sRGB hex, because the registry needs their values in Python
 to derive readable shades from them.
 
 Only the region between the marker comments is touched; the rest of the file is hand-authored.
@@ -31,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -63,24 +65,11 @@ TOKEN_MAP = {
     "--scverse-color-footer-bg": "--bs-bg-2",
 }
 
-#: Package -> website custom property holding its accent; ``default`` is for packages without one.
-ACCENT_MAP = {
-    "default": "--scverse-deep-blue",
-    "anndata": "--anndata-orange",
-    "mudata": "--mudata-green",
-    "muon": "--muon-aquamarine",
-    "pertpy": "--pertpy-blue",
-    "scanpy": "--scanpy-cerise",
-    "scirpy": "--scirpy-purple",
-    "scvi-tools": "--scvi-yellow",
-    "spatialdata": "--spatialdata-blue",
-    "squidpy": "--squidpy-violet",
-}
+#: Website ``accents.json`` key -> registry name, where they differ; ``default`` is for packages without an accent.
+PACKAGE_NAMES = {"scverse": "default", "scvi": "scvi-tools"}
 
-#: Package -> website custom property holding its second brand colour, for packages that have one.
-SECONDARY_ACCENT_MAP = {
-    "pertpy": "--pertpy-red",
-}
+#: Packages whose second website colour is used for the sidebar captions.
+SECONDARY_ACCENT_PACKAGES = frozenset({"pertpy"})
 
 BEGIN = "/* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */"
 END = "/* END GENERATED BRAND TOKENS */"
@@ -101,6 +90,28 @@ def parse_scss(scss: str) -> dict[str, str]:
     return dict(DECL_RE.findall(scss))
 
 
+def oklch_to_hex(lightness: float, chroma: float, hue: float) -> str:
+    """Convert an OKLCH colour to sRGB hex, clipping out-of-gamut channels as browsers do on sRGB screens."""
+    a, b = chroma * math.cos(math.radians(hue)), chroma * math.sin(math.radians(hue))
+    long = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3
+    medium = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3
+    short = (lightness - 0.0894841775 * a - 1.2914855480 * b) ** 3
+    linear = (
+        4.0767416621 * long - 3.3077115913 * medium + 0.2309699292 * short,
+        -1.2684380046 * long + 2.6097574011 * medium - 0.3413193965 * short,
+        -0.0041960863 * long - 0.7034186147 * medium + 1.7076147010 * short,
+    )
+    srgb = (
+        12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055 for c in (min(max(c, 0), 1) for c in linear)
+    )
+    return "#" + "".join(f"{round(c * 255):02x}" for c in srgb)
+
+
+def parse_accents(raw: str) -> dict[str, dict[str, str]]:
+    """Map each package in the website’s ``accents.json`` to its colour names and hex values, primary first."""
+    return {pkg: {name: oklch_to_hex(*lch) for name, lch in colours} for pkg, colours in json.loads(raw).items()}
+
+
 def resolve(name: str, props: dict[str, str]) -> str:
     """Return the value of `name` with every ``var()`` in it recursively substituted."""
     return re.sub(r"var\((--[\w-]+)\)", lambda m: resolve(m[1], props), props[name])
@@ -115,9 +126,9 @@ def render_region(props: dict[str, str], indent: str) -> str:
     return "\n".join(indent + line for line in lines)
 
 
-def render_accents(props: dict[str, str], accent_map: dict[str, str]) -> str:
-    """Render an accent JSON read by ``scverse_doc.registry``."""
-    return json.dumps({pkg: resolve(src, props) for pkg, src in accent_map.items()}, indent=4) + "\n"
+def render_accents(accents: dict[str, str]) -> str:
+    """Render an accent JSON read by ``scverse_doc.registry``, ``default`` first."""
+    return json.dumps(dict(sorted(accents.items(), key=lambda kv: (kv[0] != "default", kv[0]))), indent=4) + "\n"
 
 
 def render(props: dict[str, str], current: str) -> str:
@@ -135,13 +146,18 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="fail instead of writing if the output would change")
     args = parser.parse_args()
 
-    props = parse_bootstrap(
-        (args.website / "static" / "bootstrap" / "css" / "bootstrap.min.css").read_text()
-    ) | parse_scss((args.website / "assets" / "main.scss").read_text())
+    accents = parse_accents((args.website / "assets" / "accents.json").read_text())
+    props = (
+        parse_bootstrap((args.website / "static" / "bootstrap" / "css" / "bootstrap.min.css").read_text())
+        | parse_scss((args.website / "assets" / "main.scss").read_text())
+        | {f"--{pkg}-{name}": colour for pkg, colours in accents.items() for name, colour in colours.items()}
+    )
+    primary = {PACKAGE_NAMES.get(pkg, pkg): next(iter(colours.values())) for pkg, colours in accents.items()}
+    secondary = {pkg: list(accents[pkg].values())[1] for pkg in SECONDARY_ACCENT_PACKAGES}
     updates = {
         TARGET: render(props, TARGET.read_text()).encode(),
-        ACCENTS_TARGET: render_accents(props, ACCENT_MAP).encode(),
-        SECONDARY_ACCENTS_TARGET: render_accents(props, SECONDARY_ACCENT_MAP).encode(),
+        ACCENTS_TARGET: render_accents(primary).encode(),
+        SECONDARY_ACCENTS_TARGET: render_accents(secondary).encode(),
         **{dst: (args.website / src).read_bytes() for src, dst in ASSETS.items()},
     }
     if args.check:
