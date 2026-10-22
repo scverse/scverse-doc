@@ -67,7 +67,7 @@ ACCENT_MAP = {
     "anndata": "--anndata-orange",
     "mudata": "--mudata-green",
     "muon": "--muon-aquamarine",
-    "pertpy": "--scirpy-purple",  # the website has no pertpy colour; it has always shared scirpy’s
+    "pertpy": "--pertpy-blue",
     "scanpy": "--scanpy-cerise",
     "scirpy": "--scirpy-purple",
     "scvi-tools": "--scvi-yellow",

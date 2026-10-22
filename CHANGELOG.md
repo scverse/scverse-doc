@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning][].
 
 - header shadow now only extends downward (#70)
 - the autosummary class template now correctly handles classes referenced through aliased modules (#71)
+- pertpy’s accent is its logo blue instead of scirpy’s pink (#72)
 
 ## [0.2.3]
 
