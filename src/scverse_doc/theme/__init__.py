@@ -71,11 +71,12 @@ def _accent(config: Config) -> str:
 
 
 def _secondary_accent(config: Config) -> str | None:
-    accent = config.html_theme_options.get("secondary_accent")
-    if str(accent).casefold() == "true":
-        pkg = packages.get(_package_name(config))
-        return None if pkg is None else pkg.secondary_accent
-    return str(accent) if accent else None
+    accent: str | bool = config.html_theme_options.get("secondary_accent")
+    if not accent:
+        return None
+    if pkg := packages.get(_package_name(config)):
+        return pkg.secondary_accent
+    return str(accent)
 
 
 def _add_chrome(config: Config) -> None:
