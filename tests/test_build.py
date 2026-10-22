@@ -126,7 +126,7 @@ def test_conf_py_can_pick_another_theme(tmp_path: Path) -> None:
     """A theme that declares none of the source options must not be given any."""
     app, _ = build(ROOTS / "minimal", tmp_path, html_theme="alabaster")
     assert app.config.html_theme == "alabaster"
-    assert app.config.html_theme_options.keys() == {"announcement"}
+    assert app.config.html_theme_options.keys() == {"announcement", "secondary_accent"}
 
 
 @needs_full

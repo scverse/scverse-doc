@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning][].
 
 ### Added
 
-- `secondary_accent` theme option for the sidebar captions, defaulting to a package’s second brand colour from the website (#73)
+- `secondary_accent` theme option for the sidebar captions, which `True` sets to the package’s second brand colour from the website (#73)
 
 ### Changed
 

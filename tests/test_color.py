@@ -66,9 +66,10 @@ def test_accent_for_a_package_outside_the_registry(options: dict[str, str], expe
 @pytest.mark.parametrize(
     ("project", "options", "expected"),
     [
-        pytest.param("not-an-scverse-package", {}, None, id="unknown"),
-        pytest.param("anndata", {}, None, id="single-colour"),
-        pytest.param("pertpy", {}, "oklch(0.595 0.177 14)", id="registry"),
+        pytest.param("pertpy", {}, None, id="unset"),
+        pytest.param("pertpy", {"secondary_accent": True}, "oklch(0.595 0.177 14)", id="registry"),
+        pytest.param("anndata", {"secondary_accent": True}, None, id="single-colour"),
+        pytest.param("not-an-scverse-package", {"secondary_accent": True}, None, id="unknown"),
         pytest.param("pertpy", {"secondary_accent": "#c0f"}, "#c0f", id="declared"),
     ],
 )

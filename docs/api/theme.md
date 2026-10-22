@@ -33,10 +33,11 @@ CSS colour for decorative surfaces; link and text shades are derived from it.
 ```
 
 ```{confval} secondary_accent
-:type: str
-:default: the registry’s second accent, else none
+:type: str | bool
+:default: none
 
-CSS colour for the sidebar captions, for packages with a second brand colour; a readable shade is derived from it.
+CSS colour for the sidebar captions; a readable shade is derived from it.
+`True` takes the package’s second brand colour from the registry, if it has one.
 Without one, the captions keep the text colour.
 ```
 
