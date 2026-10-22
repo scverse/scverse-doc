@@ -14,7 +14,8 @@ The website takes its neutral colours from Bootstrap’s tokens (``--bs-fg-*``, 
 which already carry dark values via ``light-dark()``, and defines only the brand hues itself.
 This script looks up the tokens the theme needs in the website’s vendored Bootstrap and ``assets/main.scss``,
 resolves every ``var()`` down to literals, and writes them into ``_tokens.css`` as ``--scverse-color-x``.
-The per-package accents go to ``_accents.json``, because the registry needs their values in Python
+The per-package accents go to ``_accents.json`` and the second brand colours to ``_secondary_accents.json``,
+because the registry needs their values in Python
 to derive readable shades from them.
 
 Only the region between the marker comments is touched; the rest of the file is hand-authored.
@@ -38,6 +39,7 @@ HERE = Path(__file__).parent
 STATIC = HERE.parent / "src" / "scverse_doc" / "theme" / "scverse" / "static"
 TARGET = STATIC / "_tokens.css"
 ACCENTS_TARGET = HERE.parent / "src" / "scverse_doc" / "_accents.json"
+SECONDARY_ACCENTS_TARGET = HERE.parent / "src" / "scverse_doc" / "_secondary_accents.json"
 
 #: Website file -> theme static file, copied verbatim.
 ASSETS = {Path("static/img/logo/scverse-fa.svg"): STATIC / "scverse-fa.svg"}
@@ -75,6 +77,11 @@ ACCENT_MAP = {
     "squidpy": "--squidpy-violet",
 }
 
+#: Package -> website custom property holding its second brand colour, for packages that have one.
+SECONDARY_ACCENT_MAP = {
+    "pertpy": "--pertpy-red",
+}
+
 BEGIN = "/* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */"
 END = "/* END GENERATED BRAND TOKENS */"
 
@@ -108,9 +115,9 @@ def render_region(props: dict[str, str], indent: str) -> str:
     return "\n".join(indent + line for line in lines)
 
 
-def render_accents(props: dict[str, str]) -> str:
-    """Render the accent JSON read by ``scverse_doc.registry``."""
-    return json.dumps({pkg: resolve(src, props) for pkg, src in ACCENT_MAP.items()}, indent=4) + "\n"
+def render_accents(props: dict[str, str], accent_map: dict[str, str]) -> str:
+    """Render an accent JSON read by ``scverse_doc.registry``."""
+    return json.dumps({pkg: resolve(src, props) for pkg, src in accent_map.items()}, indent=4) + "\n"
 
 
 def render(props: dict[str, str], current: str) -> str:
@@ -133,7 +140,8 @@ def main() -> int:
     ) | parse_scss((args.website / "assets" / "main.scss").read_text())
     updates = {
         TARGET: render(props, TARGET.read_text()).encode(),
-        ACCENTS_TARGET: render_accents(props).encode(),
+        ACCENTS_TARGET: render_accents(props, ACCENT_MAP).encode(),
+        SECONDARY_ACCENTS_TARGET: render_accents(props, SECONDARY_ACCENT_MAP).encode(),
         **{dst: (args.website / src).read_bytes() for src, dst in ASSETS.items()},
     }
     if args.check:

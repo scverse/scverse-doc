@@ -9,9 +9,9 @@ import pytest
 
 from scverse_doc._color import WCAG_AA_NORMAL, contrast_ratio, derive_readable, parse_hex
 from scverse_doc.registry import DEFAULT_ACCENT, packages
-from scverse_doc.theme import _DARK_BACKGROUND, _LIGHT_BACKGROUND, _accent
+from scverse_doc.theme import _DARK_BACKGROUND, _LIGHT_BACKGROUND, _accent, _secondary_accent
 
-ACCENTS = sorted({pkg.accent for pkg in packages.values()})
+ACCENTS = sorted({a for pkg in packages.values() for a in (pkg.accent, pkg.secondary_accent) if a})
 
 
 def test_every_derived_accent_meets_aa() -> None:
@@ -55,3 +55,17 @@ def test_unreachable_target_falls_back_to_the_extreme(background: str, expected:
 def test_accent_for_a_package_outside_the_registry(options: dict[str, str], expected: str) -> None:
     config = SimpleNamespace(html_theme_options=options, project="not-an-scverse-package")
     assert _accent(config) == expected  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("project", "options", "expected"),
+    [
+        pytest.param("not-an-scverse-package", {}, None, id="unknown"),
+        pytest.param("anndata", {}, None, id="single-colour"),
+        pytest.param("pertpy", {}, "#d2455e", id="registry"),
+        pytest.param("pertpy", {"secondary_accent": "#c0f"}, "#c0f", id="declared"),
+    ],
+)
+def test_secondary_accent(project: str, options: dict[str, str], expected: str | None) -> None:
+    config = SimpleNamespace(html_theme_options=options, project=project)
+    assert _secondary_accent(config) == expected  # type: ignore[arg-type]

@@ -38,6 +38,12 @@ _ACCENT_CSS = """\
 }}
 """
 
+_SECONDARY_ACCENT_CSS = """\
+:root {{
+  --scverse-color-secondary-accent-text: light-dark({light}, {dark});
+}}
+"""
+
 #: scverse.org itself is linked from the scverse menu beside them.
 _ICON_LINKS = ({"name": "Discourse", "url": "https://discourse.scverse.org/", "icon": "fa-brands fa-discourse"},)
 
@@ -52,6 +58,14 @@ def _accent(config: Config) -> str:
     if (pkg := packages.get(_package_name(config))) is not None:
         return pkg.accent
     return DEFAULT_ACCENT
+
+
+def _secondary_accent(config: Config) -> str | None:
+    if accent := config.html_theme_options.get("secondary_accent"):
+        return str(accent)
+    if (pkg := packages.get(_package_name(config))) is not None:
+        return pkg.secondary_accent
+    return None
 
 
 def _add_chrome(config: Config) -> None:
@@ -79,15 +93,19 @@ def _configure(app: Sphinx) -> None:
     _add_chrome(config)
 
     accent = _accent(config)
+    css = _ACCENT_CSS.format(
+        accent=accent,
+        light=derive_readable(accent, _LIGHT_BACKGROUND),
+        dark=derive_readable(accent, _DARK_BACKGROUND),
+    )
+    if secondary := _secondary_accent(config):
+        css += _SECONDARY_ACCENT_CSS.format(
+            light=derive_readable(secondary, _LIGHT_BACKGROUND),
+            dark=derive_readable(secondary, _DARK_BACKGROUND),
+        )
     static_dir = _build_cache(app) / "static"
     static_dir.mkdir(parents=True, exist_ok=True)
-    (static_dir / "scverse-accent.css").write_text(
-        _ACCENT_CSS.format(
-            accent=accent,
-            light=derive_readable(accent, _LIGHT_BACKGROUND),
-            dark=derive_readable(accent, _DARK_BACKGROUND),
-        )
-    )
+    (static_dir / "scverse-accent.css").write_text(css)
     config.html_static_path = [*config.html_static_path, str(static_dir)]
     app.add_css_file("scverse-accent.css")
     app.add_js_file("scripts/readthedocs-integration.js", type="module")

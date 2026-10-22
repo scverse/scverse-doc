@@ -80,6 +80,7 @@ def test_accent_is_derived_for_both_modes(minimal: tuple[SphinxTestApp, str]) ->
     css = (Path(app.outdir) / "_static" / "scverse-accent.css").read_text()
     assert "--scverse-color-accent-decorative: #30679a;" in css
     assert "--scverse-color-accent-text: light-dark(#" in css
+    assert "--scverse-color-secondary-accent-text: light-dark(#" in css
 
 
 @needs_full

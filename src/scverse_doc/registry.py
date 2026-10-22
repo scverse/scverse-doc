@@ -61,6 +61,9 @@ _ACCENTS: dict[str, str] = json.loads(files(__package__).joinpath("_accents.json
 #: The website’s ``--scverse-deep-blue``, used when a package has no accent of its own.
 DEFAULT_ACCENT = _ACCENTS.pop("default")
 
+#: Second brand colours from the website, for the packages that have one.
+_SECONDARY_ACCENTS: dict[str, str] = json.loads(files(__package__).joinpath("_secondary_accents.json").read_text())
+
 #: Upstream ``category`` -> the ``kind`` recorded here.
 #: ``core-infrastructure`` is skipped:
 #: those entries are repositories (governance, stats, the website), not packages.
@@ -104,6 +107,9 @@ class Package:
 
     accent: str = DEFAULT_ACCENT
     """The package’s brand accent, falling back to the scverse deep blue."""
+
+    secondary_accent: str | None = None
+    """The package’s second brand colour, or :data:`None` if it has only one."""
 
 
 class _Entry(TypedDict):
@@ -149,6 +155,7 @@ def _load() -> Mapping[str, Package]:
             repo=meta.get("project_home"),
             description=" ".join(meta.get("description", "").split()),
             accent=_ACCENTS.get(name, DEFAULT_ACCENT),
+            secondary_accent=_SECONDARY_ACCENTS.get(name),
         )
         # Sorted here, because upstream’s listing order is not stable.
         for name, meta in sorted(((meta["name"].casefold(), meta) for meta in _fetch()), key=itemgetter(0))

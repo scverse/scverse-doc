@@ -9,6 +9,7 @@ sidebars = ["navbar-logo", "search-button-field", "scverse-sidebar-nav"]
 [options]
 package = ""
 accent = ""
+secondary_accent = ""
 show_ecosystem_dropdown = "True"
 # No navbar: its parts live in the primary sidebar and the article header.
 navbar_start = ""

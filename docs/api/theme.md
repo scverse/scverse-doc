@@ -32,6 +32,14 @@ The registry name to look the accent and the dropdown’s current entry up under
 CSS colour for decorative surfaces; link and text shades are derived from it.
 ```
 
+```{confval} secondary_accent
+:type: str
+:default: the registry’s second accent, else none
+
+CSS colour for the sidebar captions, for packages with a second brand colour; a readable shade is derived from it.
+Without one, the captions keep the text colour.
+```
+
 ```{confval} show_ecosystem_dropdown
 :type: bool
 :default: `True`
