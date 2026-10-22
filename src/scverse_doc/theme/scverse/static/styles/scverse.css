@@ -228,6 +228,13 @@ a.dropdown-item {
     }
 }
 
+nav.bd-links p.caption {
+    color: var(
+        --scverse-color-secondary-accent-text,
+        var(--pst-color-text-base)
+    );
+}
+
 readthedocs-flyout {
     --readthedocs-flyout-background-color: transparent;
     --readthedocs-flyout-font-family: inherit;

@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Added
+
+- `secondary_accent` theme option for the sidebar captions, which `True` sets to the package’s second brand colour from the website (#73)
+
 ### Changed
 
 - brand accents are synced from the website’s `accents.json`.

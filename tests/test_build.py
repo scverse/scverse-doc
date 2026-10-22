@@ -80,6 +80,7 @@ def test_accent_is_derived_for_both_modes(minimal: tuple[SphinxTestApp, str]) ->
     css = (Path(app.outdir) / "_static" / "scverse-accent.css").read_text()
     assert "--scverse-color-accent-decorative: oklch(0.5 0.1 249);" in css
     assert "oklch(from var(--scverse-color-accent-decorative) min(l, 0.54) c h)" in css
+    assert "oklch(from oklch(0.595 0.177 14) min(l, 0.54) c h)" in css
 
 
 @needs_full
@@ -125,7 +126,7 @@ def test_conf_py_can_pick_another_theme(tmp_path: Path) -> None:
     """A theme that declares none of the source options must not be given any."""
     app, _ = build(ROOTS / "minimal", tmp_path, html_theme="alabaster")
     assert app.config.html_theme == "alabaster"
-    assert app.config.html_theme_options.keys() == {"announcement"}
+    assert app.config.html_theme_options.keys() == {"announcement", "secondary_accent"}
 
 
 @needs_full

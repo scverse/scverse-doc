@@ -15,12 +15,13 @@ from scverse_doc.theme import (
     _MAX_LIGHTNESS_ON_LIGHT,
     _MIN_LIGHTNESS_ON_DARK,
     _accent,
+    _secondary_accent,
 )
 
 #: Minimum contrast ratio for normal-size body text under WCAG 2.1 AA.
 WCAG_AA_NORMAL = 4.5
 
-ACCENTS = sorted({pkg.accent for pkg in packages.values()})
+ACCENTS = sorted({a for pkg in packages.values() for a in (pkg.accent, pkg.secondary_accent) if a})
 
 
 def contrast(color: Color, background: str) -> float:
@@ -60,3 +61,18 @@ def test_bounds_are_load_bearing() -> None:
 def test_accent_for_a_package_outside_the_registry(options: dict[str, str], expected: str) -> None:
     config = SimpleNamespace(html_theme_options=options, project="not-an-scverse-package")
     assert _accent(config) == expected  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("project", "options", "expected"),
+    [
+        pytest.param("pertpy", {}, None, id="unset"),
+        pytest.param("pertpy", {"secondary_accent": True}, "oklch(0.595 0.177 14)", id="registry"),
+        pytest.param("anndata", {"secondary_accent": True}, None, id="single-colour"),
+        pytest.param("not-an-scverse-package", {"secondary_accent": True}, None, id="unknown"),
+        pytest.param("pertpy", {"secondary_accent": "#c0f"}, "#c0f", id="declared"),
+    ],
+)
+def test_secondary_accent(project: str, options: dict[str, str], expected: str | None) -> None:
+    config = SimpleNamespace(html_theme_options=options, project=project)
+    assert _secondary_accent(config) == expected  # type: ignore[arg-type]

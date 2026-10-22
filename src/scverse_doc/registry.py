@@ -57,13 +57,13 @@ def _build_cache(app: Sphinx) -> Path:
 
 #: Brand accents from the website, copied by ``scripts/sync_brand_tokens.py``:
 #: each key lists ``[name, [L, C, H]]`` pairs, primary first.
-_ACCENTS: dict[str, str] = {
-    {"scvi": "scvi-tools"}.get(pkg, pkg): "oklch({} {} {})".format(*colors[0][1])
+_ACCENTS: dict[str, list[str]] = {
+    {"scvi": "scvi-tools"}.get(pkg, pkg): ["oklch({} {} {})".format(*lch) for _, lch in colors]
     for pkg, colors in json.loads(files(__package__).joinpath("_accents.json").read_text()).items()
 }
 
 #: The website’s ``--scverse-deep-blue``, used when a package has no accent of its own.
-DEFAULT_ACCENT = _ACCENTS.pop("scverse")
+DEFAULT_ACCENT = _ACCENTS.pop("scverse")[0]
 
 #: Upstream ``category`` -> the ``kind`` recorded here.
 #: ``core-infrastructure`` is skipped:
@@ -109,6 +109,9 @@ class Package:
     accent: str = DEFAULT_ACCENT
     """The package’s brand accent, falling back to the scverse deep blue."""
 
+    secondary_accent: str | None = None
+    """The package’s second brand colour, or :data:`None` if it has only one."""
+
 
 class _Entry(TypedDict):
     """The fields of an upstream listing entry that the registry reads."""
@@ -152,7 +155,8 @@ def _load() -> Mapping[str, Package]:
             inventory=meta.get("inventory"),
             repo=meta.get("project_home"),
             description=" ".join(meta.get("description", "").split()),
-            accent=_ACCENTS.get(name, DEFAULT_ACCENT),
+            accent=accents[0] if (accents := _ACCENTS.get(name, [])) else DEFAULT_ACCENT,
+            secondary_accent=accents[1] if len(accents) >= 2 else None,
         )
         # Sorted here, because upstream’s listing order is not stable.
         for name, meta in sorted(((meta["name"].casefold(), meta) for meta in _fetch()), key=itemgetter(0))
