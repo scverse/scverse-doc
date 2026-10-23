@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Added
+
+- `scverse_doc.math_core` renders math to MathML at build time via [math-core](https://github.com/tmke8/math-core) instead of MathJax (#75)
+
 ## [0.3.0]
 
 ### Added
