@@ -9,16 +9,16 @@
 ```{toctree}
 :hidden:
 
-api/config.md
+api/config.rst
 api/theme.md
 api/source.md
-api/registry.md
-api/autodoc.md
-api/napoleon.md
-api/math_core.md
-api/release_notes.md
-api/typed_fields.md
-api/xref_overrides.md
+api/registry.rst
+api/autodoc.rst
+api/napoleon.rst
+api/math_core.rst
+api/release_notes.rst
+api/typed_fields.rst
+api/xref_overrides.rst
 ```
 
 ## {doc}`api/config`

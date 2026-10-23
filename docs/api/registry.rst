@@ -1,6 +1,6 @@
-# `scverse_doc.registry`
+``scverse_doc.registry``
+========================
 
-```{eval-rst}
 .. automodule:: scverse_doc.registry
 
 .. autodata:: packages
@@ -11,4 +11,3 @@
 
 .. autoclass:: Package
     :members:
-```
