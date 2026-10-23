@@ -1,0 +1,7 @@
+/* SPDX-License-Identifier: MPL-2.0 */
+/* LaTeX that math-core couldn’t convert: the source, with the error as tooltip */
+.math-core-error {
+    color: var(--pst-color-danger, #d32f2f);
+    text-decoration: underline wavy;
+    cursor: help;
+}

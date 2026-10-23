@@ -34,7 +34,8 @@ optional-dependencies.config = [
   "sphinxext-opengraph",
 ]
 # Everything, as the `scverse_doc` extension needs.
-optional-dependencies.full = [ "scverse-doc[config,theme]" ]
+optional-dependencies.full = [ "scverse-doc[config,math-core,theme]" ]
+optional-dependencies.math-core = [ "math-core" ]
 # `html_theme = "scverse"`, i.e. `scverse_doc.theme`.
 optional-dependencies.theme = [ "pydata-sphinx-theme>=0.23" ]
 # https://docs.pypi.org/project_metadata/#project-urls
@@ -62,6 +63,7 @@ doc = [
   "ipython",
   "scverse-misc[sphinx]>=0.1.2",
   "sphinx-autodoc-typehints",
+  "sphinx-toolbox",              # `rest-example` directive
   "sphinxcontrib-bibtex>=1",
 ]
 typecheck = [ "mypy", "types-docutils", "wenmode" ]  # wenmode for scripts/check_changelog.py

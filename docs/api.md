@@ -15,6 +15,7 @@ api/source.md
 api/registry.md
 api/autodoc.md
 api/napoleon.md
+api/math_core.md
 api/release_notes.md
 api/typed_fields.md
 api/xref_overrides.md
@@ -60,6 +61,10 @@ and private bases left out of `:show-inheritance:`.
 ## {doc}`api/napoleon`
 
 Prose `Returns` sections in NumPy-style docstrings.
+
+## {doc}`api/math_core`
+
+Math rendered to MathML at build time, via [math-core](https://github.com/tmke8/math-core) – no JavaScript needed.
 
 ## {doc}`api/release_notes`
 

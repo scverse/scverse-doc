@@ -16,6 +16,8 @@ each of which also works on its own:
     The layout of the API pages.
 :mod:`scverse_doc.config`
     The extension stack and the shared defaults.
+:mod:`scverse_doc.math_core`
+    Math rendered to MathML at build time, via math-core.
 :mod:`scverse_doc.napoleon`
     Prose return sections in NumPy-style docstrings.
 :mod:`scverse_doc.registry`
@@ -40,7 +42,7 @@ from typing import TYPE_CHECKING
 
 from sphinx.util.typing import ExtensionMetadata
 
-from . import autodoc, config, napoleon, registry, release_notes, source, theme, typed_fields, xref_overrides
+from . import autodoc, config, math_core, napoleon, registry, release_notes, source, theme, typed_fields, xref_overrides
 from .config import _is_set_by_user
 
 if TYPE_CHECKING:
@@ -50,6 +52,7 @@ if TYPE_CHECKING:
 __all__ = [
     "autodoc",
     "config",
+    "math_core",
     "napoleon",
     "registry",
     "release_notes",
