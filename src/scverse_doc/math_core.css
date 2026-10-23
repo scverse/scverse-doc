@@ -5,3 +5,9 @@
     text-decoration: underline wavy;
     cursor: help;
 }
+
+/* pydata-sphinx-theme lays out `div.math` as a reversed flex row and only grows MathJax’s container */
+div.math > :not(.eqno) {
+    flex-grow: 1;
+    overflow: auto hidden;
+}
