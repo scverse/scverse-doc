@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Fixed
+
+- rapids-singlecell’s accents are synced from the website (#78)
+
 ## [0.3.0]
 
 ### Added
