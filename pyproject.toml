@@ -91,7 +91,7 @@ envs.hatch-check-code.scripts.lint-check = "echo 'try `hatch check code --fix`';
 envs.hatch-check-code.scripts.lint-fix = "prek run -a --no-group=format --no-group=typecheck"
 envs.hatch-check-fmt.dependencies = [ "prek" ]
 envs.hatch-check-fmt.scripts.format-check = "echo 'try `hatch check fmt --fix`'; false"
-envs.hatch-check-fmt.scripts.format-fix = "prek run -a --group=format --no-group=typecheck"
+envs.hatch-check-fmt.scripts.format-fix = "prek run -a --group=format"
 envs.hatch-check-types.features = [ "full" ]
 envs.hatch-check-types.scripts.check = [ "mypy" ]
 envs.hatch-check-types.dependency-groups = [ "typecheck", "doc", "test" ]
