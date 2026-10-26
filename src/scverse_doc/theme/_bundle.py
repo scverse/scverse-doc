@@ -22,9 +22,12 @@ def find_lightningcss() -> str | None:
 def bundle(exe: str) -> None:
     """Bundle each ``styles/*.css`` into ``*.min.css`` next to it; ``_*.css`` partials are only imported.
 
+    Each bundle gets a ``*.min.css.map`` source map, which embeds the sources.
     Wheels ship no sources, so this is a no-op outside of source trees.
     """
     for src in STYLES.glob("[!_]*.css"):
         if not src.name.endswith(".min.css"):
             # No --targets, so modern syntax like light-dark() passes through untouched.
-            subprocess.run([exe, "--bundle", "--minify", src, "-o", src.with_suffix(".min.css")], check=True)
+            # Relative paths in STYLES, as the CLI writes them into the source map and its URL as given.
+            args = ["--bundle", "--minify", "--sourcemap", src.name, "-o", src.with_suffix(".min.css").name]
+            subprocess.run([exe, *args], cwd=STYLES, check=True)

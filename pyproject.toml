@@ -75,7 +75,7 @@ metadata.hooks.fancy-pypi-readme.fragments = [
   { path = "README.md", start-after = "<!-- badges-end -->\n" },
 ]
 build.targets.wheel.exclude = [ "/src/scverse_doc/theme/scverse/static/styles/" ]
-build.targets.wheel.artifacts = [ "/src/scverse_doc/theme/scverse/static/styles/*.min.css" ]
+build.targets.wheel.artifacts = [ "/src/scverse_doc/theme/scverse/static/styles/*.min.css*" ]
 # Builds `styles/*.min.css`, which replace the stylesheet sources in wheels, see `hatch_build.py`.
 build.targets.wheel.hooks.custom = {}
 build.targets.sdist.exclude = [ "/docs", "/tests" ]
