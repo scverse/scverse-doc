@@ -1,7 +1,8 @@
 [theme]
 inherit = "pydata_sphinx_theme"
+# Built from styles/scverse.css by hatch_build.py.
 stylesheets = [
-    "styles/scverse.css",
+    "styles/scverse.min.css",
 ]
 pygments_style = { default = "tango" }
 sidebars = ["navbar-logo", "search-button-field", "scverse-sidebar-nav"]

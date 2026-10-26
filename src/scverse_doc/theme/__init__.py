@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 from sphinx.util.typing import ExtensionMetadata
 
 from ..registry import DEFAULT_ACCENT, _build_cache, packages
+from ._bundle import bundle, find_lightningcss
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
@@ -102,6 +103,9 @@ def _configure(app: Sphinx) -> None:
         return
 
     _add_chrome(config)
+    # In source trees, rebuild the stylesheet bundles so edits show without reinstalling.
+    if exe := find_lightningcss():
+        bundle(exe)
 
     css = _ACCENT_CSS.format(accent=_accent(config))
     if secondary := _secondary_accent(config):

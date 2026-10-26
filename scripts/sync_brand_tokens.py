@@ -35,7 +35,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 STATIC = HERE.parent / "src" / "scverse_doc" / "theme" / "scverse" / "static"
-TARGET = STATIC / "_tokens.css"
+TARGET = STATIC / "styles" / "_tokens.css"
 
 #: Website file -> package file, copied verbatim.
 ASSETS = {

@@ -11,6 +11,8 @@ __pycache__/
 
 # Distribution / packaging
 /dist/
+# Built by hatch_build.py
+*.min.css*
 
 # Tests and coverage
 /data/
