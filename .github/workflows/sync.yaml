@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - src/scverse_doc/theme/scverse/static/_tokens.css
+      - src/scverse_doc/theme/scverse/static/styles/_tokens.css
       - src/scverse_doc/theme/scverse/static/scverse-fa.svg
       - scripts/**
 

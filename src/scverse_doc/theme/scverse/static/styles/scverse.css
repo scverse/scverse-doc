@@ -11,7 +11,7 @@
  *    clamps the accent’s lightness to meet WCAG AA against the current background. See scverse_doc.theme.
  */
 
-@import url("../_tokens.css");
+@import url("_tokens.css");
 
 /* Specific enough to beat pydata’s own html[data-theme="…"] token blocks. */
 html[data-theme] {
