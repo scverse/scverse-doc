@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Changed
+
+- Sphinx 9.1 or newer is required
+
+### Added
+
+- `scverse_doc.math_core` renders math to MathML at build time via [math-core](https://github.com/tmke8/math-core) instead of MathJax (#75)
+  - `math_core_options` configures the converter, e.g. with macros
+  - math-core’s `mathmlfixes.css` is included, fixing e.g. `\boxed` and `\cancel` in Chromium
+
 ### Fixed
 
 - rapids-singlecell’s accents are synced from the website (#78)

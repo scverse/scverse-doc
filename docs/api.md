@@ -9,15 +9,16 @@
 ```{toctree}
 :hidden:
 
-api/config.md
+api/config.rst
 api/theme.md
 api/source.md
-api/registry.md
-api/autodoc.md
-api/napoleon.md
-api/release_notes.md
-api/typed_fields.md
-api/xref_overrides.md
+api/registry.rst
+api/autodoc.rst
+api/napoleon.rst
+api/math_core.rst
+api/release_notes.rst
+api/typed_fields.rst
+api/xref_overrides.rst
 ```
 
 ## {doc}`api/config`
@@ -60,6 +61,10 @@ and private bases left out of `:show-inheritance:`.
 ## {doc}`api/napoleon`
 
 Prose `Returns` sections in NumPy-style docstrings.
+
+## {doc}`api/math_core`
+
+Math rendered to MathML at build time, via [math-core](https://github.com/tmke8/math-core) – no JavaScript needed.
 
 ## {doc}`api/release_notes`
 

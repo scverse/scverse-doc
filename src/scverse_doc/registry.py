@@ -55,7 +55,7 @@ def _build_cache(app: Sphinx) -> Path:
     return _cache_dir
 
 
-#: Brand accents from the website, copied by ``scripts/sync_brand_tokens.py``:
+#: Brand accents from the website, copied by ``scripts/sync_upstream.py``:
 #: each key lists ``[name, [L, C, H]]`` pairs, primary first.
 _ACCENTS: dict[str, list[str]] = {
     pkg: ["oklch({} {} {})".format(*lch) for _, lch in colors]

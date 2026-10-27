@@ -25,7 +25,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = [ "readme", "version" ]
-dependencies = [ "packaging", "sphinx>=8.1" ]
+dependencies = [ "packaging", "sphinx>=9.1" ]
 # The extension stack of `scverse_doc.config`.
 optional-dependencies.config = [
   "myst-nb>=1.1",
@@ -34,7 +34,8 @@ optional-dependencies.config = [
   "sphinxext-opengraph",
 ]
 # Everything, as the `scverse_doc` extension needs.
-optional-dependencies.full = [ "scverse-doc[config,theme]" ]
+optional-dependencies.full = [ "scverse-doc[config,math-core,theme]" ]
+optional-dependencies.math-core = [ "math-core" ]
 # `html_theme = "scverse"`, i.e. `scverse_doc.theme`.
 optional-dependencies.theme = [ "pydata-sphinx-theme>=0.23" ]
 # https://docs.pypi.org/project_metadata/#project-urls
@@ -64,6 +65,7 @@ doc = [
   "lightningcss-cli",            # to rebuild the theme’s stylesheet bundles
   "scverse-misc[sphinx]>=0.1.2",
   "sphinx-autodoc-typehints",
+  "sphinx-toolbox>=4.3.1",       # `rest-example` directive
   "sphinxcontrib-bibtex>=1",
 ]
 typecheck = [ "mypy", "types-docutils", "wenmode" ]  # wenmode for scripts/check_changelog.py
