@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning][].
 
 - `scverse_doc.math_core` renders math to MathML at build time via [math-core](https://github.com/tmke8/math-core) instead of MathJax (#75)
 
+### Fixed
+
+- rapids-singlecell’s accents are synced from the website (#78)
+
 ## [0.3.0]
 
 ### Added

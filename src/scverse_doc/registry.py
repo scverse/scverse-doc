@@ -58,7 +58,7 @@ def _build_cache(app: Sphinx) -> Path:
 #: Brand accents from the website, copied by ``scripts/sync_brand_tokens.py``:
 #: each key lists ``[name, [L, C, H]]`` pairs, primary first.
 _ACCENTS: dict[str, list[str]] = {
-    {"scvi": "scvi-tools"}.get(pkg, pkg): ["oklch({} {} {})".format(*lch) for _, lch in colors]
+    pkg: ["oklch({} {} {})".format(*lch) for _, lch in colors]
     for pkg, colors in json.loads(files(__package__).joinpath("_accents.json").read_text()).items()
 }
 

@@ -49,7 +49,7 @@ def minimal(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[SphinxTe
 def test_theme_renders_the_shared_chrome(minimal: tuple[SphinxTestApp, str]) -> None:
     app, html = minimal
     assert app.config.html_theme == "scverse"
-    for css in ("styles/scverse.css", "scverse-accent.css"):
+    for css in ("styles/scverse.min.css", "scverse-accent.css"):
         assert css in html
     assert "NumFOCUS" in html
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
