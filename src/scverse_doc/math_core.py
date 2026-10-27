@@ -36,6 +36,9 @@ Equations separated by blank lines, or rows separated by ``\\``, are aligned at 
 
         \begin{cases} 1 & x > 0 \\ 0 & \text{otherwise} \end{cases}
 
+Configure the converter, e.g. with your own macros, via :confval:`math_core_options`.
+math-core’s ``mathmlfixes.css`` is included, mainly to fix Chromium’s rendering.
+
 .. _math-core: https://github.com/tmke8/math-core
 """
 
@@ -54,11 +57,12 @@ logger = logging.getLogger(__name__)
 
 
 class _MathVisitor:
-    def __init__(self):
+    def configure(self, app: Sphinx, config: Config) -> None:
+        """Create the converters from :confval:`math_core_options`."""
         from math_core import LatexToMathML
 
-        self.converter = LatexToMathML()
-        self.fallback = LatexToMathML(continue_on_error=True)
+        self.converter = LatexToMathML(**config.math_core_options)
+        self.fallback = LatexToMathML(**{**config.math_core_options, "continue_on_error": True})
 
     def visit(self, renderer: HTML5Translator, node: nodes.math | nodes.math_block):
         """Handles inline math `` :math:`…` `` and block math ``.. math:: …``."""
@@ -96,12 +100,8 @@ def _wrap(tex: str) -> str:
     return r"\begin{aligned}" + r"\\".join(parts) + r"\end{aligned}"
 
 
-def _add_css(app: Sphinx, config: Config) -> None:
-    config.html_static_path = [*config.html_static_path, str(_CSS)]
-    app.add_css_file(_CSS.name)
-
-
-_CSS = Path(__file__).with_suffix(".css")
+# `mathmlfixes.css` is synced from math-core by `scripts/sync_upstream.py`
+_STATIC = Path(__file__).with_name("static")
 
 
 def setup(app: Sphinx):
@@ -109,5 +109,9 @@ def setup(app: Sphinx):
     visitor = _MathVisitor()
     # we raise SkipNode, so no need for depart (the `None`s)
     app.add_html_math_renderer("mathcore", (visitor.visit, None), (visitor.visit, None))
-    app.connect("config-inited", _add_css)
+    app.add_config_value("math_core_options", {}, "env", types=frozenset({dict}))
+    app.connect("config-inited", visitor.configure)
+    app.add_static_dir(_STATIC)
+    app.add_css_file("mathmlfixes.css")
+    app.add_css_file("math_core.css")
     return ExtensionMetadata(parallel_read_safe=True)

@@ -4,7 +4,7 @@
 # requires-python = ">=3.12"
 # dependencies = []
 # ///
-"""Refresh the generated brand assets from the scverse website.
+"""Refresh the files generated or copied from upstream: the scverse website and math-core.
 
 The website is the brand’s source of truth,
 so transcribing its colours into this repository by hand
@@ -20,9 +20,11 @@ Only the region between the marker comments is touched; the rest of the file is 
 The scverse logo used for the navbar link back to the website is copied verbatim for the same reason,
 as is ``accents.json``, which the registry reads the package accents from.
 
+math-core’s stylesheet fixing browsers’ MathML rendering is copied verbatim from its repository.
+
 Usage
 -----
-    uv run scripts/sync_brand_tokens.py --website ../scverse.github.io
+    uv run scripts/sync_upstream.py --website ../scverse.github.io --math-core ../math-core
 """
 
 from __future__ import annotations
@@ -41,6 +43,11 @@ TARGET = STATIC / "styles" / "_tokens.css"
 ASSETS = {
     Path("static/img/logo/scverse-fa.svg"): STATIC / "scverse-fa.svg",
     Path("assets/accents.json"): HERE.parent / "src" / "scverse_doc" / "_accents.json",
+}
+
+#: math-core file -> package file, copied verbatim.
+MATH_CORE_ASSETS = {
+    Path("css/mathmlfixes.css"): HERE.parent / "src" / "scverse_doc" / "static" / "mathmlfixes.css",
 }
 
 #: CSS custom property emitted here -> website custom property it is resolved from.
@@ -66,7 +73,7 @@ ACCENT_TOKEN_MAP = {
     "--scverse-color-gradient-end": ("scverse", "sky-blue"),
 }
 
-BEGIN = "/* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_brand_tokens.py */"
+BEGIN = "/* BEGIN GENERATED BRAND TOKENS – DO NOT EDIT; regenerate with scripts/sync_upstream.py */"
 END = "/* END GENERATED BRAND TOKENS */"
 
 #: The fenced region, captured together with the indentation of its opening marker.
@@ -114,6 +121,7 @@ def main() -> int:
     """Write the refreshed token stylesheet to disk."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--website", type=Path, required=True, help="checkout of scverse/scverse.github.io")
+    parser.add_argument("--math-core", type=Path, required=True, help="checkout of tmke8/math-core")
     parser.add_argument("--check", action="store_true", help="fail instead of writing if the output would change")
     args = parser.parse_args()
 
@@ -122,10 +130,11 @@ def main() -> int:
     updates = {
         TARGET: render(props, accents, TARGET.read_text()).encode(),
         **{dst: (args.website / src).read_bytes() for src, dst in ASSETS.items()},
+        **{dst: (args.math_core / src).read_bytes() for src, dst in MATH_CORE_ASSETS.items()},
     }
     if args.check:
         if outdated := [str(dst) for dst, new in updates.items() if not dst.is_file() or dst.read_bytes() != new]:
-            print(f"{', '.join(outdated)} out of date; rerun scripts/sync_brand_tokens.py", file=sys.stderr)
+            print(f"{', '.join(outdated)} out of date; rerun scripts/sync_upstream.py", file=sys.stderr)
             return 1
         return 0
     for dst, new in updates.items():

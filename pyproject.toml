@@ -25,7 +25,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = [ "readme", "version" ]
-dependencies = [ "packaging", "sphinx>=8.1" ]
+dependencies = [ "packaging", "sphinx>=9.1" ]
 # The extension stack of `scverse_doc.config`.
 optional-dependencies.config = [
   "myst-nb>=1.1",

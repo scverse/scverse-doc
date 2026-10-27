@@ -15,9 +15,11 @@ pytest.importorskip("math_core")
 def build(tmp_path_factory: pytest.TempPathFactory) -> tuple[str, str]:
     """Build a page with inline, labelled and broken math, and return its HTML and warnings."""
     srcdir = tmp_path_factory.mktemp("math_core")
-    (srcdir / "conf.py").write_text('extensions = ["scverse_doc.math_core"]\n')
+    (srcdir / "conf.py").write_text(
+        'extensions = ["scverse_doc.math_core"]\nmath_core_options = {"macros": {"R": r"\\mathbb{R}"}}\n'
+    )
     (srcdir / "index.rst").write_text(
-        r"""Inline :math:`a^2`, see :eq:`foo`.
+        r"""Inline :math:`a^2`, see :eq:`foo`, in :math:`\R`.
 
 .. math:: e = mc^2
    :label: foo
@@ -42,6 +44,7 @@ def build(tmp_path_factory: pytest.TempPathFactory) -> tuple[str, str]:
     finally:
         app.cleanup()
     assert (app.outdir / "_static" / "math_core.css").is_file()
+    assert (app.outdir / "_static" / "mathmlfixes.css").is_file()
     return (app.outdir / "index.html").read_text(), app.warning.getvalue()
 
 
@@ -67,6 +70,12 @@ def test_error(build: tuple[str, str]) -> None:
 def test_css(build: tuple[str, str]) -> None:
     html, _ = build
     assert 'href="_static/math_core.css' in html
+    assert 'href="_static/mathmlfixes.css' in html
+
+
+def test_options(build: tuple[str, str]) -> None:
+    html, _ = build
+    assert "<mi>ℝ</mi>" in html
 
 
 def test_wrap(build: tuple[str, str]) -> None:
