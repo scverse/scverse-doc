@@ -52,12 +52,12 @@ An unknown forge still gets the icon link, just no per-page links.
 
 ## What each theme gets
 
-| Theme | Reads |
-| --- | --- |
-| `pydata-sphinx-theme`, and so {doc}`ours <theme>` | `html_context`’s `{provider}_user`/`_repo`/`_version`/`_url` and `doc_path`, plus `use_edit_page_button` |
-| `sphinx_rtd_theme` | the same, plus `display_{provider}`, `{provider}_host` and `conf_py_path` |
-| `furo`, and anything else on `sphinx-basic-ng` | the `source_repository`/`source_branch`/`source_directory` theme options, plus `display_{provider}` for its footer icon – which it shows on Read the Docs only |
-| `sphinx-book-theme` | the `repository_url`/`repository_branch`/`repository_provider`/`path_to_docs` theme options, plus `use_repository_button`, `use_source_button` and `use_issues_button` |
+| Theme                                             | Reads                                                                                                                                                                  |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pydata-sphinx-theme`, and so {doc}`ours <theme>` | `html_context`’s `{provider}_user`/`_repo`/`_version`/`_url` and `doc_path`, plus `use_edit_page_button`                                                               |
+| `sphinx_rtd_theme`                                | the same, plus `display_{provider}`, `{provider}_host` and `conf_py_path`                                                                                              |
+| `furo`, and anything else on `sphinx-basic-ng`    | the `source_repository`/`source_branch`/`source_directory` theme options, plus `display_{provider}` for its footer icon – which it shows on Read the Docs only         |
+| `sphinx-book-theme`                               | the `repository_url`/`repository_branch`/`repository_provider`/`path_to_docs` theme options, plus `use_repository_button`, `use_source_button` and `use_issues_button` |
 
 Only the options a theme declares are written; a theme that declares none of them –
 `alabaster`, say – is left alone. Anything `conf.py` set itself wins.

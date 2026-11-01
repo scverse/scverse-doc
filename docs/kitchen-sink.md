@@ -7,7 +7,7 @@ like on any other – switch the theme with the toggle in the page header.
 
 ## Text
 
-Body copy with **bold**, *italic*, `inline literal` (the default role), an
+Body copy with **bold**, _italic_, `inline literal` (the default role), an
 [external link](https://scverse.org), an [internal one](api.md), a footnote[^fn] and a
 cross-reference to {func}`~scverse_doc.registry.intersphinx`.
 
@@ -188,11 +188,11 @@ third = "plain"
 
 ## Table
 
-| Token                              | Role                                |
-| ---------------------------------- | ----------------------------------- |
-| `--scverse-color-accent-text`      | Links and text, contrast-checked    |
-| `--scverse-color-accent-decorative`| Underlines and surfaces             |
-| `--scverse-radius`                 | Shared component geometry           |
+| Token                               | Role                             |
+| ----------------------------------- | -------------------------------- |
+| `--scverse-color-accent-text`       | Links and text, contrast-checked |
+| `--scverse-color-accent-decorative` | Underlines and surfaces          |
+| `--scverse-radius`                  | Shared component geometry        |
 
 ## Cards
 
