@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning][].
 ### Fixed
 
 - rapids-singlecell’s accents are synced from the website (#78)
+- mantispy’s accents are synced from the website (#81)
 
 ## [0.3.0]
 
