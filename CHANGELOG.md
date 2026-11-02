@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.4.0]
+
 ### Changed
 
 - Sphinx 9.1 or newer is required
@@ -86,7 +88,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.3.0...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.4.0...main
+[0.4.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.4.0
 [0.3.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.3.0
 [0.2.3]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.3
 [0.2.2]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.2
