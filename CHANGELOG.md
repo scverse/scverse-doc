@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning][].
 
 - rapids-singlecell’s accents are synced from the website (#78)
 - mantispy’s accents are synced from the website (#81)
+- liana’s, CellRank’s and PyDESeq2’s accents and squidpy’s second accent are synced from the website (#83)
 
 ## [0.3.0]
 
