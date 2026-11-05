@@ -95,6 +95,21 @@ def test_release_notes(tmp_path: Path, file_format: Format) -> None:
     assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED.strip()
 
 
+@pytest.mark.skipif(find_spec("myst_parser") is None, reason="needs myst-parser")
+@pytest.mark.parametrize("file_format", ["rst", "myst"])
+def test_release_notes_other_format(tmp_path: Path, file_format: Format) -> None:
+    """Files are parsed according to their suffix, not the page’s format."""
+    other: Format = "myst" if file_format == "rst" else "rst"
+    out, _ = build(tmp_path, file_format, ".", FILES[other], extensions=["myst_parser", "scverse_doc.release_notes"])
+    index_out = (out / "index.pseudoxml").read_text()
+    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED.strip()
+
+
+def test_unknown_suffix_parsed_like_page(tmp_path: Path) -> None:
+    out, _ = build(tmp_path, "rst", ".", {"1.2.0.txt": "1.2.0\n====="})
+    assert '<section ids="id1" names="1.2.0">' in (out / "index.pseudoxml").read_text()
+
+
 @pytest.mark.parametrize(
     ("arg", "files"),
     [

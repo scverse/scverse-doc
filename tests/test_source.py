@@ -3,12 +3,14 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 
 import pytest
 from sphinx.errors import ConfigError
 
+import scverse_doc
 from scverse_doc.source import _configure_linkcode, _html_context, _linkcode_url, _Provider, _Source, _theme_options
 
 if TYPE_CHECKING:
@@ -173,6 +175,13 @@ def test_linkcode_finds_our_own_source(module: str, fullname: str, path: str) ->
     prefix, _, lines = url.partition("#")
     assert prefix == f"https://github.com/scverse/pertpy/blob/main/{path}"
     assert lines.startswith("L")
+
+
+def test_linkcode_finds_docs_source() -> None:
+    srcdir = Path(scverse_doc.__file__).parent.parent  # pretend `src/` holds the docs
+    url = _linkcode_url(GITHUB, "scverse_doc.registry", "intersphinx", srcdir)
+    assert url is not None
+    assert url.startswith(f"https://github.com/scverse/pertpy/blob/main/{GITHUB.directory}/scverse_doc/registry.py#L")
 
 
 @pytest.mark.parametrize(

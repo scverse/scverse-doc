@@ -12,22 +12,22 @@ A package’s `conf.py` needs few lines:
 This extension sets up the subextensions,
 each of which also works on its own:
 
-:mod:`scverse_doc.autodoc`
-    The layout of the API pages.
 :mod:`scverse_doc.config`
     The extension stack and the shared defaults.
-:mod:`scverse_doc.math_core`
-    Math rendered to MathML at build time, via math-core.
-:mod:`scverse_doc.napoleon`
-    Prose return sections in NumPy-style docstrings.
-:mod:`scverse_doc.registry`
-    The package registry, usable as an :func:`~scverse_doc.registry.intersphinx` mapping.
-:mod:`scverse_doc.release_notes`
-    A ``release-notes`` directive, rendering a directory of per-version files.
-:mod:`scverse_doc.source`
-    The repository links: the header icon, “edit this page”, and ``[source]``.
 :mod:`scverse_doc.theme`
     The theme, its chrome, and the per-package accent.
+:mod:`scverse_doc.source`
+    The repository links: the header icon, “edit this page”, and ``[source]``.
+:mod:`scverse_doc.registry`
+    The package registry, usable as an :func:`~scverse_doc.registry.intersphinx` mapping.
+:mod:`scverse_doc.autodoc`
+    The layout of the API pages.
+:mod:`scverse_doc.napoleon`
+    Prose return sections in NumPy-style docstrings.
+:mod:`scverse_doc.math_core`
+    Math rendered to MathML at build time, via math-core.
+:mod:`scverse_doc.release_notes`
+    A ``release-notes`` directive, rendering a directory of per-version files.
 :mod:`scverse_doc.typed_fields`
     Parameters and attributes as definition lists.
 :mod:`scverse_doc.xref_overrides`
