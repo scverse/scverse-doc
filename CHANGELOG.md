@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.5.0]
+
 ### Added
 
 - the site navigation shows a page’s sections that contain a toctree as captions above their entries, toggled by the `sidebar_sections_with_toctrees` theme option (#85)
@@ -98,7 +100,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.4.0...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.5.0...main
+[0.5.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.0
 [0.4.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.4.0
 [0.3.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.3.0
 [0.2.3]: https://github.com/scverse/scverse-doc/releases/tag/v0.2.3
