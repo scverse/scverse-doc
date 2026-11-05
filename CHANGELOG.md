@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning][].
 ### Added
 
 - the site navigation shows a page’s sections that contain a toctree as captions above their entries, toggled by the `sidebar_sections_with_toctrees` theme option (#85)
+- `[source]` links work for modules in the docs directory (#86)
+- `release-notes` parses each file by its suffix, so e.g. Markdown notes work on a reST page (#86)
+
+### Fixed
+
+- `release-notes` with a relative path works inside other directives, e.g. `rest-example` (#86)
 
 ## [0.4.0]
 

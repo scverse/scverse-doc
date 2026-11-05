@@ -4,15 +4,17 @@
 Sphinx renders typed fields (``:param:`` with ``:type:``, ``:var:`` with ``:vartype:``, …)
 as a list of paragraphs, cramming name, type, and description into one line.
 This extension renders them as definition lists instead, like numpydoc:
+each name a term classified by its type, with the description indented below it.
 
-.. code:: rst
+Examples
+--------
+..  rest-example::
 
-   .. py:function:: test(a)
+    ..  py:function:: greet(name)
+        :no-index:
 
-      :param a: Only parameter
-      :type a: str
-
-renders the term ``a`` classified as :class:`str`, with the description indented below it.
+        :param name: Who to greet
+        :type name: str
 """
 
 from __future__ import annotations

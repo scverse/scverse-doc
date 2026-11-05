@@ -8,6 +8,12 @@ Set up as an extension, it defaults `intersphinx_mapping` to :func:`intersphinx(
 so linking into the core packages needs nothing in `conf.py`.
 See :func:`intersphinx()` for more.
 
+Examples
+--------
+..  rest-example::
+
+    :class:`anndata.AnnData` and :func:`scanpy.pp.normalize_total` link to their docs.
+
 .. _listed packages: https://scverse.org/packages/
 """
 

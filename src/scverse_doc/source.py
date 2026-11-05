@@ -195,8 +195,11 @@ def _configure_theme(app: Sphinx) -> None:
         config.html_context = _html_context(source) | config.html_context
 
 
-def _linkcode_url(source: _Source, module: str, fullname: str) -> str | None:
-    """Link to a Python object’s definition, or :data:`None` if it has no findable source."""
+def _linkcode_url(source: _Source, module: str, fullname: str, srcdir: Path | None = None) -> str | None:
+    """Link to a Python object’s definition, or :data:`None` if it has no findable source.
+
+    Modules in `srcdir` (the docs’ own helpers) link into :confval:`source_directory`.
+    """
     try:
         obj = import_module(module)
         for part in filter(None, fullname.split(".")):
@@ -206,6 +209,10 @@ def _linkcode_url(source: _Source, module: str, fullname: str) -> str | None:
         file = Path(inspect.getsourcefile(obj) or "")
     except (ImportError, AttributeError, TypeError, OSError):
         return None
+    if srcdir is not None and file.is_relative_to(srcdir):
+        return source.view(
+            PurePosixPath(source.directory, *file.relative_to(srcdir).parts), (start, start + len(lines) - 1)
+        )
     # A non-editable install puts the file outside the checkout,
     # so the repository-relative path comes from the defining module’s depth.
     parts = str(getattr(obj, "__module__", module) or module).split(".")
@@ -225,7 +232,7 @@ def _configure_linkcode(app: Sphinx) -> None:
     def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
         if domain != "py" or not info["module"]:
             return None
-        return _linkcode_url(source, info["module"], info["fullname"])
+        return _linkcode_url(source, info["module"], info["fullname"], Path(app.srcdir))
 
     config.linkcode_resolve = linkcode_resolve
 
