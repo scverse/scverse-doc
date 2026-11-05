@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Added
+
+- the site navigation shows a page’s sections that contain a toctree as captions above their entries, toggled by the `sidebar_sections_with_toctrees` theme option (#85)
+
 ## [0.4.0]
 
 ### Changed
