@@ -12,7 +12,7 @@ The accent colour and the “scverse packages” dropdown come from the
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, TypedDict
 
 from docutils import nodes
 from sphinx.builders.html import StandaloneHTMLBuilder
@@ -25,6 +25,21 @@ from ._bundle import bundle, find_lightningcss
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.config import Config
+
+
+class _Toctree(Protocol):
+    """The ``toctree`` template function: a lambda around `StandaloneHTMLBuilder._get_local_toctree`."""
+
+    def __call__(
+        self, *, collapse: bool = ..., maxdepth: int = ..., includehidden: bool = ..., **kwargs: bool
+    ) -> str: ...
+
+
+class _PageContext(TypedDict, total=False):
+    """The `html-page-context` template context, with the keys this theme reads or sets."""
+
+    toctree: _Toctree
+
 
 __all__ = ["setup"]
 
@@ -161,13 +176,13 @@ def _add_section_toctree(
     app: Sphinx,
     pagename: str,
     templatename: str,
-    context: dict[str, object],
+    context: _PageContext,
     doctree: object,
 ) -> None:
     """Let ``toctree(sections_with_toctrees=True)`` keep page sections that contain toctrees."""
     toctree = context.get("toctree")
     builder = app.builder
-    if app.config.html_theme != "scverse" or not callable(toctree) or not isinstance(builder, StandaloneHTMLBuilder):
+    if app.config.html_theme != "scverse" or toctree is None or not isinstance(builder, StandaloneHTMLBuilder):
         return
 
     def section_toctree(
@@ -177,7 +192,7 @@ def _add_section_toctree(
         maxdepth: int = 0,
         includehidden: bool = False,
         **kwargs: bool,
-    ) -> object:
+    ) -> str:
         if not sections_with_toctrees:
             return toctree(collapse=collapse, maxdepth=maxdepth, includehidden=includehidden, **kwargs)
         tree = global_toctree_for_doc(
