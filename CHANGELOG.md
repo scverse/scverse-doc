@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Fixed
+
+- `release-notes` nests Markdown notes under its version headings again when `.md` is parsed by MyST-NB (#87)
+
 ## [0.5.0]
 
 ### Added
