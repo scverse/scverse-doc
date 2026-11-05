@@ -6,7 +6,7 @@ from __future__ import annotations
 import shutil
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from sphinx.environment import CONFIG_OK
@@ -54,6 +54,28 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[SphinxTestApp, str]) -> 
     assert "NumFOCUS" in html
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
     assert 'href="https://github.com/scverse/pertpy"' in html
+
+
+@needs_full
+def test_sidebar_shows_sections_with_toctrees(minimal: tuple[SphinxTestApp, str]) -> None:
+    _, html = minimal
+    nav = html[html.index('class="bd-docs-nav') :]
+    nav = nav[: nav.index("</nav>")]
+    assert "Grouped section" in nav
+    assert "grouped.html" in nav
+    assert nav.index("Root section") < nav.index("root-grouped.html")
+    assert "Plain section" not in nav
+    assert "Plain subsection" not in nav
+
+
+@needs_full
+def test_toctree_without_sections_falls_back(minimal: tuple[SphinxTestApp, str]) -> None:
+    from scverse_doc.theme import _add_section_toctree, _PageContext
+
+    app, _ = minimal
+    context = cast("_PageContext", {"toctree": lambda **kwargs: kwargs})
+    _add_section_toctree(app, "page", "page.html", context, None)
+    assert context["toctree"](maxdepth=2) == {"collapse": True, "maxdepth": 2, "includehidden": False}
 
 
 @needs_full

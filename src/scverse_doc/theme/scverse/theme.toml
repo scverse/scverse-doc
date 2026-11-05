@@ -12,6 +12,7 @@ package = ""
 accent = ""
 secondary_accent = false
 show_ecosystem_dropdown = true
+sidebar_sections_with_toctrees = true
 # No navbar: its parts live in the primary sidebar and the article header.
 navbar_start = []
 navbar_center = []
