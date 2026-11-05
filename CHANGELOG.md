@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.5.1]
+
 ### Fixed
 
 - `release-notes` nests Markdown notes under its version headings again when `.md` is parsed by MyST-NB (#87)
@@ -104,7 +106,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.5.0...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.5.1...main
+[0.5.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.1
 [0.5.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.0
 [0.4.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.4.0
 [0.3.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.3.0
