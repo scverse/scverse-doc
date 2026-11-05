@@ -63,6 +63,7 @@ def test_sidebar_shows_sections_with_toctrees(minimal: tuple[SphinxTestApp, str]
     nav = nav[: nav.index("</nav>")]
     assert "Grouped section" in nav
     assert "grouped.html" in nav
+    assert nav.index("Root section") < nav.index("root-grouped.html")
     assert "Plain section" not in nav
     assert "Plain subsection" not in nav
 

@@ -11,12 +11,14 @@ The accent colour and the “scverse packages” dropdown come from the
 
 from __future__ import annotations
 
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, TypedDict
 
 from docutils import nodes
+from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
-from sphinx.environment.adapters.toctree import global_toctree_for_doc
+from sphinx.environment.adapters.toctree import _resolve_toctree
 from sphinx.util.typing import ExtensionMetadata
 
 from ..registry import DEFAULT_ACCENT, _build_cache, packages
@@ -172,6 +174,22 @@ def _keep_sections_with_toctrees(tree: nodes.Element) -> None:
             ul.parent.remove(ul)
 
 
+def _with_section_caption(toctree: addnodes.toctree) -> addnodes.toctree:
+    """Caption a toctree with its section’s title, unless it has a caption or isn’t in a subsection.
+
+    Only used on the root page, whose sections Sphinx otherwise leaves out of the global toctree.
+    Copies the node when it changes it, as the root doctree is cached.
+    """
+    section = toctree.parent
+    while section is not None and not isinstance(section, nodes.section):
+        section = section.parent
+    if toctree.get("caption") or section is None or not isinstance(section.parent, nodes.section):
+        return toctree  # the page title isn’t a caption
+    toctree = toctree.copy()
+    toctree["caption"] = toctree["rawcaption"] = section[0].astext()  # a section starts with its title
+    return toctree
+
+
 def _add_section_toctree(
     app: Sphinx,
     pagename: str,
@@ -195,18 +213,26 @@ def _add_section_toctree(
     ) -> str:
         if not sections_with_toctrees:
             return toctree(collapse=collapse, maxdepth=maxdepth, includehidden=includehidden, **kwargs)
-        tree = global_toctree_for_doc(
+        resolve = partial(
+            _resolve_toctree,
             app.env,
             pagename,
             builder,
-            tags=app.tags,
-            collapse=collapse,
+            prune=True,
             maxdepth=maxdepth,
-            includehidden=includehidden,
             titles_only=False,
+            collapse=collapse,
+            includehidden=includehidden,
+            tags=app.tags,
         )
-        if tree is not None:
-            _keep_sections_with_toctrees(tree)
+        toctrees = map(_with_section_caption, app.env.master_doctree.findall(addnodes.toctree))
+        resolved = [t for t in map(resolve, toctrees) if t is not None]
+        # Like `global_toctree_for_doc`, but root-page sections are only visible in toctree captions.
+        if not resolved:
+            return ""
+        tree, *rest = resolved
+        tree.extend(child for t in rest for child in t.children)
+        _keep_sections_with_toctrees(tree)
         return builder.render_partial(tree)["fragment"]
 
     context["toctree"] = section_toctree

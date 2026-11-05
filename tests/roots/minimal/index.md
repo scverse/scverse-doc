@@ -7,3 +7,11 @@ A fixture documentation tree used by the theme's own tests.
 
 page
 ```
+
+## Root section
+
+```{toctree}
+:hidden:
+
+root-grouped
+```
