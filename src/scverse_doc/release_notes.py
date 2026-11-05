@@ -69,8 +69,6 @@ FULL_VERSION_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:.*)?$")
 class _Backend:
     dir: Path
     instance: SphinxDirective
-    #: The format the directive is in, which :meth:`render_native` parses.
-    filetype: ClassVar[str] = "restructuredtext"
 
     def run(self) -> Sequence[nodes.Node]:
         versions = sorted(
@@ -102,11 +100,13 @@ class _Backend:
     def render_include(self, path: Path) -> Sequence[nodes.Node]:
         """Parse `path` with the parser for its suffix, falling back to the page’s."""
         env = self.instance.env
+        # filetype names depend on `source_suffix` (e.g. `.md` can be `markdown` or `myst-nb`)
+        page_filetype = get_filetype(env.config.source_suffix, env.doc2path(env.docname))
         try:
             filetype = get_filetype(env.config.source_suffix, path)
         except FiletypeNotFoundError:  # e.g. `.txt`
-            filetype = self.filetype
-        if filetype == self.filetype:
+            filetype = page_filetype
+        if filetype == page_filetype:
             return self.render_native(path)
         # Like docutils’ ``include`` with ``:parser:``: parse into a document sharing the page’s targets
         parser = env._registry.create_source_parser(filetype, config=env.config, env=env)
@@ -128,8 +128,6 @@ class _Backend:
 # TODO(flying-sheep): Remove once MyST-Parser bug is fixed
 # https://github.com/executablebooks/MyST-Parser/issues/967
 class _BackendMyst(_Backend):
-    filetype: ClassVar[str] = "markdown"
-
     def run(self) -> Sequence[nodes.Node]:
         super().run()
         return []

@@ -105,6 +105,22 @@ def test_release_notes_other_format(tmp_path: Path, file_format: Format) -> None
     assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED.strip()
 
 
+@pytest.mark.skipif(find_spec("myst_nb") is None, reason="needs myst-nb")
+def test_release_notes_myst_nb(tmp_path: Path) -> None:
+    """``.md`` files parsed by MyST-NB are in the page’s format, so they nest under the version headings."""
+    out, warnings = build(
+        tmp_path,
+        "myst",
+        ".",
+        FILES["myst"],
+        extensions=["myst_nb", "scverse_doc.release_notes"],
+        source_suffix={".md": "myst-nb"},
+    )
+    assert "start at H3" not in warnings  # i.e. the version files weren’t parsed as separate documents
+    index_out = (out / "index.pseudoxml").read_text()
+    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED.strip()
+
+
 def test_unknown_suffix_parsed_like_page(tmp_path: Path) -> None:
     out, _ = build(tmp_path, "rst", ".", {"1.2.0.txt": "1.2.0\n====="})
     assert '<section ids="id1" names="1.2.0">' in (out / "index.pseudoxml").read_text()
