@@ -57,6 +57,16 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[SphinxTestApp, str]) -> 
 
 
 @needs_full
+def test_sidebar_shows_sections_with_toctrees(minimal: tuple[SphinxTestApp, str]) -> None:
+    _, html = minimal
+    nav = html[html.index('class="bd-docs-nav') :]
+    nav = nav[: nav.index("</nav>")]
+    assert "Grouped section" in nav
+    assert "grouped.html" in nav
+    assert "Plain section" not in nav
+
+
+@needs_full
 def test_linkcode_is_resolved_when_requested(minimal: tuple[SphinxTestApp, str]) -> None:
     app, _ = minimal
     assert callable(app.config.linkcode_resolve)

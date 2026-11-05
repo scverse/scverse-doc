@@ -48,3 +48,11 @@ Without one, the captions keep the text colour.
 Whether the scverse menu in the page header lists the “scverse packages”.
 Without them, it is a plain link to scverse.org.
 ```
+
+```{confval} sidebar_sections_with_toctrees
+:type: bool
+:default: `True`
+
+Whether the site navigation shows a page’s sections that contain a toctree, as captions above their entries.
+Sections without a toctree are always left out.
+```

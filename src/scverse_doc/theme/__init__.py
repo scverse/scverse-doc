@@ -14,6 +14,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from docutils import nodes
+from sphinx.builders.html import StandaloneHTMLBuilder
+from sphinx.environment.adapters.toctree import global_toctree_for_doc
 from sphinx.util.typing import ExtensionMetadata
 
 from ..registry import DEFAULT_ACCENT, _build_cache, packages
@@ -135,6 +138,65 @@ def _add_ecosystem_context(
     context["scverse_ecosystem"] = groups
 
 
+def _keep_sections_with_toctrees(tree: nodes.Element) -> None:
+    """Drop section entries without a toctree below them; turn the rest into captions.
+
+    `pydata-sphinx-theme` removes every entry linking to an anchor, so the kept ones must not be links.
+    """
+    # Bottom-up, so emptied sub-lists are gone before their parents are checked.
+    for item in reversed(list(tree.findall(nodes.list_item))):
+        ref, *descendants = item.findall(nodes.reference)
+        if not ref["anchorname"]:
+            continue
+        if any(not r["anchorname"] for r in descendants):
+            ref.parent.replace_self(nodes.paragraph("", "", *ref.children, classes=["caption"]))
+            continue
+        ul = item.parent
+        ul.remove(item)
+        if not ul.children:
+            ul.parent.remove(ul)
+
+
+def _add_section_toctree(
+    app: Sphinx,
+    pagename: str,
+    templatename: str,
+    context: dict[str, object],
+    doctree: object,
+) -> None:
+    """Let ``toctree(sections_with_toctrees=True)`` keep page sections that contain toctrees."""
+    toctree = context.get("toctree")
+    builder = app.builder
+    if app.config.html_theme != "scverse" or not callable(toctree) or not isinstance(builder, StandaloneHTMLBuilder):
+        return
+
+    def section_toctree(
+        *,
+        sections_with_toctrees: bool = False,
+        collapse: bool = True,
+        maxdepth: int = 0,
+        includehidden: bool = False,
+        **kwargs: bool,
+    ) -> object:
+        if not sections_with_toctrees:
+            return toctree(collapse=collapse, maxdepth=maxdepth, includehidden=includehidden, **kwargs)
+        tree = global_toctree_for_doc(
+            app.env,
+            pagename,
+            builder,
+            tags=app.tags,
+            collapse=collapse,
+            maxdepth=maxdepth,
+            includehidden=includehidden,
+            titles_only=False,
+        )
+        if tree is not None:
+            _keep_sections_with_toctrees(tree)
+        return builder.render_partial(tree)["fragment"]
+
+    context["toctree"] = section_toctree
+
+
 def setup(app: Sphinx) -> ExtensionMetadata:
     """Register the theme, its templates, and the build hooks."""
     app.add_html_theme("scverse", str(_THEME_PATH))
@@ -143,5 +205,6 @@ def setup(app: Sphinx) -> ExtensionMetadata:
 
     app.connect("builder-inited", _configure)
     app.connect("html-page-context", _add_ecosystem_context)
+    app.connect("html-page-context", _add_section_toctree)
 
     return ExtensionMetadata(parallel_read_safe=True)
