@@ -18,7 +18,7 @@
 
 The shared Sphinx theme and documentation configuration for scverse packages.
 
-Install it, and a package's `conf.py` becomes:
+Install it, and a package’s `conf.py` becomes:
 
 ```python
 extensions = ["scverse_doc"]
@@ -26,7 +26,7 @@ extensions = ["scverse_doc"]
 source_repository = "https://github.com/scverse/pertpy"
 ```
 
-That gets you the scverse brand and dark mode, the shared sidebar layout, footer, and announcement banner, a "scverse packages" dropdown generated from the package registry, cross-links to every core package, the repository links ("edit this page" and the header icon), and the standard extension stack.
+That gets you the scverse brand and dark mode, the shared sidebar layout, footer, and announcement banner, a “scverse packages” dropdown generated from the package registry, cross-links to every core package, the repository links (“edit this page” and the header icon), and the standard extension stack.
 
 Every piece also works on its own. For the theme without the extension stack or the shared defaults, select it and leave `extensions` alone – it is a registered Sphinx theme, so installing the package is enough:
 
@@ -45,7 +45,7 @@ The [kitchen sink][] shows every construct the theme styles, in both colour sche
 ## Installation
 
 You need to have Python 3.12 or newer installed on your system.
-If you don't have Python installed, we recommend installing [uv][].
+If you don’t have Python installed, we recommend installing [uv][].
 
 We recommend managing dependencies in project-specific virtual environments to avoid dependency conflicts.
 This is most convenient using package managers such as [uv][].
