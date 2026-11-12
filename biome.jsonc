@@ -12,6 +12,7 @@
         ],
     },
     "formatter": { "useEditorconfig": true },
+    "markdown": { "formatter": { "enabled": false } }, // handled by panache
     "javascript": {
         "formatter": {
             "semicolons": "asNeeded",

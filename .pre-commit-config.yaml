@@ -14,6 +14,11 @@ repos:
         groups: [format]
       - id: biome-lint
         args: [--error-on-warnings]
+  - repo: https://github.com/jolars/panache-pre-commit
+    rev: v3.18.0
+    hooks:
+      - id: panache-format
+        groups: [format]
   - repo: https://github.com/tox-dev/pyproject-fmt
     rev: v2.30.3
     hooks:

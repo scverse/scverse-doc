@@ -7,7 +7,7 @@ like on any other – switch the theme with the toggle in the page header.
 
 ## Text
 
-Body copy with **bold**, _italic_, `inline literal` (the default role), an
+Body copy with **bold**, *italic*, `inline literal` (the default role), an
 [external link](https://scverse.org), an [internal one](api.md), a footnote[^fn] and a
 cross-reference to {func}`~scverse_doc.registry.intersphinx`.
 
@@ -40,10 +40,11 @@ custom property; H{sub}`2`O and x{sup}`2` also render.
 2. Numbered
 
 Definition list
-: Enabled through the `deflist` MyST extension.
+:   Enabled through the `deflist` MyST extension.
 
 Field and option lists and `hlist` are docutils-only, so they need `eval-rst`:
 
+<!-- panache-ignore-format-start -->
 ```{eval-rst}
 :Field: A field list entry.
 :Another: A second one.
@@ -62,11 +63,12 @@ Field and option lists and `hlist` are docutils-only, so they need `eval-rst`:
    * scvi-tools
    * squidpy
 ```
+<!-- panache-ignore-format-end -->
 
 ## Admonitions
 
 ```{note}
-A note, in the theme's border and surface tokens.
+A note, in the theme’s border and surface tokens.
 ```
 
 ```{warning}
@@ -188,11 +190,11 @@ third = "plain"
 
 ## Table
 
-| Token                               | Role                             |
-| ----------------------------------- | -------------------------------- |
-| `--scverse-color-accent-text`       | Links and text, contrast-checked |
-| `--scverse-color-accent-decorative` | Underlines and surfaces          |
-| `--scverse-radius`                  | Shared component geometry        |
+  | Token                               | Role                             |
+  | ----------------------------------- | -------------------------------- |
+  | `--scverse-color-accent-text`       | Links and text, contrast-checked |
+  | `--scverse-color-accent-decorative` | Underlines and surfaces          |
+  | `--scverse-radius`                  | Shared component geometry        |
 
 ## Cards
 
@@ -229,10 +231,12 @@ accent-driven parts of the theme, build with one:
 $ hatch run docs:build -D html_theme_options.accent=#de367b
 ```
 
+<!-- panache-ignore-format-start -->
 ```{button-link} https://scverse.org
 :color: primary
 A button
 ```
+<!-- panache-ignore-format-end -->
 
 ## Tabs
 
