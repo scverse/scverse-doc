@@ -231,12 +231,11 @@ accent-driven parts of the theme, build with one:
 $ hatch run docs:build -D html_theme_options.accent=#de367b
 ```
 
-<!-- panache-ignore-format-start -->
 ```{button-link} https://scverse.org
 :color: primary
+
 A button
 ```
-<!-- panache-ignore-format-end -->
 
 ## Tabs
 
