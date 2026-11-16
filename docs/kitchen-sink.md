@@ -198,25 +198,26 @@ third = "plain"
 
 ## Cards
 
-::::{grid} 1 2 2 3
+:::::{grid} 1 2 2 3
 :gutter: 2
 
-:::{grid-item-card} Plain card
+::::{grid-item-card} Plain card
 Title colour comes from `--pst-heading-color`.
-:::
+::::
 
-:::{grid-item-card} Linked card
+::::{grid-item-card} Linked card
 :link: api.md
 
 Hover it: the title switches to the accent, the card lifts.
-:::
+::::
 
-:::{grid-item-card} With a footer
+::::{grid-item-card} With a footer
 Body.
-+++
+:::{card-footer}
 Footer.
 :::
 ::::
+:::::
 
 ## Badges and buttons
 
