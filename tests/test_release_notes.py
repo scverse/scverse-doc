@@ -51,6 +51,8 @@ EXPECTED = """\
         <title>
             1.2.0
 """
+# myst-parser ≥5.2 moves explicit target ids (``(v1.3)=``) to the front of a section’s ids
+EXPECTED_MYST = re.sub(r'ids="(\S+) (v[\w-]+)"', r'ids="\2 \1"', EXPECTED)
 
 
 @pytest.fixture(
@@ -92,7 +94,8 @@ def build(
 def test_release_notes(tmp_path: Path, file_format: Format) -> None:
     out, _ = build(tmp_path, file_format, ".", FILES[file_format])
     index_out = (out / "index.pseudoxml").read_text()
-    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED.strip()
+    expected = EXPECTED_MYST if file_format == "myst" else EXPECTED
+    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == expected.strip()
 
 
 @pytest.mark.skipif(find_spec("myst_parser") is None, reason="needs myst-parser")
@@ -102,7 +105,8 @@ def test_release_notes_other_format(tmp_path: Path, file_format: Format) -> None
     other: Format = "myst" if file_format == "rst" else "rst"
     out, _ = build(tmp_path, file_format, ".", FILES[other], extensions=["myst_parser", "scverse_doc.release_notes"])
     index_out = (out / "index.pseudoxml").read_text()
-    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED.strip()
+    expected = EXPECTED_MYST if file_format == "myst" else EXPECTED
+    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == expected.strip()
 
 
 @pytest.mark.skipif(find_spec("myst_nb") is None, reason="needs myst-nb")
@@ -118,7 +122,7 @@ def test_release_notes_myst_nb(tmp_path: Path) -> None:
     )
     assert "start at H3" not in warnings  # i.e. the version files weren’t parsed as separate documents
     index_out = (out / "index.pseudoxml").read_text()
-    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED.strip()
+    assert "\n".join(l[4:] for l in dedent(index_out).splitlines()[1:]) == EXPECTED_MYST.strip()
 
 
 def test_unknown_suffix_parsed_like_page(tmp_path: Path) -> None:
