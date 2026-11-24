@@ -53,7 +53,7 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[SphinxTestApp, str]) -> 
     for css in ("styles/scverse.min.css", "scverse-accent.css"):
         assert css in html
     assert "NumFOCUS" in html
-    assert "discourse.scverse.org" in html
+    assert 'href="https://discourse.scverse.org/"' in html
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
     assert 'href="https://github.com/scverse/pertpy"' in html
 
@@ -103,7 +103,7 @@ def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[SphinxTest
 def test_ecosystem_package_gets_the_menu_but_not_the_scverse_footer(tmp_path: Path) -> None:
     _, html = build(ROOTS / "minimal", tmp_path, project="annsel")
     assert "scverse-ecosystem-dropdown" in html
-    assert "discourse.scverse.org" in html
+    assert 'href="https://discourse.scverse.org/"' in html
     assert "NumFOCUS" not in html
 
 
@@ -188,7 +188,7 @@ def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
     assert app.config.napoleon_numpy_docstring is DEFAULTS.napoleon_numpy_docstring
     # "not-an-scverse-package" is not in the registry, so it gets the look but nothing claiming to be scverse.
     assert "scverse-accent.css" in html
-    for brand in ("fa-scverse", "NumFOCUS", "discourse.scverse.org"):
+    for brand in ("fa-scverse", "NumFOCUS", 'href="https://discourse.scverse.org/"'):
         assert brand not in html
 
 
