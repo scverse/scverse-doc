@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import inspect
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
@@ -171,12 +173,31 @@ def test_html_context_names_the_declared_forge() -> None:
     }
 
 
+@pytest.fixture
+def aliased(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Importable module ``aliased`` with a ``type`` statement and a ``TypeAliasType`` call."""
+    (tmp_path / "aliased.py").write_text(
+        "import typing\n\ntype Alias = (\n    int | str\n)\nCalled = typing.TypeAliasType('Called', int)\n"
+    )
+    monkeypatch.syspath_prepend(tmp_path)
+    monkeypatch.delitem(sys.modules, "aliased", raising=False)
+
+
+@pytest.mark.usefixtures("aliased")
 @pytest.mark.parametrize(
     ("module", "fullname", "path"),
     [
         pytest.param("scverse_doc.registry", "intersphinx", "src/scverse_doc/registry.py", id="module"),
         # A package resolves to its ``__init__.py``, one level deeper than its name.
         pytest.param("scverse_doc.theme", "setup", "src/scverse_doc/theme/__init__.py", id="package"),
+        pytest.param("scverse_doc.source", "_Source.icon_link", "src/scverse_doc/source.py", id="property"),
+        pytest.param(
+            "scverse_doc.registry",
+            "_RegistryInventories._resolved",
+            "src/scverse_doc/registry.py",
+            id="cached_property",
+        ),
+        pytest.param("aliased", "Alias", "src/aliased.py", id="type-alias"),
     ],
 )
 def test_linkcode_finds_our_own_source(module: str, fullname: str, path: str) -> None:
@@ -187,6 +208,18 @@ def test_linkcode_finds_our_own_source(module: str, fullname: str, path: str) ->
     assert lines.startswith("L")
 
 
+def test_linkcode_sees_through_reexported_class(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Like ``AnnData.__module__ = "anndata"``."""
+    _, start = inspect.getsourcelines(_Source)
+    monkeypatch.setattr(_Source, "__module__", "scverse_doc")
+    monkeypatch.setattr(scverse_doc, "_Source", _Source, raising=False)
+    url = _linkcode_url(GITHUB, "scverse_doc", "_Source")
+    assert url is not None
+    prefix, _, lines = url.partition("#")
+    assert prefix == "https://github.com/scverse/pertpy/blob/main/src/scverse_doc/source.py"
+    assert lines.startswith(f"L{start}-L")
+
+
 def test_linkcode_finds_docs_source() -> None:
     srcdir = Path(scverse_doc.__file__).parent.parent  # pretend `src/` holds the docs
     url = _linkcode_url(GITHUB, "scverse_doc.registry", "intersphinx", srcdir)
@@ -194,11 +227,13 @@ def test_linkcode_finds_docs_source() -> None:
     assert url.startswith(f"https://github.com/scverse/pertpy/blob/main/{GITHUB.directory}/scverse_doc/registry.py#L")
 
 
+@pytest.mark.usefixtures("aliased")
 @pytest.mark.parametrize(
     ("module", "fullname"),
     [
         pytest.param("scverse_doc.registry", "nope", id="missing"),
         pytest.param("scverse_doc.config", "DEFAULTS", id="no-source-lines"),
+        pytest.param("aliased", "Called", id="no-type-statement"),
     ],
 )
 def test_linkcode_gives_up_quietly(module: str, fullname: str) -> None:

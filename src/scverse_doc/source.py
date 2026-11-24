@@ -14,13 +14,15 @@ GitLab’s or Bitbucket’s; :confval:`source_provider` names the layout for a s
 
 from __future__ import annotations
 
+import ast
 import inspect
 import os
 from dataclasses import dataclass
 from enum import Enum
+from functools import cached_property
 from importlib import import_module
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING, NamedTuple, Self, cast, override
+from typing import TYPE_CHECKING, NamedTuple, Self, TypeAliasType, cast, override
 from urllib.parse import urlsplit
 
 from sphinx import addnodes
@@ -202,27 +204,85 @@ def _configure_theme(app: Sphinx) -> None:
         config.html_context = _html_context(source) | config.html_context
 
 
+def _locate_class(cls: type) -> tuple[Path, tuple[int, int] | None, str] | None:
+    """File, line span and module a class is defined in, found via its methods’ code.
+
+    Packages often set ``__module__`` to the public one (e.g. ``AnnData.__module__ = "anndata"``),
+    which makes :mod:`inspect` search the wrong file. Code objects keep the real one.
+    """
+    methods = (cast("object", inspect.unwrap(m)) for m in vars(cls).values())
+    own = (
+        m
+        for m in methods
+        if inspect.isfunction(m)
+        and m.__qualname__.startswith(f"{cls.__qualname__}.")
+        and not m.__code__.co_filename.startswith("<")  # e.g. `dataclass`-generated
+    )
+    if (method := next(own, None)) is None:
+        return None
+    file = Path(method.__code__.co_filename)
+    # Setting ``__module__`` also drops ``__firstlineno__``, so find the innermost ``class`` statement around the method.
+    line = method.__code__.co_firstlineno
+    classes = (
+        n
+        for n in ast.walk(ast.parse(file.read_bytes()))
+        if isinstance(n, ast.ClassDef) and n.lineno <= line <= (n.end_lineno or 0)
+    )
+    # farthest down = innermost
+    if (node := max(classes, key=lambda n: n.lineno, default=None)) is None:  # pragma: no cover
+        return None
+    start = min([node.lineno, *(d.lineno for d in node.decorator_list)])
+    return file, (start, node.end_lineno or start), method.__module__
+
+
+def _locate_type_alias(alias: TypeAliasType) -> tuple[Path, tuple[int, int] | None, str] | None:
+    """File, line span and module of a ``type`` statement, which :mod:`inspect` can’t find."""
+    if (module := alias.__module__) is None:  # pragma: no cover
+        return None
+    file = Path(inspect.getsourcefile(import_module(module)) or "")
+    aliases = (
+        n
+        for n in ast.walk(ast.parse(file.read_bytes()))
+        if isinstance(n, ast.TypeAlias) and n.name.id == alias.__name__
+    )
+    if (node := next(aliases, None)) is None:
+        return None
+    return file, (node.lineno, node.end_lineno or node.lineno), module
+
+
 def _linkcode_url(source: _Source, module: str, fullname: str, srcdir: Path | None = None) -> str | None:
     """Link to a Python object’s definition, or :data:`None` if it has no findable source.
 
     Modules in `srcdir` (the docs’ own helpers) link into :confval:`source_directory`.
     """
     try:
-        obj = import_module(module)
+        obj: object = import_module(module)
         for part in filter(None, fullname.split(".")):
             obj = getattr(obj, part)
-        obj = inspect.unwrap(obj) if callable(obj) else obj
-        lines, start = inspect.getsourcelines(obj)
-        file = Path(inspect.getsourcefile(obj) or "")
+        obj = cast("object", inspect.unwrap(obj)) if callable(obj) else obj
+        # A property is its getter.
+        if isinstance(obj, property):
+            obj = obj.fget
+        elif isinstance(obj, cached_property):
+            obj = obj.func
+        if inspect.isclass(obj) and (located := _locate_class(obj)):
+            file, span, defining_module = located
+        elif isinstance(obj, TypeAliasType) and (located := _locate_type_alias(obj)):
+            file, span, defining_module = located
+        else:
+            # Unsupported objects raise `TypeError`, caught below.
+            lines, start = inspect.getsourcelines(obj)  # type: ignore[arg-type]
+            file = Path(inspect.getsourcefile(obj) or "")  # type: ignore[arg-type]
+            # A module is its whole file.
+            span = None if inspect.ismodule(obj) else (start, start + len(lines) - 1)
+            defining_module = getattr(obj, "__module__", module)
     except (ImportError, AttributeError, TypeError, OSError):
         return None
-    # A module is its whole file.
-    span = None if inspect.ismodule(obj) else (start, start + len(lines) - 1)
     if srcdir is not None and file.is_relative_to(srcdir):
         return source.view(PurePosixPath(source.directory, *file.relative_to(srcdir).parts), span)
     # A non-editable install puts the file outside the checkout,
     # so the repository-relative path comes from the defining module’s depth.
-    parts = str(getattr(obj, "__module__", module) or module).split(".")
+    parts = str(defining_module or module).split(".")
     offset = -1 if file.name == "__init__.py" else 0
     path = PurePosixPath(source.code, *file.parts[offset - len(parts) :])
     return source.view(path, span)
