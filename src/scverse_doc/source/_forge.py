@@ -1,36 +1,23 @@
 # SPDX-License-Identifier: MPL-2.0
-"""Links into the source repository: the repository icon, “edit this page”, and ``[source]``.
-
-Declare the repository with :confval:`source_repository`.
-Whatever the selected theme understands is filled in: `pydata-sphinx-theme`’s
-`html_context` entries, `furo`’s and `sphinx-book-theme`’s theme options, and the icon link.
-
-If `conf.py` lists :mod:`sphinx.ext.linkcode`, this also resolves that extension’s
-``[source]`` links.
-
-Hosts other than GitHub work as long as their URLs are laid out like GitHub’s,
-GitLab’s or Bitbucket’s; :confval:`source_provider` names the layout for a self-hosted one.
-"""
+"""The source repository as configured, and the theme options and context that point at it."""
 
 from __future__ import annotations
 
-import inspect
 import os
 from dataclasses import dataclass
 from enum import Enum
-from importlib import import_module
-from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, NamedTuple, Self
 from urllib.parse import urlsplit
 
 from sphinx.errors import ConfigError
-from sphinx.util.typing import ExtensionMetadata
 
 if TYPE_CHECKING:
+    from pathlib import PurePosixPath
+
     from sphinx.application import Sphinx
     from sphinx.config import Config
 
-__all__ = ["setup"]
+__all__ = ["Provider", "Source", "configure_theme", "html_context", "theme_options"]
 
 
 class _ProviderData(NamedTuple):
@@ -46,7 +33,7 @@ class _ProviderData(NamedTuple):
 
 #: The forge layouts we can build links for, keyed by the name that appears in their hosts.
 #: A self-hosted instance picks one with :confval:`source_provider`.
-class _Provider(_ProviderData, Enum):
+class Provider(_ProviderData, Enum):
     github = ("GitHub", "fa-brands fa-github", "blob/{ref}/{path}", "#L{start}-L{end}")
     gitlab = ("GitLab", "fa-brands fa-gitlab", "-/blob/{ref}/{path}", "#L{start}-{end}")
     bitbucket = ("Bitbucket", "fa-brands fa-bitbucket", "src/{ref}/{path}", "#lines-{start}:{end}")
@@ -56,7 +43,7 @@ class _Provider(_ProviderData, Enum):
         return self is not self._unknown
 
     @classmethod
-    def parse(cls, name: str, host: str) -> _Provider:
+    def parse(cls, name: str, host: str) -> Provider:
         """The forge named by :confval:`source_provider`, else the one `host` is named after."""
         if not name:
             return next((member for member in cls if member and member.name in host), cls._unknown)
@@ -68,7 +55,7 @@ class _Provider(_ProviderData, Enum):
 
 
 @dataclass(frozen=True)
-class _Source:
+class Source:
     """Where a package’s source lives, as derived from the ``source_*`` config values."""
 
     url: str
@@ -83,7 +70,7 @@ class _Source:
     code: str
     """Where the importable code lives in the repository – ``"src"`` in a src layout."""
 
-    provider: _Provider
+    provider: Provider
     """How this repository’s forge lays out its URLs."""
 
     @classmethod
@@ -97,7 +84,7 @@ class _Source:
             ref=_ref(config),
             directory=str(config.source_directory).strip("/"),
             code=str(config.source_code_directory).strip("/"),
-            provider=_Provider.parse(config.source_provider, host),
+            provider=Provider.parse(config.source_provider, host),
         )
 
     @property
@@ -128,7 +115,7 @@ def _ref(config: Config) -> str:
     return "main"
 
 
-def _theme_options(source: _Source) -> dict[str, object]:
+def theme_options(source: Source) -> dict[str, object]:
     """Every theme option some theme reads this from; only the declared ones are applied."""
     if not source.provider:
         # Every one of these makes a theme build per-page URLs we have no layout for:
@@ -150,12 +137,12 @@ def _theme_options(source: _Source) -> dict[str, object]:
         "use_repository_button": True,
         "use_source_button": True,
     }
-    if source.provider in {_Provider.github, _Provider.gitlab}:  # sphinx-book-theme warns for the others
+    if source.provider in {Provider.github, Provider.gitlab}:  # sphinx-book-theme warns for the others
         options["use_issues_button"] = True
     return options
 
 
-def _html_context(source: _Source) -> dict[str, object]:
+def html_context(source: Source) -> dict[str, object]:
     """The `html_context` entries `pydata-sphinx-theme`, `sphinx_rtd_theme` and `furo` read."""
     parts = urlsplit(source.url)
     owner, _, name = parts.path.strip("/").rpartition("/")
@@ -173,7 +160,7 @@ def _html_context(source: _Source) -> dict[str, object]:
     }
 
 
-def _configure_theme(app: Sphinx) -> None:
+def configure_theme(app: Sphinx) -> None:
     """Fill in whatever the selected theme understands.
 
     On ``builder-inited``, since which options a theme declares is only known
@@ -181,71 +168,15 @@ def _configure_theme(app: Sphinx) -> None:
     `pydata-sphinx-theme` reads these from the same event, but connects later.
     """
     config = app.config
-    if (source := _Source.from_config(config)) is None or (theme := getattr(app.builder, "theme", None)) is None:
+    if (source := Source.from_config(config)) is None or (theme := getattr(app.builder, "theme", None)) is None:
         return
     declared = theme.get_options()
     options = config.html_theme_options
-    for name, value in _theme_options(source).items():
+    for name, value in theme_options(source).items():
         if name in declared:
             options.setdefault(name, value)
     if "icon_links" in declared:
         # Prepended, so this works whichever order the theme’s own hook runs in.
         options["icon_links"] = [source.icon_link, *options.get("icon_links", [])]
     if source.provider:
-        config.html_context = _html_context(source) | config.html_context
-
-
-def _linkcode_url(source: _Source, module: str, fullname: str, srcdir: Path | None = None) -> str | None:
-    """Link to a Python object’s definition, or :data:`None` if it has no findable source.
-
-    Modules in `srcdir` (the docs’ own helpers) link into :confval:`source_directory`.
-    """
-    try:
-        obj = import_module(module)
-        for part in filter(None, fullname.split(".")):
-            obj = getattr(obj, part)
-        obj = inspect.unwrap(obj) if callable(obj) else obj
-        lines, start = inspect.getsourcelines(obj)
-        file = Path(inspect.getsourcefile(obj) or "")
-    except (ImportError, AttributeError, TypeError, OSError):
-        return None
-    if srcdir is not None and file.is_relative_to(srcdir):
-        return source.view(
-            PurePosixPath(source.directory, *file.relative_to(srcdir).parts), (start, start + len(lines) - 1)
-        )
-    # A non-editable install puts the file outside the checkout,
-    # so the repository-relative path comes from the defining module’s depth.
-    parts = str(getattr(obj, "__module__", module) or module).split(".")
-    offset = -1 if file.name == "__init__.py" else 0
-    path = PurePosixPath(source.code, *file.parts[offset - len(parts) :])
-    return source.view(path, (start, start + len(lines) - 1))
-
-
-def _configure_linkcode(app: Sphinx) -> None:
-    """Resolve `sphinx.ext.linkcode`’s links, if `conf.py` asked for it but defined no resolver."""
-    config = app.config
-    if "sphinx.ext.linkcode" not in app.extensions or config.linkcode_resolve is not None:
-        return
-    if (source := _Source.from_config(config)) is None:
-        return
-
-    def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
-        if domain != "py" or not info["module"]:
-            return None
-        return _linkcode_url(source, info["module"], info["fullname"], Path(app.srcdir))
-
-    config.linkcode_resolve = linkcode_resolve
-
-
-def setup(app: Sphinx) -> ExtensionMetadata:
-    """Register the ``source_*`` config values and wire them into the theme and linkcode."""
-    app.add_config_value("source_repository", "", "env", types=frozenset({str}))
-    app.add_config_value("source_branch", "", "env", types=frozenset({str}))
-    app.add_config_value("source_directory", "docs", "env", types=frozenset({str}))
-    app.add_config_value("source_code_directory", "src", "env", types=frozenset({str}))
-    app.add_config_value("source_provider", "", "env", types=frozenset({str}))
-
-    app.connect("builder-inited", _configure_linkcode)
-    app.connect("builder-inited", _configure_theme)
-
-    return ExtensionMetadata(parallel_read_safe=True)
+        config.html_context = html_context(source) | config.html_context

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import shutil
 from importlib.util import find_spec
 from pathlib import Path
@@ -250,6 +251,35 @@ def test_prose_returns(autodoc: Path) -> None:
     assert "<p>The fitted model, or <cite>None</cite>" in html
     # Unpatched napoleon would read the sentence as a type.
     assert "Return type" not in html
+
+
+@needs_full
+@pytest.mark.parametrize("theme", ["pydata_sphinx_theme", "furo", "sphinx_book_theme", "sphinx_rtd_theme"])
+def test_edit_links_on_generated_pages_point_at_the_code(tmp_path: Path, theme: str) -> None:
+    """Autosummary stubs exist only in the build, so their edit links go to the documented object instead."""
+    src = shutil.copytree(
+        ROOTS / "autodoc", tmp_path / "src", ignore=shutil.ignore_patterns("__pycache__", "generated")
+    )
+    build(
+        src,
+        tmp_path,
+        extensions=["scverse_doc.autodoc", "scverse_doc.napoleon", "scverse_doc.source"],
+        html_theme=theme,
+        source_repository="https://github.com/scverse/pertpy",
+    )
+    html = tmp_path / "html"
+    repo = "https://github.com/scverse/pertpy"
+    # Themes link real pages to their edit (or view) page.
+    assert re.search(rf"{repo}/(edit|blob)/main/docs/index\.rst", (html / "index.html").read_text())
+    thing = (html / "generated" / "apimod.Thing.html").read_text()
+    # Which directory depends on where this process first imported the root’s modules from.
+    assert re.search(rf'href="{repo}/blob/main/\w+/apimod\.py#L\d+-L\d+"', thing)
+    assert not re.search(rf"{repo}/(edit|blob)/main/docs/generated/", thing)
+    # A stub from a directive Sphinx never parses (it’s in a comment).
+    public = (html / "generated" / "apimod.Public.html").read_text()
+    assert re.search(rf'href="{repo}/blob/main/\w+/apimod\.py#L\d+-L\d+"', public)
+    module = (html / "generated" / "apipkg.sub.deep.html").read_text()
+    assert re.search(rf'href="{repo}/blob/main/\w+/apipkg/sub/deep\.py"', module)
 
 
 def test_returned_tuple_annotates_items(autodoc: Path) -> None:

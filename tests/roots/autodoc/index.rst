@@ -23,3 +23,14 @@ API
    Thing
    fit
    split
+
+..  a commented-out directive still makes autosummary_generate write stubs (like anndata does)
+    .. autosummary::
+       :toctree: generated
+
+       Public
+
+.. toctree::
+   :hidden:
+
+   generated/apimod.Public

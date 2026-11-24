@@ -116,6 +116,7 @@ envs.hatch-test.overrides.matrix.extras.extra-dependencies = [
   # to check `scverse_doc.source` against other themes
   { value = "furo", if = [ "full" ] },
   { value = "sphinx-book-theme", if = [ "full" ] },
+  { value = "sphinx-rtd-theme", if = [ "full" ] },
 ]
 envs.hatch-test.default-args = []
 envs.hatch-test.dependency-groups = [ "dev", "test" ]
