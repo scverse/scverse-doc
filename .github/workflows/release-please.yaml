@@ -1,0 +1,25 @@
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      # Not `GITHUB_TOKEN`: its PRs and releases wouldn’t trigger autofix.ci and `release.yaml`
+      - uses: actions/create-github-app-token@v3.3.0
+        id: app-token
+        with:
+          client-id: ${{ vars.PR_CREATOR_APP_ID }}
+          private-key: ${{ secrets.PR_CREATOR_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write # PR labels
+      - uses: googleapis/release-please-action@v5.0.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          release-type: simple
