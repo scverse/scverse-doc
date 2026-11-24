@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.5.3]
+
 ### Fixed
 
 - the sticky article header’s shadow appears only once the page is scrolled, by working around a [lightningcss minification bug](https://github.com/parcel-bundler/lightningcss/issues/1369) (#98)
@@ -120,7 +122,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.5.2...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.5.3...main
+[0.5.3]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.3
 [0.5.2]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.2
 [0.5.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.1
 [0.5.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.0
