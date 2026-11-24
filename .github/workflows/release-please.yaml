@@ -17,8 +17,7 @@ jobs:
           client-id: ${{ vars.PR_CREATOR_APP_ID }}
           private-key: ${{ secrets.PR_CREATOR_PRIVATE_KEY }}
           permission-contents: write
-          permission-pull-requests: write
-          permission-issues: write # PR labels
+          permission-pull-requests: write # also covers release-please’s PR labels
       - uses: googleapis/release-please-action@v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token }}
