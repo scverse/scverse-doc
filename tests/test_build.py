@@ -6,6 +6,7 @@ from __future__ import annotations
 import shutil
 from importlib.util import find_spec
 from pathlib import Path
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 
 import pytest
@@ -52,6 +53,7 @@ def test_theme_renders_the_shared_chrome(minimal: tuple[SphinxTestApp, str]) -> 
     for css in ("styles/scverse.min.css", "scverse-accent.css"):
         assert css in html
     assert "NumFOCUS" in html
+    assert 'href="https://discourse.scverse.org/"' in html
     assert "github.com/scverse/pertpy/edit/main/docs/index.md" in html
     assert 'href="https://github.com/scverse/pertpy"' in html
 
@@ -93,7 +95,34 @@ def test_ecosystem_dropdown_is_built_from_the_registry(minimal: tuple[SphinxTest
     # Display names are the upstream ``name`` verbatim, inconsistent casing and all.
     assert ">AnnData</a>" in html
     assert ">annsel</a>" in html
+    assert ">scverse-doc</a>" not in html  # infrastructure is left out
     assert 'class="dropdown-item active"' in html
+
+
+@needs_full
+def test_ecosystem_package_gets_the_menu_but_not_the_scverse_footer(tmp_path: Path) -> None:
+    _, html = build(ROOTS / "minimal", tmp_path, project="annsel")
+    assert "scverse-ecosystem-dropdown" in html
+    assert 'href="https://discourse.scverse.org/"' in html
+    assert "NumFOCUS" not in html
+
+
+@pytest.mark.parametrize(
+    ("project", "discourse", "announcement"),
+    [
+        pytest.param("pertpy", True, "https://scverse.org/announcement.html", id="core"),
+        pytest.param("scverse-doc", True, "https://scverse.org/announcement.html", id="infrastructure"),
+        pytest.param("annsel", True, None, id="ecosystem"),
+        pytest.param("not-an-scverse-package", False, None, id="unregistered"),
+    ],
+)
+def test_scverse_links_depend_on_the_registry_kind(project: str, discourse: bool, announcement: str | None) -> None:
+    from scverse_doc.theme import _add_chrome
+
+    config = SimpleNamespace(project=project, html_theme_options={}, html_context={})
+    _add_chrome(config)  # type: ignore[arg-type]
+    assert bool(config.html_theme_options.get("icon_links")) is discourse
+    assert config.html_theme_options.get("announcement") == announcement
 
 
 @needs_full
@@ -157,8 +186,10 @@ def test_conf_py_wins_over_defaults(tmp_path: Path) -> None:
     assert app.config.nb_execution_mode == "force"
     assert app.config.html_theme_options["show_toc_level"] == 4
     assert app.config.napoleon_numpy_docstring is DEFAULTS.napoleon_numpy_docstring
-    # "not-an-scverse-package" is not in the registry, which must not break the theme.
-    assert "scverse-ecosystem-dropdown" in html
+    # "not-an-scverse-package" is not in the registry, so it gets the look but nothing claiming to be scverse.
+    assert "scverse-accent.css" in html
+    for brand in ("fa-scverse", "NumFOCUS", 'href="https://discourse.scverse.org/"'):
+        assert brand not in html
 
 
 @pytest.fixture(scope="module")

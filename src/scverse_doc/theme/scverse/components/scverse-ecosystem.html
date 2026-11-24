@@ -3,8 +3,9 @@
     The packages are generated from the registry,
     so adding a package to scverse/ecosystem-packages makes it reachable from every scverse docs site
     without any package touching its own conf.py.
+    Projects outside the registry don’t get the menu at all.
 -#}
-{%- if theme_show_ecosystem_dropdown | tobool and scverse_ecosystem -%}
+{%- if scverse_kind and theme_show_ecosystem_dropdown | tobool -%}
   <div
     class="dropdown scverse-ecosystem-dropdown"
     data-bs-toggle="tooltip"
@@ -40,7 +41,7 @@
       {%- endfor %}
     </ul>
   </div>
-{%- else -%}
+{%- elif scverse_kind -%}
   <a
     class="nav-link pst-navbar-icon"
     href="https://scverse.org/"
