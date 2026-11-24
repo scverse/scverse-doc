@@ -275,6 +275,9 @@ def test_edit_links_on_generated_pages_point_at_the_code(tmp_path: Path, theme: 
     # Which directory depends on where this process first imported the root’s modules from.
     assert re.search(rf'href="{repo}/blob/main/\w+/apimod\.py#L\d+-L\d+"', thing)
     assert not re.search(rf"{repo}/(edit|blob)/main/docs/generated/", thing)
+    # A stub from a directive Sphinx never parses (it’s in a comment).
+    public = (html / "generated" / "apimod.Public.html").read_text()
+    assert re.search(rf'href="{repo}/blob/main/\w+/apimod\.py#L\d+-L\d+"', public)
     module = (html / "generated" / "apipkg.sub.deep.html").read_text()
     assert re.search(rf'href="{repo}/blob/main/\w+/apipkg/sub/deep\.py"', module)
 
