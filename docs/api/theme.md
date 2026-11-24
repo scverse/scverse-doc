@@ -22,7 +22,8 @@ and setting `html_sidebars` replaces the site navigation – include `scverse-si
 :type: str
 :default: `project`
 
-The registry name to look the accent and the dropdown’s current entry up under.
+The registry name to look the accent, the dropdown’s current entry, and the scverse branding up under.
+A project not in the registry gets no scverse menu, Discourse link, footer lines or announcement banner.
 ```
 
 ```{confval} accent

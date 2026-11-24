@@ -7,6 +7,13 @@ Declare the package with the :ref:`theme options <theme-options>`;
 This theme sets up :mod:`scverse_doc.source`, which adds the repository links.
 The accent colour and the “scverse packages” dropdown come from the
 :mod:`registry <scverse_doc.registry>`, without any configuration.
+
+What identifies a site as scverse depends on the package’s registry entry:
+
+- every registered package gets the scverse menu and the Discourse link;
+- scverse’s own packages (core and infrastructure) also get the footer’s
+  scverse/NumFOCUS lines and the shared announcement banner;
+- an unregistered project gets none of these, only the look.
 """
 
 from __future__ import annotations
@@ -21,7 +28,7 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.environment.adapters.toctree import _resolve_toctree
 from sphinx.util.typing import ExtensionMetadata
 
-from ..registry import DEFAULT_ACCENT, _build_cache, packages
+from ..registry import DEFAULT_ACCENT, Package, _build_cache, packages
 from ._bundle import bundle, find_lightningcss
 
 if TYPE_CHECKING:
@@ -75,18 +82,22 @@ _SECONDARY_ACCENT_CSS = f"""\
 }}}}
 """
 
-#: scverse.org itself is linked from the scverse menu beside them.
+#: For every registered package; scverse.org itself is linked from the scverse menu beside them.
 _ICON_LINKS = ({"name": "Discourse", "url": "https://discourse.scverse.org/", "icon": "fa-brands fa-discourse"},)
 
+#: The banner shared by scverse’s own projects, i.e. not the ecosystem packages.
+_ANNOUNCEMENT_URL = "https://scverse.org/announcement.html"
 
-def _package_name(config: Config) -> str:
-    return str(config.html_theme_options.get("package") or config.project)
+
+def _package(config: Config) -> Package | None:
+    pkg_name = str(config.html_theme_options.get("package") or config.project)
+    return packages.get(pkg_name)
 
 
 def _accent(config: Config) -> str:
     if accent := config.html_theme_options.get("accent"):
         return str(accent)
-    if (pkg := packages.get(_package_name(config))) is not None:
+    if (pkg := _package(config)) is not None:
         return pkg.accent
     return DEFAULT_ACCENT
 
@@ -95,17 +106,21 @@ def _secondary_accent(config: Config) -> str | None:
     accent: str | bool = config.html_theme_options.get("secondary_accent")
     if accent is not True:
         return accent or None
-    if pkg := packages.get(_package_name(config)):
+    if pkg := _package(config):
         return pkg.secondary_accent
     return None
 
 
 def _add_chrome(config: Config) -> None:
-    """Add the brand icon links and the colour mode, alongside whatever :mod:`scverse_doc.source` set."""
+    """Add the colour mode, and for registered packages the scverse links, alongside what :mod:`~scverse_doc.source` set."""
+    config.html_context = {"default_mode": "auto", **config.html_context}
+    if (pkg := _package(config)) is None:
+        return
     options = config.html_theme_options
     # Appended, so this works whichever order `scverse_doc.source`’s hook runs in.
     options["icon_links"] = [*options.get("icon_links", []), *_ICON_LINKS]
-    config.html_context = {"default_mode": "auto", **config.html_context}
+    if pkg.kind != "ecosystem":
+        options.setdefault("announcement", _ANNOUNCEMENT_URL)
 
 
 def _configure(app: Sphinx) -> None:
@@ -145,13 +160,15 @@ def _add_ecosystem_context(
     context: dict[str, object],
     doctree: object,
 ) -> None:
-    """Expose the registry to the scverse menu template."""
+    """Expose the package’s registry kind to the scverse templates, and the registry to the scverse menu."""
     if app.config.html_theme != "scverse":
         return
-    current = _package_name(app.config).lower()
+    current = _package(app.config)
+    context["scverse_kind"] = current and current.kind
     groups: dict[str, list[dict[str, object]]] = {"core": [], "ecosystem": []}
     for pkg in packages.values():
-        groups[pkg.kind].append({"name": pkg.name, "docs": pkg.docs, "current": pkg.name.lower() == current})
+        if pkg.kind in groups:  # scverse’s own tooling isn’t what readers browse for
+            groups[pkg.kind].append({"name": pkg.name, "docs": pkg.docs, "current": pkg is current})
     context["scverse_ecosystem"] = groups
 
 

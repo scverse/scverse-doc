@@ -1,17 +1,21 @@
-{#- Shared footer: the boilerplate every scverse README already carries, rendered identically on every docs site. -#}
+{#- Shared footer: the boilerplate every scverse README already carries, rendered identically on every docs site.
+    The scverse lines are only for scverse’s own projects: on an ecosystem package they’d read as if scverse ran it.
+-#}
 <div class="scverse-footer-brand">
   <span>{%- if show_copyright and copyright %}© {{ copyright }}{% endif -%}</span>
-  <span>
-    <a href="https://scverse.org/">scverse</a> is a
-    <a href="https://numfocus.org/">NumFOCUS</a> affiliated project.
-  </span>
-  <span>
-    <a href="https://scverse.org/about/roles/">Governance</a>
-    ·
-    <a href="https://discourse.scverse.org/">Discourse</a>
-    ·
-    <a href="https://scverse.org/join/">Get involved</a>
-  </span>
+  {%- if scverse_kind in ("core", "infrastructure") %}
+    <span>
+      <a href="https://scverse.org/">scverse</a> is a
+      <a href="https://numfocus.org/">NumFOCUS</a> affiliated project.
+    </span>
+    <span>
+      <a href="https://scverse.org/about/roles/">Governance</a>
+      ·
+      <a href="https://discourse.scverse.org/">Discourse</a>
+      ·
+      <a href="https://scverse.org/join/">Get involved</a>
+    </span>
+  {%- endif %}
   {%- if last_updated %}
     <span>{% trans last_updated=last_updated|e %}Last updated on {{ last_updated }}.{% endtrans %}</span>
   {%- endif %}

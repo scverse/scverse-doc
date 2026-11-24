@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Added
+
+- the registry covers scverse’s infrastructure repositories (e.g. `scverse-doc`, `cookiecutter-scverse`) as `kind="infrastructure"` (#96)
+
+### Changed
+
+- the scverse branding depends on the package’s registry entry: ecosystem packages get the scverse menu and Discourse link, scverse’s own packages also the footer’s scverse lines and the announcement banner, and unregistered projects none of it (#96)
+
 ## [0.5.1]
 
 ### Fixed

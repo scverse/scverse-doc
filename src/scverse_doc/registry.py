@@ -72,11 +72,10 @@ _ACCENTS: dict[str, list[str]] = {
 DEFAULT_ACCENT = _ACCENTS.pop("scverse")[0]
 
 #: Upstream ``category`` -> the ``kind`` recorded here.
-#: ``core-infrastructure`` is skipped:
-#: those entries are repositories (governance, stats, the website), not packages.
-_KINDS: dict[str, Literal["core", "ecosystem"]] = {
+_KINDS: dict[str, Literal["core", "infrastructure", "ecosystem"]] = {
     "core-datastructure": "core",
     "core-framework": "core",
+    "core-infrastructure": "infrastructure",
     "ecosystem": "ecosystem",
 }
 
@@ -97,8 +96,9 @@ class Package:
     name: str
     """The package’s display name, e.g. ``"scvi-tools"``."""
 
-    kind: Literal["core", "ecosystem"]
-    """Whether the package is maintained by the core team or listed as an ecosystem package."""
+    kind: Literal["core", "infrastructure", "ecosystem"]
+    """Whether the package is maintained by the core team, is part of scverse’s own tooling
+    (e.g. this package, the cookiecutter, the website), or is listed as an ecosystem package."""
 
     docs: str
     """Where to send a reader – a link for humans, not necessarily a documentation root."""

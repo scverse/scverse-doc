@@ -30,4 +30,3 @@ navigation_depth = 3
 collapse_navigation = false
 pygments_light_style = "tango"
 pygments_dark_style = "monokai"
-announcement = "https://scverse.org/announcement.html"
