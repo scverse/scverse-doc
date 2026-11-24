@@ -11,12 +11,22 @@ import pytest
 from sphinx.errors import ConfigError
 
 import scverse_doc
-from scverse_doc.source import _configure_linkcode, _html_context, _linkcode_url, _Provider, _Source, _theme_options
+from scverse_doc.source import (
+    _configure_linkcode,
+    _html_context,
+    _linkcode_url,
+    _Provider,
+    _Source,
+    _StubCollector,
+    _theme_options,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    from sphinx.application import Sphinx
     from sphinx.config import Config
+    from sphinx.environment import BuildEnvironment
 
 
 def config(**overrides: str) -> Config:
@@ -209,3 +219,16 @@ def test_linkcode_only_resolves_python() -> None:
     app.config.linkcode_resolve = None
     _configure_linkcode(app)  # type: ignore[arg-type]
     assert app.config.linkcode_resolve("js", {"module": "", "fullname": "x"}) is None
+
+
+def test_stubs_merge_from_parallel_readers() -> None:
+    """Only the documents a worker read are taken from it, so stale entries it inherited don’t win."""
+    env = cast("BuildEnvironment", SimpleNamespace(scverse_autosummary_stubs={"api": {"generated/a.A": "a.A"}}))
+    other = cast(
+        "BuildEnvironment",
+        SimpleNamespace(scverse_autosummary_stubs={"api": {"generated/old": "old"}, "more": {"generated/b.B": "b.B"}}),
+    )
+    _StubCollector().merge_other(cast("Sphinx", None), env, {"more"}, other)
+    assert _StubCollector.object_name(env, "generated/a.A") == "a.A"
+    assert _StubCollector.object_name(env, "generated/b.B") == "b.B"
+    assert _StubCollector.object_name(env, "generated/old") is None

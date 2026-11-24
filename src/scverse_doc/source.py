@@ -287,7 +287,7 @@ def _object_url(source: _Source, name: str, srcdir: Path | None = None) -> str |
     """Link to the definition of the object with dotted `name`, or :data:`None` if it has no findable source."""
     try:
         _, obj, _, module = import_by_name(name)
-    except ImportExceptionGroup:
+    except ImportExceptionGroup:  # pragma: no cover
         return None
     # A submodule comes back as an attribute of its parent.
     module = obj.__name__ if inspect.ismodule(obj) else module
