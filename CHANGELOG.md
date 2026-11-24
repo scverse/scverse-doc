@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0](https://github.com/scverse/scverse-doc/compare/v0.5.3...v0.6.0) (2026-11-24)
+
+### Features
+
+* edit links for generated documents ([#100](https://github.com/scverse/scverse-doc/issues/100)) ([41b5779](https://github.com/scverse/scverse-doc/commit/41b5779b5ce41438dfb54431b43b725b7df8a7aa))
+
 ## [0.5.3](https://github.com/scverse/scverse-doc/compare/v0.5.2...v0.5.3) (2026-11-24)
 
 ### Bug Fixes
