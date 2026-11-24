@@ -294,22 +294,35 @@ def _object_url(source: _Source, name: str, srcdir: Path | None = None) -> str |
     return _linkcode_url(source, module, name.removeprefix(module).lstrip("."), srcdir)
 
 
-def _point_edit_button_at_code(
+def _point_edit_links_at_code(
     app: Sphinx, pagename: str, templatename: str, context: dict[str, object], doctree: nodes.document | None
 ) -> None:
-    """Make `pydata-sphinx-theme`’s edit button on autosummary stubs link to the documented object’s source.
+    """Make the edit links on autosummary stubs point at the documented object’s source.
 
-    Those pages are generated into the build’s source tree, so the theme’s link to them would 404.
-    Runs after the theme’s own ``html-page-context`` handler, whose link function it replaces.
+    Those pages are generated into the build’s source tree, so the themes’ links to them would 404.
+    Sets the per-page values each theme reads, before the themes’ own ``html-page-context`` handlers run.
     """
-    if "get_edit_provider_and_url" not in context or (source := _Source.from_config(app.config)) is None:
+    if (source := _Source.from_config(app.config)) is None or not source.provider:
         return
     if (name := _StubCollector.object_name(app.env, pagename)) is None:
         return
     if (url := _object_url(source, name, Path(app.srcdir))) is None:
-        context["theme_use_edit_page_button"] = False  # no source to point at, but never a dead link
-    else:
-        context["get_edit_provider_and_url"] = lambda: (source.provider.label, url)
+        # No source to point at: hide the links rather than have them 404.
+        context["page_source_suffix"] = ""  # pydata-sphinx-theme, sphinx-book-theme, furo
+        context[f"display_{source.provider.name}"] = False  # sphinx_rtd_theme
+        return
+    context.update(
+        {
+            # pydata-sphinx-theme and sphinx-book-theme; the comment passes the check for a `file_name` placeholder.
+            "edit_page_url_template": f"{url}{{# file_name #}}",
+            "edit_page_provider_name": source.provider.label,
+            # furo
+            "theme_source_edit_link": url,
+            "theme_source_view_link": url,
+            # sphinx_rtd_theme; copied, since it’s the environment’s own metadata
+            "meta": {**cast("dict[str, object]", context.get("meta") or {}), f"{source.provider.name}_url": url},
+        }
+    )
 
 
 def setup(app: Sphinx) -> ExtensionMetadata:
@@ -323,6 +336,7 @@ def setup(app: Sphinx) -> ExtensionMetadata:
     app.connect("builder-inited", _configure_linkcode)
     app.connect("builder-inited", _configure_theme)
     app.add_env_collector(_StubCollector)
-    app.connect("html-page-context", _point_edit_button_at_code, priority=600)
+    # Before pydata-sphinx-theme (500) and sphinx-book-theme (501) read the context.
+    app.connect("html-page-context", _point_edit_links_at_code, priority=499)
 
     return ExtensionMetadata(parallel_read_safe=True)

@@ -254,8 +254,9 @@ def test_prose_returns(autodoc: Path) -> None:
 
 
 @needs_full
-def test_edit_button_on_generated_pages_points_at_the_code(tmp_path: Path) -> None:
-    """Autosummary stubs exist only in the build, so their edit link goes to the documented object instead."""
+@pytest.mark.parametrize("theme", ["pydata_sphinx_theme", "furo", "sphinx_book_theme", "sphinx_rtd_theme"])
+def test_edit_links_on_generated_pages_point_at_the_code(tmp_path: Path, theme: str) -> None:
+    """Autosummary stubs exist only in the build, so their edit links go to the documented object instead."""
     src = shutil.copytree(
         ROOTS / "autodoc", tmp_path / "src", ignore=shutil.ignore_patterns("__pycache__", "generated")
     )
@@ -263,16 +264,17 @@ def test_edit_button_on_generated_pages_points_at_the_code(tmp_path: Path) -> No
         src,
         tmp_path,
         extensions=["scverse_doc.autodoc", "scverse_doc.napoleon", "scverse_doc.source"],
-        html_theme="pydata_sphinx_theme",
+        html_theme=theme,
         source_repository="https://github.com/scverse/pertpy",
     )
     html = tmp_path / "html"
     repo = "https://github.com/scverse/pertpy"
-    assert f"{repo}/edit/main/docs/index.rst" in (html / "index.html").read_text()
+    # Themes link real pages to their edit (or view) page.
+    assert re.search(rf"{repo}/(edit|blob)/main/docs/index\.rst", (html / "index.html").read_text())
     thing = (html / "generated" / "apimod.Thing.html").read_text()
     # Which directory depends on where this process first imported the root’s modules from.
     assert re.search(rf'href="{repo}/blob/main/\w+/apimod\.py#L\d+-L\d+"', thing)
-    assert f"{repo}/edit/main/docs/generated/" not in thing
+    assert not re.search(rf"{repo}/(edit|blob)/main/docs/generated/", thing)
     module = (html / "generated" / "apipkg.sub.deep.html").read_text()
     assert re.search(rf'href="{repo}/blob/main/\w+/apipkg/sub/deep\.py"', module)
 
