@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+### Fixed
+
+- the sticky article header’s shadow appears only once the page is scrolled, by working around a [lightningcss minification bug](https://github.com/parcel-bundler/lightningcss/issues/1369) (#98)
+
 ## [0.5.2]
 
 ### Added

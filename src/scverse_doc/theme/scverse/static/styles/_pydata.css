@@ -94,7 +94,7 @@ html:not(:has(.bd-header__inner)) {
     /* Where supported, only once the page is scrolled */
     @supports (animation-timeline: scroll()) {
         .bd-header-article {
-            /* Longhands: given `animation`, lightningcss folds the timeline into it, which Chromium rejects
+            /* Longhands: given `animation`, lightningcss folds the timeline into it, which browsers reject
              * (https://github.com/parcel-bundler/lightningcss/issues/1369) */
             animation-name: scverse-header-shadow;
             animation-timing-function: linear;
