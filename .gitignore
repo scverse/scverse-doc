@@ -28,3 +28,4 @@ __pycache__/
 docs/generated/
 docs/jupyter_execute/
 *.lock
+!.github/workflows/actions.lock

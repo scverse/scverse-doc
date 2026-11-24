@@ -6,11 +6,11 @@ permissions: {}
 jobs:
   check-title:
     name: Check title
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+    permissions:
+      pull-requests: read
     steps:
       # The squash-merged title is the commit message release-please builds the changelog from
-      - run: |
-          grep -Eq '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([^)]+\))?!?: .+' <<< "$TITLE" \
-            || { echo "::error::PR title “$TITLE” isn’t a conventional commit, e.g. “fix(theme): make logo fill sidebar”"; exit 1; }
+      - uses: amannn/action-semantic-pull-request@v6.1.2
         env:
-          TITLE: ${{ github.event.pull_request.title }}
+          GITHUB_TOKEN: ${{ github.token }}
