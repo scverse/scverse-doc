@@ -4,8 +4,6 @@
 buck-out/
 
 # Compiled files
-.venv/
-uv.lock
 __pycache__/
 .*cache/
 
@@ -16,7 +14,6 @@ __pycache__/
 
 # Tests and coverage
 /data/
-/node_modules/
 /.coverage*
 
 # docs
@@ -24,7 +21,5 @@ __pycache__/
 /docs/_build/
 
 # Local development
-.venv/
-docs/generated/
-docs/jupyter_execute/
-*.lock
+/.venv/
+/*.lock

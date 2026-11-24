@@ -2,18 +2,15 @@ name: PR
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
-permissions:
-  contents: read
+permissions: {}
 jobs:
-  check-changelog:
-    name: Check changelog
-    runs-on: ubuntu-latest
+  check-title:
+    name: Check title
+    runs-on: ubuntu-slim
+    permissions:
+      pull-requests: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-      - run: uv run scripts/check_changelog.py --pr="$PR" --title="$TITLE"
+      # The squash-merged title is the commit message release-please builds the changelog from
+      - uses: amannn/action-semantic-pull-request@v6.1.2
         env:
-          PR: ${{ github.event.pull_request.number }}
-          TITLE: ${{ github.event.pull_request.title }}
+          GITHUB_TOKEN: ${{ github.token }}
