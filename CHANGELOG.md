@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning][].
 
 ## [Unreleased]
 
+## [0.5.2]
+
 ### Added
 
 - the registry covers scverse’s infrastructure repositories (e.g. `scverse-doc`, `cookiecutter-scverse`) as `kind="infrastructure"` (#96)
@@ -114,7 +116,8 @@ and this project adheres to [Semantic Versioning][].
 - Read the Docs integration: version selector and search, both with dark mode
 - Autodoc, prose, and confval rendering extensions (from scverse-misc)
 
-[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.5.1...main
+[Unreleased]: https://github.com/scverse/scverse-doc/compare/v0.5.2...main
+[0.5.2]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.2
 [0.5.1]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.1
 [0.5.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.5.0
 [0.4.0]: https://github.com/scverse/scverse-doc/releases/tag/v0.4.0
